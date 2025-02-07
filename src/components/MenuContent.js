@@ -8,29 +8,28 @@ import Stack from "@mui/material/Stack";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import AnalyticsRoundedIcon from "@mui/icons-material/AnalyticsRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
-import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import { NavLink } from "react-router-dom";
 
 const mainListItems = [
-  { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "dashboard" },
-  { text: "Invoice", icon: <HomeRoundedIcon />, path: "invoice" },
-  { text: "Product", icon: <HomeRoundedIcon />, path: "product" },
-  { text: "Customers", icon: <PeopleRoundedIcon />, path: "customers" },
-  { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "suppliers" },
-  { text: "Purchase", icon: <HomeRoundedIcon />, path: "purchase" },
-  { text: "Stock", icon: <HomeRoundedIcon />, path: "stock" },
-  { text: "Bank", icon: <HomeRoundedIcon />, path: "bank" },
-  { text: "Income", icon: <HomeRoundedIcon />, path: "income" },
-  { text: "Loan", icon: <HomeRoundedIcon />, path: "loan" },
+  { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "/dashboard" },
+  { text: "Invoices", icon: <HomeRoundedIcon />, path: "/invoices" },
+  { text: "Products", icon: <HomeRoundedIcon />, path: "/products" },
+  { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
+  { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
+  { text: "Purchases", icon: <HomeRoundedIcon />, path: "/purchases" },
+  { text: "Stock", icon: <HomeRoundedIcon />, path: "/stock" },
+  { text: "Bank", icon: <HomeRoundedIcon />, path: "/bank" },
+  { text: "Incomes", icon: <HomeRoundedIcon />, path: "/incomes" },
+  { text: "Loan", icon: <HomeRoundedIcon />, path: "/loan" },
 ];
 
 const secondaryListItems = [
-  { text: "Settings", icon: <SettingsRoundedIcon />, path: "settings" },
-  { text: "About", icon: <InfoRoundedIcon />, path: "about" },
-  { text: "Feedback", icon: <HelpRoundedIcon />, path: "feedback" },
+  { text: "Settings", icon: <SettingsRoundedIcon />, path: "/settings" },
+  { text: "About", icon: <InfoRoundedIcon />, path: "/about" },
+  { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
 ];
 
 export default function MenuContent() {
@@ -41,10 +40,17 @@ export default function MenuContent() {
           <ListItem
             key={index}
             disablePadding
-            sx={{ display: "block" }}
             component={NavLink}
             to={item.path}
             style={{ textDecoration: "none", color: "white" }}
+            sx={{
+              display: "block",
+              "&.active": {
+                color: "text.primary",
+                bgcolor: "action.selected",
+                fontWeight: "fontWeightBold",
+              },
+            }}
           >
             <ListItemButton selected={index === 0}>
               <ListItemIcon>{item.icon}</ListItemIcon>

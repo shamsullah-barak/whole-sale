@@ -4,17 +4,17 @@ import { alpha } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import AppNavbar from "./components/AppNavbar";
-import Header from "./components/Header";
-import MainGrid from "./components/MainGrid";
-import SideMenu from "./components/SideMenu";
-import AppTheme from "./shared-theme/AppTheme";
+import AppNavbar from "../../components/AppNavbar";
+import Header from "../../components/Header";
+import MainGrid from "../../components/MainGrid";
+import SideMenu from "../../components/SideMenu";
+import AppTheme from "../../shared-theme/AppTheme";
 import {
   chartsCustomizations,
   dataGridCustomizations,
   datePickersCustomizations,
   treeViewCustomizations,
-} from "./theme/customizations";
+} from "../../theme/customizations";
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -23,7 +23,7 @@ const xThemeComponents = {
   ...treeViewCustomizations,
 };
 
-export default function Dashboard(props) {
+const MainDashboard = (props) => {
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
@@ -51,10 +51,13 @@ export default function Dashboard(props) {
             }}
           >
             <Header />
-            <MainGrid />
+            {/* <MainGrid /> */}
+            {props.children}
           </Stack>
         </Box>
       </Box>
     </AppTheme>
   );
-}
+};
+
+export default MainDashboard;

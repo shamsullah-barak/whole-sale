@@ -23,6 +23,10 @@ export default function Router() {
       element: <Dashboard />,
     },
     {
+      path: "/dashboard",
+      element: <Dashboard />,
+    },
+    {
       path: "/customers",
       element: <Customers />,
     },

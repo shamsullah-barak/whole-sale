@@ -11,7 +11,7 @@ import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const mainListItems = [
   { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "/dashboard" },
@@ -33,6 +33,7 @@ const secondaryListItems = [
 ];
 
 export default function MenuContent() {
+  const { pathname } = useLocation();
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
@@ -52,7 +53,7 @@ export default function MenuContent() {
               },
             }}
           >
-            <ListItemButton selected={index === 0}>
+            <ListItemButton selected={pathname === item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

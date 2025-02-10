@@ -8,7 +8,7 @@ import ColorModeIconDropdown from "../shared-theme/ColorModeIconDropdown";
 
 import Search from "./Search";
 
-export default function Header() {
+export default function Header({ title }) {
   return (
     <Stack
       direction="row"
@@ -22,7 +22,7 @@ export default function Header() {
       }}
       spacing={2}
     >
-      <NavbarBreadcrumbs />
+      <NavbarBreadcrumbs title={title} />
       <Stack direction="row" sx={{ gap: 1 }}>
         <Search />
         <CustomDatePicker />

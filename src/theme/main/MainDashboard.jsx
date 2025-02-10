@@ -50,7 +50,7 @@ const MainDashboard = (props) => {
               mt: { xs: 8, md: 0 },
             }}
           >
-            <Header />
+            <Header title={props.title} />
             {/* <MainGrid /> */}
             {props.children}
           </Stack>

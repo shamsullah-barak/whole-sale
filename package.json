@@ -13,6 +13,7 @@
     "@mui/x-tree-view": "^7.25.0",
     "@react-spring/web": "^9.7.5",
     "@reduxjs/toolkit": "^2.5.1",
+    "axios": "^1.7.9",
     "cra-template-redux": "2.0.0",
     "dayjs": "^1.11.13",
     "react": "^19.0.0",

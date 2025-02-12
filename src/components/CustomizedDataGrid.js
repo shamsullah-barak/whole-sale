@@ -1,11 +1,26 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { columns } from "../internals/data/gridData";
-import { useSelector } from "react-redux";
-import { selectProducts } from "../features/products/productSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchProductsAsync,
+  selectProducts,
+} from "../features/products/productSlice";
 
 const CustomizedDataGrid = () => {
+  const dispatch = useDispatch();
   const products = useSelector(selectProducts);
+  useEffect(() => {
+    const loadProducts = () => {
+      dispatch(fetchProductsAsync({ page: 1, limit: products.limitPerPage }));
+    };
+    loadProducts();
+  }, []);
+
+  const stateChanged = (data) => {
+    const { page, pageSize } = data;
+    dispatch(fetchProductsAsync({ page: page + 1, limit: pageSize }));
+  };
 
   return (
     <DataGrid
@@ -18,16 +33,13 @@ const CustomizedDataGrid = () => {
         pagination: { paginationModel: { pageSize: products?.limitPerPage } },
       }}
       pageSizeOptions={[10, 20, 50]}
+      onPaginationModelChange={(data) => stateChanged(data)}
       disableColumnResize
-      rowCount={products.totalRows} // Total number of records
-      paginationMode="server" // Enable server-side pagination
+      rowCount={products.totalRows}
+      paginationMode="server"
       pagination
       page={products.currentPage}
       pageSize={products.limitPerPage}
-      onPageChange={(newPage) => console.log({ newPage })}
-      onPageSizeChange={(newPageSize) => {
-        console.log({ newPageSize });
-      }}
       loading={products.loading}
       density="compact"
       slotProps={{

@@ -13,8 +13,9 @@ const initialState = {
 // async reducers
 export const fetchProductsAsync = createAsyncThunk(
   "products/fetchProducts",
-  async () => {
-    const products = await fetchProducts();
+  async ({ page, limit }) => {
+    console.log({ page, limit });
+    const products = await fetchProducts(page, limit);
     return products;
   }
 );

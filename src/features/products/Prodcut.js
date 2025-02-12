@@ -8,14 +8,6 @@ import { Button } from "@mui/material";
 import { NavLink } from "react-router-dom";
 
 const Products = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const loadProducts = () => {
-      dispatch(fetchProductsAsync());
-    };
-    loadProducts();
-  }, []);
-
   return (
     <MainDashboard title="Products">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>

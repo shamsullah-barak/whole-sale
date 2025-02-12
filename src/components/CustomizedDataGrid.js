@@ -1,20 +1,34 @@
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { columns } from "../internals/data/gridData";
+import { useSelector } from "react-redux";
+import { selectProducts } from "../features/products/productSlice";
 
-const CustomizedDataGrid = ({ products }) => {
+const CustomizedDataGrid = () => {
+  const products = useSelector(selectProducts);
+
   return (
     <DataGrid
-      rows={products}
+      rows={products?.products}
       columns={columns}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
       }
       initialState={{
-        pagination: { paginationModel: { pageSize: 20 } },
+        pagination: { paginationModel: { pageSize: products?.limitPerPage } },
       }}
       pageSizeOptions={[10, 20, 50]}
       disableColumnResize
+      rowCount={products.totalRows} // Total number of records
+      paginationMode="server" // Enable server-side pagination
+      pagination
+      page={products.currentPage}
+      pageSize={products.limitPerPage}
+      onPageChange={(newPage) => console.log({ newPage })}
+      onPageSizeChange={(newPageSize) => {
+        console.log({ newPageSize });
+      }}
+      loading={products.loading}
       density="compact"
       slotProps={{
         filterPanel: {

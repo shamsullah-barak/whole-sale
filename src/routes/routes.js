@@ -9,6 +9,7 @@ import Stock from "../pages/Stock";
 import Suppliers from "../pages/Suppliers";
 import Bank from "../pages/Bank";
 import Products from "../features/products/Prodcut";
+import CreateProduct from "../features/products/CreateProduct";
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +46,10 @@ export default function Router() {
     {
       path: "/products",
       element: <Products />,
+    },
+    {
+      path: "/products/add",
+      element: <CreateProduct />,
     },
     {
       path: "/purchases",

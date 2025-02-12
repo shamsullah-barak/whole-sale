@@ -75,7 +75,7 @@ export function renderAvatar(params) {
 }
 
 export const columns = [
-  { field: "Name", headerName: "Name", flex: 1.5, minWidth: 200 },
+  { field: "name", headerName: "Name", flex: 1.5, minWidth: 200 },
   {
     field: "unit",
     headerName: "unit",
@@ -86,32 +86,32 @@ export const columns = [
   {
     field: "sku",
     headerName: "sku",
-    headerAlign: "right",
-    align: "right",
+    headerAlign: "center",
+    align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
     field: "currentStock",
     headerName: "Current Stock",
-    headerAlign: "right",
-    align: "right",
+    headerAlign: "center",
+    align: "center",
     flex: 1,
     minWidth: 100,
   },
   {
     field: "mainStockLevel",
     headerName: "Stock Level",
-    headerAlign: "right",
-    align: "right",
+    headerAlign: "center",
+    align: "center",
     flex: 1,
     minWidth: 120,
   },
   {
     field: "purchasedPrice",
     headerName: "Purchased Price",
-    headerAlign: "right",
-    align: "right",
+    headerAlign: "center",
+    align: "center",
     flex: 1,
     minWidth: 100,
   },

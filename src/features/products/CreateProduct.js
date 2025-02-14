@@ -78,8 +78,10 @@ const CreateProduct = () => {
             purchasedPrice: "",
             salePrice: "",
             status: "active",
-            companyId: "",
-            categoryId: "",
+            // companyId: "",
+            // categoryId: "",
+            companyName: "",
+            category: "",
           }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
@@ -193,7 +195,7 @@ const CreateProduct = () => {
                     <MenuItem value="inactive">Inactive</MenuItem>
                   </Field>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <Field
                     as={TextField}
                     select
@@ -207,8 +209,28 @@ const CreateProduct = () => {
                       </MenuItem>
                     ))}
                   </Field>
+                </Grid> */}
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    label="Company Name"
+                    name="companyName"
+                    error={touched.companyName && !!errors.companyName}
+                    helperText={touched.companyName && errors.companyName}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    label="Category "
+                    name="category"
+                    error={touched.category && !!errors.category}
+                    helperText={touched.category && errors.category}
+                  />
+                </Grid>
+                {/* <Grid item xs={12} sm={6}>
                   <Field
                     as={TextField}
                     select
@@ -222,7 +244,7 @@ const CreateProduct = () => {
                       </MenuItem>
                     ))}
                   </Field>
-                </Grid>
+                </Grid> */}
               </Grid>
               <Button
                 type="submit"

@@ -4,12 +4,13 @@ import Loans from "../pages/Loan";
 import Customers from "../pages/Customers";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
-import Purchases from "../pages/Purchases";
 import Stock from "../pages/Stock";
 import Suppliers from "../pages/Suppliers";
 import Bank from "../pages/Bank";
 import Products from "../features/products/Prodcut";
 import CreateProduct from "../features/products/CreateProduct";
+import Purchases from "../features/purchases/Purchase";
+import CreatePurchases from "../features/purchases/CreatePurchase";
 
 // ----------------------------------------------------------------------
 
@@ -54,6 +55,10 @@ export default function Router() {
     {
       path: "/purchases",
       element: <Purchases />,
+    },
+    {
+      path: "/purchases/add",
+      element: <CreatePurchases />,
     },
     {
       path: "/stock",

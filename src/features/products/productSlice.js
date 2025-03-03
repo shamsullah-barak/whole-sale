@@ -26,9 +26,17 @@ export const productSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchProductsAsync.pending, (state) => {
+        console.log("product pending state");
         state.loading = true;
       })
+      .addCase(fetchProductsAsync.rejected, (state) => {
+        console.log({ me: "Request failed" });
+      })
       .addCase(fetchProductsAsync.fulfilled, (state, action) => {
+        console.log({
+          message: "product fetch state",
+          payload: action.payload,
+        });
         state.loading = false;
         state.products = action.payload.results;
         state.currentPage = action.payload.page;

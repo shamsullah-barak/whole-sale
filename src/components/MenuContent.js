@@ -19,6 +19,7 @@ const mainListItems = [
   { text: "Products", icon: <HomeRoundedIcon />, path: "/products" },
   { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
+  { text: "Accounts", icon: <PeopleRoundedIcon />, path: "/accounts" },
   { text: "Purchases", icon: <HomeRoundedIcon />, path: "/purchases" },
   { text: "Stock", icon: <HomeRoundedIcon />, path: "/stock" },
   { text: "Bank", icon: <HomeRoundedIcon />, path: "/bank" },

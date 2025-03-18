@@ -8,6 +8,7 @@ const initialState = {
   limitPerPage: 10,
   loading: false,
   totalRows: 0,
+  selectedAccount: null,
 };
 
 // async reducers

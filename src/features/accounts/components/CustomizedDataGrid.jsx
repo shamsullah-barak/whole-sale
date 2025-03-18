@@ -23,7 +23,8 @@ const CustomizedDataGrid = () => {
   };
 
   const handleRowClick = (params) => {
-    navigate(`/accounts/${params.row.id}`);
+    console.log({ params: params.row });
+    dispatch(setSelectedAccount(params.row));
   };
 
   return (

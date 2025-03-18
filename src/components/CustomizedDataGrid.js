@@ -2,10 +2,8 @@ import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { columns } from "../internals/data/gridData";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchProductsAsync,
-  selectProducts,
-} from "../features/products/productSlice";
+import { fetchProductsAsync } from "../store/slices/product.slice";
+import { selectProducts } from "../store/selectors/product.selector";
 
 const CustomizedDataGrid = () => {
   const dispatch = useDispatch();

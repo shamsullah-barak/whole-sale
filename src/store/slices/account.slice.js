@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchPurchases } from "./purchaseAPI";
+import { fetchAccounts } from "../actions/account.actions";
 
 const initialState = {
-  purchases: [],
+  accounts: [],
   currentPage: 1,
   totalPages: 1,
   limitPerPage: 10,
@@ -11,26 +11,26 @@ const initialState = {
 };
 
 // async reducers
-export const fetchPurchasesAsync = createAsyncThunk(
-  "purchases/fetchPurchases",
+export const fetchAccountsAsync = createAsyncThunk(
+  "accounts/fetchAccounts",
   async ({ page, limit }) => {
-    const purchases = await fetchPurchases(page, limit);
-    return purchases;
+    const accounts = await fetchAccounts(page, limit);
+    return accounts;
   }
 );
 
-export const purchaseSlice = createSlice({
-  name: "purchases",
+export const accountSlice = createSlice({
+  name: "accounts",
   initialState,
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPurchasesAsync.pending, (state) => {
+      .addCase(fetchAccountsAsync.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchPurchasesAsync.fulfilled, (state, action) => {
+      .addCase(fetchAccountsAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.purchases = action.payload.results;
+        state.accounts = action.payload.results;
         state.currentPage = action.payload.page;
         state.limitPerPage = action.payload.limit;
         state.totalPages = action.payload.totalPages;
@@ -38,9 +38,3 @@ export const purchaseSlice = createSlice({
       });
   },
 });
-
-// state selector
-export const selectPurchases = (state) => state.purchases;
-
-// reducer
-export default purchaseSlice.reducer;

@@ -12,6 +12,7 @@ import CreateProduct from "../features/products/CreateProduct";
 import Purchases from "../features/purchases/Purchase";
 import CreatePurchases from "../features/purchases/CreatePurchase";
 import Accounts from "../features/accounts/Accounts";
+import SubAccount from "../features/accounts/sub";
 
 // ----------------------------------------------------------------------
 
@@ -76,6 +77,10 @@ export default function Router() {
     {
       path: "/accounts",
       element: <Accounts />,
+    },
+    {
+      path: "/accounts/:accountId",
+      element: <SubAccount />,
     },
     {
       path: "404",

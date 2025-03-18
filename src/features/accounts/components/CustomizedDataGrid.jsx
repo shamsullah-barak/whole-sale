@@ -3,9 +3,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { columns } from "../data/gridData";
 import { fetchAccountsAsync, selectAccounts } from "../accountSlice";
+import { useNavigate } from "react-router-dom";
 
 const CustomizedDataGrid = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const accounts = useSelector(selectAccounts);
   useEffect(() => {
     const loadProducts = () => {
@@ -19,10 +21,16 @@ const CustomizedDataGrid = () => {
     dispatch(fetchAccountsAsync({ page: page + 1, limit: pageSize }));
   };
 
+  const handleRowClick = (params) => {
+    navigate(`/accounts/${params.row.id}`);
+  };
+
   return (
     <DataGrid
       rows={accounts?.accounts}
       columns={columns}
+      getRowId={(row) => row.id}
+      onRowClick={handleRowClick}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
       }

@@ -4,7 +4,7 @@
 // import { TextField, MenuItem, Button, Grid } from "@mui/material";
 // import axios from "axios";
 
-// const PurchaseForm = () => {
+// const AccountForm = () => {
 //   const createPurchaseHandler = async (data) => {
 //     try {
 //       const response = await axios.post(
@@ -159,13 +159,13 @@
 //   );
 // };
 
-// export default PurchaseForm;
+// export default AccountForm;
 
 import React, { useState } from "react";
 import { TextField, MenuItem, Button, Grid } from "@mui/material";
 import axios from "axios";
 
-const PurchaseForm = () => {
+const AccountForm = () => {
   const [purchase, setPurchase] = useState({
     note: "",
     purchasedPrice: 0,
@@ -327,4 +327,4 @@ const PurchaseForm = () => {
   );
 };
 
-export default PurchaseForm;
+export default AccountForm;

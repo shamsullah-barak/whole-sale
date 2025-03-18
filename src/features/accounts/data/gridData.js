@@ -12,46 +12,49 @@ function renderStatus(status) {
 
 export const columns = [
   {
-    field: "paymentStatus",
-    headerName: "status",
+    field: "name",
+    headerName: "name",
     flex: 0.5,
     minWidth: 80,
-    renderCell: (params) => renderStatus(params.value),
   },
   {
-    field: "quantity",
-    headerName: "quantity",
+    field: "province",
+    headerName: "province",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "purchasedPrice",
-    headerName: "purchased price",
+    field: "district",
+    headerName: "district",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
-    valueFormatter: (params) => {
-      return params ? params.toFixed(2) : 0.0;
-    },
   },
   {
-    field: "totalPrice",
-    headerName: "total cost",
+    field: "accountType",
+    headerName: "account type",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
-    valueFormatter: (params) => {
-      return params ? params.toFixed(2) : 0.0;
-    },
   },
-
   {
-    field: "notes",
-    headerName: "Notes",
+    field: "phoneNumber",
+    headerName: "phone number",
+    headerAlign: "center",
+    align: "center",
     flex: 1,
+    minWidth: 80,
+  },
+  {
+    field: "whatsAppNumber",
+    headerName: "whatsApp",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
+    minWidth: 80,
   },
 ];

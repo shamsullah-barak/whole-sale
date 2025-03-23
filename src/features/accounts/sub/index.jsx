@@ -1,11 +1,13 @@
 import React from "react";
 import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../../theme/main/MainDashboard";
-import { Button } from "@mui/material";
-import { NavLink } from "react-router-dom";
 import SubAccountForm from "./subAccount";
+import { useSelector } from "react-redux";
+import { getSelectedAccount } from "../../../store/selectors/account.selector";
 
 const SubAccount = () => {
+  const selectedAccount = useSelector(getSelectedAccount);
+
   return (
     <MainDashboard title="Sub Account">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>

@@ -3,7 +3,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { columns } from "../data/gridData";
 import { useNavigate } from "react-router-dom";
-import { fetchAccountsAsync } from "../../../store/slices/account.slice";
+import {
+  fetchAccountsAsync,
+  setSelectedAccount,
+} from "../../../store/slices/account.slice";
 import { selectAccounts } from "../../../store/selectors/account.selector";
 
 const CustomizedDataGrid = () => {
@@ -23,13 +26,14 @@ const CustomizedDataGrid = () => {
   };
 
   const handleRowClick = (params) => {
-    console.log({ params: params.row });
-    dispatch(setSelectedAccount(params.row));
+    dispatch(setSelectedAccount({ account: params.row }));
+    navigate(`/accounts/${params.row.id}`);
   };
 
   return (
     <DataGrid
       rows={accounts?.accounts}
+      style={{ cursor: "pointer" }}
       columns={columns}
       getRowId={(row) => row.id}
       onRowClick={handleRowClick}

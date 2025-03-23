@@ -24,6 +24,15 @@ export const accountSlice = createSlice({
   name: "accounts",
   initialState,
 
+  reducers: {
+    setSelectedAccount: (state, action) => {
+      state.selectedAccount = action.payload.account;
+    },
+    unSetSelectedAccount: (state, action) => {
+      state.selectedAccount = null;
+    },
+  },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchAccountsAsync.pending, (state) => {
@@ -39,3 +48,6 @@ export const accountSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedAccount, unSetSelectedAccount } =
+  accountSlice.actions;

@@ -9,7 +9,7 @@ const CreatePurchases = () => {
   return (
     <MainDashboard title="Purchases > Create">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
           <NavLink to="/purchases">
             <Button variant="outlined" sx={{ width: "100px" }}>
               Back

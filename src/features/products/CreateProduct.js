@@ -52,7 +52,7 @@ const CreateProduct = () => {
   return (
     <MainDashboard title="Products">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
           <NavLink to="/products">
             <Button variant="outlined" sx={{ width: "100px" }}>
               Back
@@ -98,7 +98,7 @@ const CreateProduct = () => {
           {({ handleChange, values, errors, touched, isSubmitting }) => (
             <Form>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -108,7 +108,7 @@ const CreateProduct = () => {
                     helperText={touched.name && errors.name}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -119,7 +119,7 @@ const CreateProduct = () => {
                     helperText={touched.unit && errors.unit}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -127,7 +127,7 @@ const CreateProduct = () => {
                     name="description"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -137,7 +137,7 @@ const CreateProduct = () => {
                     helperText={touched.sku && errors.sku}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -147,7 +147,7 @@ const CreateProduct = () => {
                     helperText={touched.barCode && errors.barCode}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -156,7 +156,7 @@ const CreateProduct = () => {
                     type="number"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -165,7 +165,7 @@ const CreateProduct = () => {
                     type="number"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -174,7 +174,7 @@ const CreateProduct = () => {
                     type="number"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -183,7 +183,7 @@ const CreateProduct = () => {
                     type="number"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     select
@@ -195,7 +195,7 @@ const CreateProduct = () => {
                     <MenuItem value="inactive">Inactive</MenuItem>
                   </Field>
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
+                {/* <Grid  xs={12} sm={6}>
                   <Field
                     as={TextField}
                     select
@@ -210,7 +210,7 @@ const CreateProduct = () => {
                     ))}
                   </Field>
                 </Grid> */}
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -220,7 +220,7 @@ const CreateProduct = () => {
                     helperText={touched.companyName && errors.companyName}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <Field
                     as={TextField}
                     fullWidth
@@ -230,7 +230,7 @@ const CreateProduct = () => {
                     helperText={touched.category && errors.category}
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
+                {/* <Grid  xs={12} sm={6}>
                   <Field
                     as={TextField}
                     select

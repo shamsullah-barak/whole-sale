@@ -15,11 +15,12 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const mainListItems = [
   { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "/dashboard" },
+  { text: "Journal", icon: <AnalyticsRoundedIcon />, path: "/journal" },
+  { text: "Ledgers", icon: <PeopleRoundedIcon />, path: "/ledgers" },
   { text: "Invoices", icon: <HomeRoundedIcon />, path: "/invoices" },
   { text: "Products", icon: <HomeRoundedIcon />, path: "/products" },
   { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
-  { text: "Accounts", icon: <PeopleRoundedIcon />, path: "/accounts" },
   { text: "Purchases", icon: <HomeRoundedIcon />, path: "/purchases" },
   { text: "Stock", icon: <HomeRoundedIcon />, path: "/stock" },
   { text: "Bank", icon: <HomeRoundedIcon />, path: "/bank" },

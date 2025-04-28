@@ -11,8 +11,9 @@ import Products from "../features/products/Product";
 import CreateProduct from "../features/products/CreateProduct";
 import Purchases from "../features/purchases/Purchase";
 import CreatePurchases from "../features/purchases/CreatePurchase";
-import Accounts from "../features/accounts/Accounts";
+import Ledgers from "../features/accounts/Accounts";
 import SubAccount from "../features/accounts/sub";
+import Journal from "../features/journal";
 
 // ----------------------------------------------------------------------
 
@@ -75,12 +76,16 @@ export default function Router() {
       element: <Bank />,
     },
     {
-      path: "/accounts",
-      element: <Accounts />,
+      path: "/ledgers",
+      element: <Ledgers />,
     },
     {
-      path: "/accounts/:accountId",
+      path: "/ledgers/:accountId",
       element: <SubAccount />,
+    },
+    {
+      path: "/journal",
+      element: <Journal />,
     },
     {
       path: "404",

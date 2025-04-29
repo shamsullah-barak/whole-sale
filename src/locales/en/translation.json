@@ -1,0 +1,15 @@
+{
+  "Dashboard": "Dashboard",
+  "Journal": "Journal",
+  "Ledgers": "Ledgers",
+  "Invoices": "Invoices",
+  "Products": "Products",
+  "Customers": "Customers",
+  "Suppliers": "Suppliers",
+  "Purchases": "Purchases",
+  "Stock": "Stock",
+  "Bank": "Bank",
+  "Incomes": "Incomes",
+  "Loans": "Loans",
+  "Settings": "Settings"
+}

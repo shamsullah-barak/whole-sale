@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
+import { useTranslation } from "react-i18next";
 
 const columns = [
   {
@@ -132,23 +133,7 @@ const JournalList = () => {
 
 const Journal = () => {
   return (
-    // <MainDashboard title="Journal">
-    //   <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-    //     <Grid xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
-    //       <JournalList />
-    //       <JournalForm />
-    //     </Grid>
-    //   </Grid>
-    // </MainDashboard>
-
     <MainDashboard title="Journals">
-      {/* <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-      <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
-        <NavLink to="/products/add">
-          <Button variant="outlined">New Product</Button>
-        </NavLink>
-      </Grid>
-    </Grid> */}
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", height: "100%" }}>
           <JournalList />
@@ -175,6 +160,7 @@ const financialTerms = [
 const JournalForm = () => {
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
+  const { t } = useTranslation();
 
   const [journalEntry, setJournalEntry] = useState({
     description: "",
@@ -223,11 +209,39 @@ const JournalForm = () => {
           >
             {financialTerms.map((item, index) => (
               <MenuItem key={index} value={item}>
-                {item}
+                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
+
+        {/* {journalEntry.status === "Purchase of goods" && (
+          <>
+            <Grid xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="select product"
+                name="productId"
+                value={journalEntry.productId}
+                onChange={(event) =>
+                  setJournalEntry({
+                    ...journalEntry,
+                    productId: event.target.value,
+                  })
+                }
+                style={{ minWidth: "200px" }}
+              >
+                {financialTerms.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </>
+        )} */}
+
         <Grid xs={12} sm={6}>
           <TextField
             fullWidth

@@ -3,10 +3,10 @@ import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../../theme/main/MainDashboard";
 import SubAccountForm from "./subAccount";
 import { useSelector } from "react-redux";
-import { getSelectedAccount } from "../../../store/selectors/account.selector";
+import { getSelectedLedger } from "../../../store/selectors/ledgers.selector";
 
 const SubAccount = () => {
-  const selectedAccount = useSelector(getSelectedAccount);
+  const selectedAccount = useSelector(getSelectedLedger);
 
   return (
     <MainDashboard title="Sub Account">

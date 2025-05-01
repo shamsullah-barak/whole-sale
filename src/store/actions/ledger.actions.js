@@ -1,10 +1,10 @@
 import axios from "axios";
 
 // A mock function to mimic making an async request for data
-export const fetchAccounts = async (page, limit) => {
+export const fetchLedgers = async (page, limit) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/accounts?page=${page}&limit=${limit}`
+      `http://localhost:5000/api/ledgers?page=${page}&limit=${limit}`
     );
     console.log({ res: response.data });
     return response.data;

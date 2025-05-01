@@ -1,16 +1,15 @@
 import React from "react";
 import MainDashboard from "../../theme/main/MainDashboard";
 import { NavLink } from "react-router-dom";
-
 import { Button, Typography, Grid, Paper } from "@mui/material";
-import PurchaseForm from "./PurchaseForm";
+import LedgerForm from "./LedgerForm";
 
-const CreatePurchases = () => {
+const CreateLedger = () => {
   return (
-    <MainDashboard title="Purchases > Create">
+    <MainDashboard title="Ledgers > Create">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
-          <NavLink to="/purchases">
+          <NavLink to="/ledgers">
             <Button variant="outlined" sx={{ width: "100px" }}>
               Back
             </Button>
@@ -20,12 +19,12 @@ const CreatePurchases = () => {
 
       <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
         <Typography variant="h5" gutterBottom>
-          Create Purchase
+          Create Ledger
         </Typography>
-        <PurchaseForm />
+        <LedgerForm />
       </Paper>
     </MainDashboard>
   );
 };
 
-export default CreatePurchases;
+export default CreateLedger;

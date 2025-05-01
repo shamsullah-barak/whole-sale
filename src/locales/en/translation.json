@@ -11,5 +11,15 @@
   "Bank": "Bank",
   "Incomes": "Incomes",
   "Loans": "Loans",
-  "Settings": "Settings"
+  "Settings": "Settings",
+  "Money deposit": "Money deposit",
+  "Money withdrawal": "Money withdrawal",
+  "Issuing a remittance": "Issuing a remittance",
+  "Receiving a remittance": "Receiving a remittance",
+  "Purchase of goods": "Purchase of goods",
+  "Purchase return": "Purchase return",
+  "Sale of goods": "Sale of goods",
+  "Sales return": "Sales return",
+  "Settlement of balance": "Settlement of balance",
+  "Settlement of receivables": "Settlement of receivables"
 }

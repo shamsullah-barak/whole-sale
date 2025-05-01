@@ -11,5 +11,15 @@
   "Bank": "بانک",
   "Incomes": "ګټه",
   "Loans": "پورونه",
-  "Settings": "تیظیمات"
+  "Settings": "تیظیمات",
+  "Money deposit": "د پیسو جمع",
+  "Money withdrawal": "د پیسو ایستل",
+  "Issuing a remittance": "حواله ایستل",
+  "Receiving a remittance": "حواله جمع",
+  "Purchase of goods": "د اجناسو رانیول",
+  "Purchase return": "خرید واپسي",
+  "Sale of goods": "د اجناسو فروش",
+  "Sales return": "فروش واپسی",
+  "Settlement of balance": "تصفیه باقي",
+  "Settlement of receivables": "تصفیه طلب"
 }

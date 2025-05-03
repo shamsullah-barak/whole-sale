@@ -15,10 +15,10 @@ const financialTerms = [
   "Settlement of receivables",
 ];
 
-const SubAccountForm = () => {
-  const [purchase, setPurchase] = useState({
+const SubLedgerForm = () => {
+  const [ledger, setLedger] = useState({
     note: "",
-    purchasedPrice: 0,
+    price: 0,
     totalPrice: 0,
     salePrice: 0,
     status: "paid",
@@ -27,22 +27,22 @@ const SubAccountForm = () => {
     quantity: 0,
   });
 
-  // purchase handler
+  // ledger handler
   const createPurchaseHandler = async (event) => {
     event.preventDefault(event);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/purchases",
-        purchase,
+        "http://localhost:5000/api/ledgers",
+        ledger,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      setPurchase({
+      setLedger({
         note: "",
-        purchasedPrice: 0,
+        price: 0,
         totalPrice: 0,
         salePrice: 0,
         status: "paid",
@@ -64,9 +64,9 @@ const SubAccountForm = () => {
             fullWidth
             label="Status"
             name="status"
-            value={purchase.status}
+            value={ledger.status}
             onChange={(event) =>
-              setPurchase({ ...purchase, status: event.target.value })
+              setLedger({ ...ledger, status: event.target.value })
             }
           >
             {financialTerms.map((item, index) => (
@@ -83,12 +83,12 @@ const SubAccountForm = () => {
             label="Quantity"
             name="quantity"
             type="number"
-            value={purchase.quantity}
+            value={ledger.quantity}
             onChange={(event) =>
-              setPurchase({
-                ...purchase,
+              setLedger({
+                ...ledger,
                 quantity: event.target.value,
-                totalPrice: purchase.purchasedPrice * event.target.value,
+                totalPrice: ledger.price * event.target.value,
               })
             }
           />
@@ -108,4 +108,4 @@ const SubAccountForm = () => {
   );
 };
 
-export default SubAccountForm;
+export default SubLedgerForm;

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
+import { selectLedgers } from "../../store/selectors/ledgers.selector";
 
 const columns = [
   {
@@ -43,6 +44,7 @@ const columns = [
 ];
 
 const JournalList = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const journals = useSelector(selectJournals);
@@ -71,7 +73,15 @@ const JournalList = () => {
     <>
       {journals.journals.length === 0 ? (
         <>
-          <div>No Data found</div>
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "50px",
+              marginBottom: "50px",
+            }}
+          >
+            {t("No Data found")}
+          </div>
         </>
       ) : (
         <>
@@ -132,8 +142,10 @@ const JournalList = () => {
 };
 
 const Journal = () => {
+  const { t } = useTranslation();
+
   return (
-    <MainDashboard title="Journals">
+    <MainDashboard title={t("Journal")}>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", height: "100%" }}>
           <JournalList />
@@ -160,6 +172,7 @@ const financialTerms = [
 const JournalForm = () => {
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
+  const ledgers = useSelector(selectLedgers);
   const { t } = useTranslation();
 
   const [journalEntry, setJournalEntry] = useState({
@@ -214,6 +227,25 @@ const JournalForm = () => {
             ))}
           </TextField>
         </Grid>
+
+        {journalEntry.status === "Money deposit" && (
+          <>
+            <Grid xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="select ledger"
+                style={{ minWidth: "200px" }}
+              >
+                {ledgers.ledgers?.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item.ledgerType} د {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </>
+        )}
 
         {/* {journalEntry.status === "Purchase of goods" && (
           <>

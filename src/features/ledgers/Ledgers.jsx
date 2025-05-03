@@ -11,6 +11,7 @@ import {
   setSelectedLedger,
 } from "../../store/slices/ledger.slice";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
+import { useTranslation } from "react-i18next";
 
 export const columns = [
   {
@@ -36,8 +37,8 @@ export const columns = [
     minWidth: 80,
   },
   {
-    field: "accountType",
-    headerName: "account type",
+    field: "ledgerType",
+    headerName: "ledger type",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -78,7 +79,7 @@ const CustomizedDataGrid = () => {
   };
 
   const handleRowClick = (params) => {
-    dispatch(setSelectedLedger({ account: params.row }));
+    dispatch(setSelectedLedger({ ledger: params.row }));
     navigate(`/ledgers/${params.row.id}`);
   };
 
@@ -136,12 +137,13 @@ const CustomizedDataGrid = () => {
 };
 
 const Ledgers = () => {
+  const { t } = useTranslation();
   return (
-    <MainDashboard title="Ledgers">
+    <MainDashboard title="Ledger">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
           <NavLink to="/ledgers/create">
-            <Button variant="outlined">New Ledger</Button>
+            <Button variant="outlined">{t("New Ledger")}</Button>
           </NavLink>
         </Grid>
       </Grid>

@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { TextField, MenuItem, Button, Grid } from "@mui/material";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const LedgerForm = () => {
+  const { t } = useTranslation();
   const [ledger, setLedger] = useState({
-    note: "",
-    price: 0,
-    totalPrice: 0,
-    salePrice: 0,
-    status: "paid",
-    companyName: "",
-    category: "",
-    quantity: 0,
+    name: "",
+    district: "",
+    ledgerType: "paid",
+    phoneNumber: "",
+    whatsAppNumber: "",
+    province: "",
   });
 
   // ledger handler
@@ -28,14 +28,13 @@ const LedgerForm = () => {
         }
       );
       setLedger({
-        note: "",
-        price: 0,
-        totalPrice: 0,
-        salePrice: 0,
-        status: "paid",
-        companyName: "",
-        category: "",
-        quantity: 0,
+        name: "",
+        province: "",
+        district: "",
+        ledgerType: "",
+        phoneNumber: "",
+        whatsAppNumber: "",
+        province: "",
       });
     } catch (error) {
       console.log(error);
@@ -48,26 +47,25 @@ const LedgerForm = () => {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Name | Note | Description"
-            name="note"
-            value={ledger.note}
+            label="Name"
+            name="name"
+            value={ledger.name}
             onChange={(event) =>
-              setLedger({ ...ledger, note: event.target.value })
+              setLedger({ ...ledger, name: event.target.value })
             }
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Ledger Price"
-            name="price"
-            type="number"
-            value={ledger.price}
+            label="province"
+            name="province"
+            type="text"
+            value={ledger.province}
             onChange={(event) =>
               setLedger({
                 ...ledger,
-                price: event.target.value,
-                totalPrice: ledger.quantity * event.target.value,
+                province: event.target.value,
               })
             }
           />
@@ -75,80 +73,66 @@ const LedgerForm = () => {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Quantity"
-            name="quantity"
-            type="number"
-            value={ledger.quantity}
+            label="district"
+            name="district"
+            type="text"
+            value={ledger.district}
             onChange={(event) =>
-              setLedger({
-                ...ledger,
-                quantity: event.target.value,
-                totalPrice: ledger.price * event.target.value,
-              })
+              setLedger({ ...ledger, district: event.target.value })
             }
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField
-            fullWidth
-            label="Total Price"
-            name="totalPrice"
-            type="number"
-            value={ledger.quantity * ledger.price}
-            disabled={true}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Sale Price"
-            name="salePrice"
-            type="number"
-            value={ledger.salePrice}
-            onChange={(event) =>
-              setLedger({ ...ledger, salePrice: event.target.value })
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
             select
             fullWidth
-            label="Status"
-            name="status"
-            value={ledger.status}
+            label="Ledger Type"
+            name="ledgerType"
+            value={ledger.ledgerType}
             onChange={(event) =>
-              setLedger({ ...ledger, status: event.target.value })
+              setLedger({ ...ledger, ledgerType: event.target.value })
             }
           >
-            <MenuItem value="paid">Paid</MenuItem>
-            <MenuItem value="partial">Partial</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="afghani">Afghani</MenuItem>
+            <MenuItem value="dollar">Dollar</MenuItem>
+            <MenuItem value="rupee">Rupee</MenuItem>
           </TextField>
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Company Name"
-            name="companyName"
-            value={ledger.companyName}
+            label="Phone Number"
+            name="phoneNumber"
+            value={ledger.phoneNumber}
             onChange={(event) =>
-              setLedger({ ...ledger, companyName: event.target.value })
+              setLedger({ ...ledger, phoneNumber: event.target.value })
             }
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Category "
-            name="category"
-            value={ledger.category}
+            label="whatsAppNumber "
+            name="whatsAppNumber"
+            value={ledger.whatsAppNumber}
             onChange={(event) =>
-              setLedger({ ...ledger, category: event.target.value })
+              setLedger({ ...ledger, whatsAppNumber: event.target.value })
             }
           />
         </Grid>
+        {/* <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("amount")}
+            name="amount"
+            type="number"
+            value={ledger.amount}
+            onChange={(event) =>
+              setLedger({ ...ledger, amount: event.target.value })
+            }
+          />
+        </Grid> */}
       </Grid>
       <Button
         type="submit"
@@ -158,7 +142,7 @@ const LedgerForm = () => {
         style={{ marginTop: 20 }}
         onClick={createLedgerHandler}
       >
-        Create Ledger
+        {t("Create Ledger")}
       </Button>
     </form>
   );

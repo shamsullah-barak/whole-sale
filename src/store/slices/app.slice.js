@@ -13,11 +13,16 @@ export const appSlice = createSlice({
   reducers: {
     changeLanguage: (state, action) => {
       state.language = action.payload.language;
+      state.appLoading = true;
       state.selectedDirection = ["ps", "dr"].includes(action.payload.language)
         ? "rtl"
         : "ltr";
     },
+
+    closeAppLoading: (state) => {
+      state.appLoading = false;
+    },
   },
 });
 
-export const { changeLanguage } = appSlice.actions;
+export const { changeLanguage, closeAppLoading } = appSlice.actions;

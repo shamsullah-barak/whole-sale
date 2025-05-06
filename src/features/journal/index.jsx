@@ -9,6 +9,7 @@ import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
+import { selectDirection } from "../../store/selectors/app.selector";
 
 const columns = [
   {
@@ -173,6 +174,7 @@ const JournalForm = () => {
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
   const ledgers = useSelector(selectLedgers);
+  const selectedDirection = useSelector(selectDirection);
   const { t } = useTranslation();
 
   const [journalEntry, setJournalEntry] = useState({
@@ -212,7 +214,7 @@ const JournalForm = () => {
           <TextField
             select
             fullWidth
-            label="Status"
+            label={t("Status")}
             name="status"
             value={journalEntry.status}
             onChange={(event) =>
@@ -221,7 +223,7 @@ const JournalForm = () => {
             style={{ minWidth: "200px" }}
           >
             {financialTerms.map((item, index) => (
-              <MenuItem key={index} value={item}>
+              <MenuItem key={index} value={item} dir={selectedDirection}>
                 {t(`${item}`)}
               </MenuItem>
             ))}

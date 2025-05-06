@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { useTranslation } from "react-i18next";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useDispatch } from "react-redux";
-import { changeLanguage } from "../store/slices/app.slice";
+import { changeLanguage, closeAppLoading } from "../store/slices/app.slice";
 
 const LanguageSwitcher = (props) => {
   const dispatch = useDispatch();
@@ -21,6 +21,9 @@ const LanguageSwitcher = (props) => {
   const handleMode = (language) => () => {
     i18n.changeLanguage(language);
     dispatch(changeLanguage({ language }));
+    setTimeout(() => {
+      dispatch(closeAppLoading());
+    }, 500);
     handleClose();
   };
 

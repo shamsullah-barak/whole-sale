@@ -277,7 +277,7 @@ const JournalForm = () => {
         <Grid xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Quantity"
+            label={t("Quantity")}
             name="quantity"
             type="number"
             value={journalEntry.quantity}
@@ -292,7 +292,7 @@ const JournalForm = () => {
         <Grid xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Description"
+            label={t("Description")}
             name="description"
             type="text"
             value={journalEntry.description}
@@ -313,7 +313,7 @@ const JournalForm = () => {
         style={{ marginTop: 20 }}
         onClick={createPurchaseHandler}
       >
-        Create Journal Entry
+        {t("Add")}
       </Button>
     </form>
   );

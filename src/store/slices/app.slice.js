@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  state: "en",
+  language: "en",
+  selectedDirection: "ltr",
   appLoading: false,
 };
 
@@ -10,10 +11,13 @@ export const appSlice = createSlice({
   initialState,
 
   reducers: {
-    changeState: (state, action) => {
-      state.state = action.payload.state;
+    changeLanguage: (state, action) => {
+      state.language = action.payload.language;
+      state.selectedDirection = ["ps", "dr"].includes(action.payload.language)
+        ? "rtl"
+        : "ltr";
     },
   },
 });
 
-export const { changeState } = appSlice.actions;
+export const { changeLanguage } = appSlice.actions;

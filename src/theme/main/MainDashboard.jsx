@@ -15,6 +15,8 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from "../../theme/customizations";
+import { useSelector } from "react-redux";
+import { selectDirection } from "../../store/selectors/app.selector";
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -24,10 +26,11 @@ const xThemeComponents = {
 };
 
 const MainDashboard = (props) => {
+  const selectedDirection = useSelector(selectDirection);
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", direction: selectedDirection }}>
         <SideMenu />
         <AppNavbar />
         {/* Main content */}

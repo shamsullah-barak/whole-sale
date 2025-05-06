@@ -5,13 +5,17 @@ import CustomDatePicker from "./CustomDatePicker";
 import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 import MenuButton from "./MenuButton";
 import ColorModeIconDropdown from "../shared-theme/ColorModeIconDropdown";
-
 import Search from "./Search";
+import LanguageSwitcher from "../shared-theme/LanguageSwitcher";
+import { useSelector } from "react-redux";
+import { selectDirection } from "../store/selectors/app.selector";
 
-export default function Header({ title }) {
+const Header = ({ title }) => {
+  const selectedDirection = useSelector(selectDirection);
   return (
     <Stack
       direction="row"
+      dir={selectedDirection}
       sx={{
         display: { xs: "none", md: "flex" },
         width: "100%",
@@ -30,7 +34,10 @@ export default function Header({ title }) {
           <NotificationsRoundedIcon />
         </MenuButton>
         <ColorModeIconDropdown />
+        <LanguageSwitcher />
       </Stack>
     </Stack>
   );
-}
+};
+
+export default Header;

@@ -10,6 +10,8 @@ import SelectContent from "./SelectContent";
 import MenuContent from "./MenuContent";
 import CardAlert from "./CardAlert";
 import OptionsMenu from "./OptionsMenu";
+import { useSelector } from "react-redux";
+import { selectDirection } from "../store/selectors/app.selector";
 
 const drawerWidth = 240;
 
@@ -24,10 +26,12 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-export default function SideMenu() {
+const SideMenu = () => {
+  const selectedDirection = useSelector(selectDirection);
   return (
     <Drawer
       variant="permanent"
+      anchor={selectedDirection === "rtl" ? "right" : "left"}
       sx={{
         display: { xs: "none", md: "block" },
         [`& .${drawerClasses.paper}`]: {
@@ -87,4 +91,6 @@ export default function SideMenu() {
       </Stack>
     </Drawer>
   );
-}
+};
+
+export default SideMenu;

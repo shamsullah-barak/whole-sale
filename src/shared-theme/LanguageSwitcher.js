@@ -23,7 +23,7 @@ const LanguageSwitcher = (props) => {
     dispatch(changeLanguage({ language }));
     setTimeout(() => {
       dispatch(closeAppLoading());
-    }, 500);
+    }, 100);
     handleClose();
   };
 

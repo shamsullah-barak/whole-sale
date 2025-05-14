@@ -13,6 +13,9 @@ import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import COLORS from "../constant/colors";
+import { useSelector } from "react-redux";
+import { selectDirection } from "../store/selectors/app.selector";
 
 const mainListItems = [
   { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "/dashboard" },
@@ -37,7 +40,9 @@ const secondaryListItems = [
 
 export default function MenuContent() {
   const { pathname } = useLocation();
+  const selectedDirection = useSelector(selectDirection);
   const { t } = useTranslation();
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
@@ -47,19 +52,30 @@ export default function MenuContent() {
             disablePadding
             component={NavLink}
             to={item.path}
-            style={{ textDecoration: "none", color: "white" }}
-            sx={{
+            style={{ textDecoration: "none" }}
+            sx={(theme) => ({
               display: "block",
+              borderRadius: "5px",
+              color: theme.palette.mode === "dark" ? "#fff" : "#000",
+              textAlign: "right",
               "&.active": {
-                color: "text.primary",
-                bgcolor: "action.selected",
-                fontWeight: "fontWeightBold",
+                color: COLORS.WHITE,
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? theme.palette.action.selected
+                    : COLORS.PURPLE,
+                fontWeight: theme.typography.fontWeightBold,
               },
-            }}
+            })}
           >
             <ListItemButton selected={pathname === item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={t(`${item.text}`)} />
+              <ListItemText
+                style={{
+                  textAlign: selectedDirection === "rtl" ? "right" : "left",
+                }}
+                primary={t(`${item.text}`)}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -69,7 +85,12 @@ export default function MenuContent() {
           <ListItem key={index} disablePadding sx={{ display: "block" }}>
             <ListItemButton>
               <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={t(item.text)} />
+              <ListItemText
+                style={{
+                  textAlign: selectedDirection === "rtl" ? "right" : "left",
+                }}
+                primary={t(item.text)}
+              />
             </ListItemButton>
           </ListItem>
         ))}

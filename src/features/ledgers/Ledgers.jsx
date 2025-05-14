@@ -12,6 +12,8 @@ import {
 } from "../../store/slices/ledger.slice";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { useTranslation } from "react-i18next";
+import COLORS from "../../constant/colors";
+import { selectDirection } from "../../store/selectors/app.selector";
 
 export const columns = [
   {
@@ -137,18 +139,37 @@ const CustomizedDataGrid = () => {
 };
 
 const Ledgers = () => {
+  const selectedDirection = useSelector(selectDirection);
   const { t } = useTranslation();
   return (
     <MainDashboard title="Ledger">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
+        <Grid
+          xs={12}
+          lg={9}
+          sx={{
+            width: "100%",
+            textAlign: selectedDirection === "rtl" ? "left" : "right",
+          }}
+        >
           <NavLink to="/ledgers/create">
-            <Button variant="outlined">{t("New Ledger")}</Button>
+            <Button
+              variant="contained"
+              color="inherit"
+              sx={(theme) => ({
+                backgroundColor:
+                  theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+                color:
+                  theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+              })}
+            >
+              {t("New Ledger")}
+            </Button>
           </NavLink>
         </Grid>
       </Grid>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid item xs={12} lg={9} sx={{ width: "100%" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%" }}>
           <CustomizedDataGrid />
         </Grid>
       </Grid>

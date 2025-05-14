@@ -10,6 +10,7 @@ import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { selectDirection } from "../../store/selectors/app.selector";
+import COLORS from "../../constant/colors";
 
 const columns = [
   {
@@ -49,8 +50,6 @@ const JournalList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const journals = useSelector(selectJournals);
-
-  console.log({ journals });
 
   useEffect(() => {
     const loadProducts = () => {
@@ -310,9 +309,14 @@ const JournalForm = () => {
       <Button
         type="submit"
         variant="contained"
-        color="primary"
         fullWidth
+        color="inherit"
         style={{ marginTop: 20 }}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
         onClick={createPurchaseHandler}
       >
         {t("Add")}

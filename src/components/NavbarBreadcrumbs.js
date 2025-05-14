@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
 import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
+import { useTranslation } from "react-i18next";
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
@@ -16,6 +17,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
 }));
 
 const NavbarBreadcrumbs = ({ title }) => {
+  const { t } = useTranslation();
   return (
     <StyledBreadcrumbs
       aria-label="breadcrumb"
@@ -25,7 +27,7 @@ const NavbarBreadcrumbs = ({ title }) => {
         variant="body1"
         sx={{ color: "text.primary", fontWeight: 600 }}
       >
-        {title}
+        {t(title)}
       </Typography>
     </StyledBreadcrumbs>
   );

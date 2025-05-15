@@ -8,9 +8,14 @@ import { feedbackCustomizations } from "./customizations/feedback";
 import { navigationCustomizations } from "./customizations/navigation";
 import { surfacesCustomizations } from "./customizations/surfaces";
 import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
+import { useSelector } from "react-redux";
+import { selectFontFamily } from "../store/selectors/app.selector";
 
 function AppTheme(props) {
   const { children, disableCustomTheme, themeComponents } = props;
+  const fontFamily = useSelector(selectFontFamily);
+
+  console.log({ fontFamily });
   const theme = React.useMemo(() => {
     return disableCustomTheme
       ? {}
@@ -21,7 +26,6 @@ function AppTheme(props) {
             cssVarPrefix: "template",
           },
           colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
-          typography,
           shadows,
           shape,
           components: {
@@ -32,8 +36,14 @@ function AppTheme(props) {
             ...surfacesCustomizations,
             ...themeComponents,
           },
+
+          // fonts
+          typography: {
+            typography: typography,
+            fontFamily: fontFamily,
+          },
         });
-  }, [disableCustomTheme, themeComponents]);
+  }, [disableCustomTheme, themeComponents, fontFamily]);
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;
   }

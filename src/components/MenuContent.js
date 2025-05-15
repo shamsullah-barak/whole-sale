@@ -82,7 +82,27 @@ export default function MenuContent() {
       </List>
       <List dense>
         {secondaryListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: "block" }}>
+          <ListItem
+            key={index}
+            disablePadding
+            component={NavLink}
+            to={item.path}
+            style={{ textDecoration: "none" }}
+            sx={(theme) => ({
+              display: "block",
+              borderRadius: "5px",
+              color: theme.palette.mode === "dark" ? "#fff" : "#000",
+              textAlign: "right",
+              "&.active": {
+                color: COLORS.WHITE,
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? theme.palette.action.selected
+                    : COLORS.PURPLE,
+                fontWeight: theme.typography.fontWeightBold,
+              },
+            })}
+          >
             <ListItemButton>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText

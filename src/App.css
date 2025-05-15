@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "Naskh";
+  src: url("/public/fonts/Naskh.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Nastalik";
+  src: url("/public/fonts/Nastalik.ttf");
+}
+
+@font-face {
+  font-family: "QalamMajeed";
+  src: url("/public/fonts/QalamMajeed.ttf");
+}

@@ -6,11 +6,20 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import AnalyticsRoundedIcon from "@mui/icons-material/AnalyticsRounded";
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
+import EqualizerIcon from "@mui/icons-material/Equalizer";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CommentBankIcon from "@mui/icons-material/CommentBank";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import NoteAltIcon from "@mui/icons-material/NoteAlt";
+import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import COLORS from "../constant/colors";
@@ -18,18 +27,23 @@ import { useSelector } from "react-redux";
 import { selectDirection } from "../store/selectors/app.selector";
 
 const mainListItems = [
-  { text: "Dashboard", icon: <AnalyticsRoundedIcon />, path: "/dashboard" },
-  { text: "Journal", icon: <AnalyticsRoundedIcon />, path: "/journal" },
-  { text: "Ledgers", icon: <PeopleRoundedIcon />, path: "/ledgers" },
-  { text: "Invoices", icon: <HomeRoundedIcon />, path: "/invoices" },
-  { text: "Products", icon: <HomeRoundedIcon />, path: "/products" },
+  { text: "Dashboard", icon: <EqualizerIcon />, path: "/dashboard" },
+  { text: "Journal", icon: <NoteAltIcon />, path: "/journal" },
+  { text: "Ledgers", icon: <ReceiptIcon />, path: "/ledgers" },
+  { text: "Invoices", icon: <RequestQuoteIcon />, path: "/invoices" },
+  {
+    text: "Products",
+    icon: <ProductionQuantityLimitsIcon />,
+    path: "/products",
+  },
+
   { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
-  { text: "Purchases", icon: <HomeRoundedIcon />, path: "/purchases" },
-  { text: "Stock", icon: <HomeRoundedIcon />, path: "/stock" },
-  { text: "Bank", icon: <HomeRoundedIcon />, path: "/bank" },
-  { text: "Incomes", icon: <HomeRoundedIcon />, path: "/incomes" },
-  { text: "Loan", icon: <HomeRoundedIcon />, path: "/loan" },
+  { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
+  { text: "Stock", icon: <InventoryIcon />, path: "/stock" },
+  { text: "Bank", icon: <CommentBankIcon />, path: "/bank" },
+  { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
+  { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },
 ];
 
 const secondaryListItems = [

@@ -68,6 +68,8 @@ const CustomizedDataGrid = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const ledgers = useSelector(selectLedgers);
+  const selectedDirection = useSelector(selectDirection);
+
   useEffect(() => {
     const loadProducts = () => {
       dispatch(fetchLedgersAsync({ page: 1, limit: ledgers?.limitPerPage }));
@@ -88,7 +90,10 @@ const CustomizedDataGrid = () => {
   return (
     <DataGrid
       rows={ledgers?.ledgers}
-      style={{ cursor: "pointer" }}
+      style={{
+        cursor: "pointer",
+        textAlign: selectedDirection === "rtl" ? "left" : "right",
+      }}
       columns={columns}
       getRowId={(row) => row.id}
       onRowClick={handleRowClick}

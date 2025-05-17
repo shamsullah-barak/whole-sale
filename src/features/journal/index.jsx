@@ -1,7 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import MainDashboard from "../../theme/main/MainDashboard";
-import { TextField, MenuItem, Button, Grid2 as Grid } from "@mui/material";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Grid2 as Grid,
+  Autocomplete,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
+import { selectProducts } from "../../store/selectors/product.selector";
 
 const columns = [
   {
@@ -172,6 +179,8 @@ const financialTerms = [
 const JournalForm = () => {
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
+  const products = useSelector(selectProducts).products;
+
   const ledgers = useSelector(selectLedgers);
   const selectedDirection = useSelector(selectDirection);
   const { t } = useTranslation();
@@ -235,7 +244,7 @@ const JournalForm = () => {
               <TextField
                 select
                 fullWidth
-                label="select ledger"
+                label={t("select ledger")}
                 style={{ minWidth: "200px" }}
               >
                 {ledgers.ledgers?.map((item, index) => (
@@ -248,13 +257,23 @@ const JournalForm = () => {
           </>
         )}
 
-        {/* {journalEntry.status === "Purchase of goods" && (
+        {journalEntry.status === "Purchase of goods" && (
           <>
-            <Grid xs={12} sm={6}>
+            <Autocomplete
+              disablePortal
+              disableClearable
+              popup
+              options={products}
+              getOptionLabel={(option) => option.name}
+              sx={{ width: 300 }}
+              renderInput={(params) => <TextField {...params} label="Movie" />}
+            />
+
+            {/* <Grid xs={12} sm={6}>
               <TextField
                 select
                 fullWidth
-                label="select product"
+                label={t("select product")}
                 name="productId"
                 value={journalEntry.productId}
                 onChange={(event) =>
@@ -271,9 +290,9 @@ const JournalForm = () => {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
+            </Grid> */}
           </>
-        )} */}
+        )}
 
         <Grid xs={12} sm={6}>
           <TextField

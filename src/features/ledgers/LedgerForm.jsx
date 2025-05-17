@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TextField, MenuItem, Button, Grid } from "@mui/material";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import COLORS from "../../constant/colors";
 
 const LedgerForm = () => {
   const { t } = useTranslation();
@@ -137,8 +138,13 @@ const LedgerForm = () => {
       <Button
         type="submit"
         variant="contained"
-        color="primary"
+        color="inherit"
         fullWidth
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
         style={{ marginTop: 20 }}
         onClick={createLedgerHandler}
       >

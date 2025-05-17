@@ -29,5 +29,7 @@
   "Quantity": "مقدار",
   "Add": "اضافه کول",
   "Description": "تشریج",
-  "Status": "حالت"
+  "Status": "حالت",
+  "select ledger": "کهاته انتخابول",
+  "select product": "تولید انتخابول"
 }

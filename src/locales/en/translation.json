@@ -29,5 +29,7 @@
   "Quantity": "Quantity",
   "Add": "Add",
   "Description": "Description",
-  "Status": "Status"
+  "Status": "Status",
+  "select ledger": "Select Ledger",
+  "select product": "Select Product"
 }

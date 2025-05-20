@@ -31,5 +31,6 @@
   "Description": "Description",
   "Status": "Status",
   "select ledger": "Select Ledger",
-  "select product": "Select Product"
+  "select product": "Select Product",
+  "search": "Search"
 }

@@ -18,6 +18,7 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
+import { ToastContainer, toast } from "react-toastify";
 
 const columns = [
   {
@@ -189,10 +190,12 @@ const JournalForm = () => {
     description: "",
     quantity: 0,
     status: "",
+    ledgerId: "",
+    ledgerInfo: "",
   });
 
   // journalEntry handler
-  const createPurchaseHandler = async (event) => {
+  const createJournalEntryHandler = async (event) => {
     event.preventDefault(event);
     try {
       const response = await axios.post(
@@ -211,65 +214,86 @@ const JournalForm = () => {
         status: "",
       });
     } catch (error) {
-      console.log(error);
+      console.log({ error });
+      toast.error(
+        error.response.data.message ?? "something went wrong! please try again"
+      );
     }
   };
 
   return (
-    <form>
-      <Grid container>
-        <Grid xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            label={t("Status")}
-            name="status"
-            value={journalEntry.status}
-            onChange={(event) =>
-              setJournalEntry({ ...journalEntry, status: event.target.value })
-            }
-            style={{ minWidth: "200px" }}
-          >
-            {financialTerms.map((item, index) => (
-              <MenuItem key={index} value={item} dir={selectedDirection}>
-                {t(`${item}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
+    <>
+      <ToastContainer />
+      <form>
+        <Grid container>
+          <Grid xs={12} sm={6}>
+            <TextField
+              select
+              fullWidth
+              label={t("Status")}
+              name="status"
+              value={journalEntry.status}
+              onChange={(event) =>
+                setJournalEntry({ ...journalEntry, status: event.target.value })
+              }
+              style={{ minWidth: "200px" }}
+            >
+              {financialTerms.map((item, index) => (
+                <MenuItem key={index} value={item} dir={selectedDirection}>
+                  {t(`${item}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
 
-        {journalEntry.status === "Money deposit" && (
-          <>
-            <Grid xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label={t("select ledger")}
-                style={{ minWidth: "200px" }}
-              >
-                {ledgers.ledgers?.map((item, index) => (
-                  <MenuItem key={index} value={item}>
-                    {item.ledgerType} د {item.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </>
-        )}
+          {journalEntry.status === "Money deposit" && (
+            <>
+              <Grid xs={12} sm={6}>
+                <TextField
+                  select
+                  fullWidth
+                  label={t("select ledger")}
+                  style={{ minWidth: "200px" }}
+                  dir={selectedDirection === "rtl" ? "right" : "left"}
+                  value={journalEntry.ledgerId} // ✅ بدل شو
+                  onChange={(event) => {
+                    const selectedLedger = ledgers.ledgers.find(
+                      (ledger) => ledger.id === event.target.value
+                    );
+                    setJournalEntry({
+                      ...journalEntry,
+                      ledgerId: selectedLedger.id,
+                      ledgerInfo: selectedLedger.name,
+                    });
+                  }}
+                >
+                  {ledgers.ledgers?.map((item, index) => (
+                    <MenuItem key={index} value={item.id}>
+                      {" "}
+                      {/* ✅ value د id شو */}
+                      {item.ledgerType} د {item.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            </>
+          )}
 
-        {journalEntry.status === "Purchase of goods" && (
-          <>
-            <Autocomplete
-              disablePortal
-              disableClearable
-              popup
-              options={products}
-              getOptionLabel={(option) => option.name}
-              sx={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="Movie" />}
-            />
+          {journalEntry.status === "Purchase of goods" && (
+            <>
+              <Autocomplete
+                disablePortal
+                disableClearable
+                popup
+                options={products}
+                getOptionLabel={(option) => option.name}
+                sx={{ width: 300 }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Movie" />
+                )}
+              />
 
-            {/* <Grid xs={12} sm={6}>
+              {/* <Grid xs={12} sm={6}>
               <TextField
                 select
                 fullWidth
@@ -289,58 +313,59 @@ const JournalForm = () => {
                     {item}
                   </MenuItem>
                 ))}
-              </TextField>
-            </Grid> */}
-          </>
-        )}
+                </TextField>
+                </Grid> */}
+            </>
+          )}
 
-        <Grid xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("Quantity")}
-            name="quantity"
-            type="number"
-            value={journalEntry.quantity}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                quantity: event.target.value,
-              })
-            }
-          />
+          <Grid xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label={t("Quantity")}
+              name="quantity"
+              type="number"
+              value={journalEntry.quantity}
+              onChange={(event) =>
+                setJournalEntry({
+                  ...journalEntry,
+                  quantity: event.target.value,
+                })
+              }
+            />
+          </Grid>
+          <Grid xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label={t("Description")}
+              name="description"
+              type="text"
+              value={journalEntry.description}
+              onChange={(event) =>
+                setJournalEntry({
+                  ...journalEntry,
+                  description: event.target.value,
+                })
+              }
+            />
+          </Grid>
         </Grid>
-        <Grid xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("Description")}
-            name="description"
-            type="text"
-            value={journalEntry.description}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                description: event.target.value,
-              })
-            }
-          />
-        </Grid>
-      </Grid>
-      <Button
-        type="submit"
-        variant="contained"
-        fullWidth
-        color="inherit"
-        style={{ marginTop: 20 }}
-        sx={(theme) => ({
-          backgroundColor:
-            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-        })}
-        onClick={createPurchaseHandler}
-      >
-        {t("Add")}
-      </Button>
-    </form>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          color="inherit"
+          style={{ marginTop: 20 }}
+          sx={(theme) => ({
+            backgroundColor:
+              theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+            color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+          })}
+          onClick={createJournalEntryHandler}
+        >
+          {t("Add")}
+        </Button>
+      </form>
+    </>
   );
 };
 

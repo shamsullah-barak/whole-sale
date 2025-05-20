@@ -4,6 +4,7 @@ import productReducer from "./reducers/product.reducer";
 import purchaseSlice from "./reducers/purchase.reducer";
 import journalSlice from "./reducers/journal.reducer";
 import appSlice from "./reducers/app.reducer";
+import transactionTypesSlice from "./reducers/transaction.types.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     products: productReducer,
     purchases: purchaseSlice,
     journals: journalSlice,
+    transactionTypes: transactionTypesSlice,
   },
 });

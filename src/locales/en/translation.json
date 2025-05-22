@@ -12,8 +12,8 @@
   "Incomes": "Incomes",
   "Loan": "Loans",
   "Settings": "Settings",
-  "Money deposit": "Money deposit",
-  "Money withdrawal": "Money withdrawal",
+  "Money Deposit": "Money Deposit",
+  "Money Withdrawal": "Money Withdrawal",
   "Issuing a remittance": "Issuing a remittance",
   "Receiving a remittance": "Receiving a remittance",
   "Purchase of goods": "Purchase of goods",
@@ -32,5 +32,6 @@
   "Status": "Status",
   "select ledger": "Select Ledger",
   "select product": "Select Product",
-  "search": "Search"
+  "search": "Search",
+  "CashBox": "CashBox"
 }

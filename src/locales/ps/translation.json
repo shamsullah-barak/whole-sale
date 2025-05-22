@@ -12,8 +12,8 @@
   "Incomes": "ګټه",
   "Loan": "پورونه",
   "Settings": "تیظیمات",
-  "Money deposit": "د پیسو جمع",
-  "Money withdrawal": "د پیسو ایستل",
+  "Money Deposit": "د پیسو جمع",
+  "Money Withdrawal": "د پیسو ایستل",
   "Issuing a remittance": "حواله ایستل",
   "Receiving a remittance": "حواله جمع",
   "Purchase of goods": "د اجناسو رانیول",
@@ -32,5 +32,6 @@
   "Status": "حالت",
   "select ledger": "کهاته انتخابول",
   "select product": "تولید انتخابول",
-  "search": " پلټنه وکړی"
+  "search": " پلټنه وکړی",
+  "CashBox": "تجرۍ"
 }

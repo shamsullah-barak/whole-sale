@@ -19,6 +19,7 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
 import { ToastContainer, toast } from "react-toastify";
+import { selectTransactionTypes } from "../../store/selectors/transaction.types.selector";
 
 const columns = [
   {
@@ -28,8 +29,8 @@ const columns = [
     minWidth: 80,
   },
   {
-    field: "quantity",
-    headerName: "quantity",
+    field: "amount",
+    headerName: "amount",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -180,6 +181,7 @@ const financialTerms = [
 const JournalForm = () => {
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
+  const transactionTypes = useSelector(selectTransactionTypes);
   const products = useSelector(selectProducts).products;
 
   const ledgers = useSelector(selectLedgers);
@@ -188,10 +190,11 @@ const JournalForm = () => {
 
   const [journalEntry, setJournalEntry] = useState({
     description: "",
-    quantity: 0,
+    amount: 0,
     status: "",
     ledgerId: "",
     ledgerInfo: "",
+    statusId: "",
   });
 
   // journalEntry handler
@@ -210,7 +213,7 @@ const JournalForm = () => {
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       setJournalEntry({
         description: "",
-        quantity: 0,
+        amount: 0,
         status: "",
       });
     } catch (error) {
@@ -232,21 +235,30 @@ const JournalForm = () => {
               fullWidth
               label={t("Status")}
               name="status"
-              value={journalEntry.status}
-              onChange={(event) =>
-                setJournalEntry({ ...journalEntry, status: event.target.value })
-              }
+              value={journalEntry.statusId || ""} // default empty string if null
+              onChange={(event) => {
+                const selectedId = event.target.value;
+                const selectedType = transactionTypes.find(
+                  (item) => item.id === selectedId
+                );
+
+                setJournalEntry({
+                  ...journalEntry,
+                  statusId: selectedType.id,
+                  status: selectedType.engName,
+                });
+              }}
               style={{ minWidth: "200px" }}
             >
-              {financialTerms.map((item, index) => (
-                <MenuItem key={index} value={item} dir={selectedDirection}>
-                  {t(`${item}`)}
+              {transactionTypes.map((item) => (
+                <MenuItem key={item.id} value={item.id} dir={selectedDirection}>
+                  {t(`${item.engName}`)}
                 </MenuItem>
               ))}
             </TextField>
           </Grid>
 
-          {journalEntry.status === "Money deposit" && (
+          {journalEntry.status === "Money Deposit" && (
             <>
               <Grid xs={12} sm={6}>
                 <TextField
@@ -322,13 +334,13 @@ const JournalForm = () => {
             <TextField
               fullWidth
               label={t("Quantity")}
-              name="quantity"
+              name="amount"
               type="number"
-              value={journalEntry.quantity}
+              value={journalEntry.amount}
               onChange={(event) =>
                 setJournalEntry({
                   ...journalEntry,
-                  quantity: event.target.value,
+                  amount: event.target.value,
                 })
               }
             />

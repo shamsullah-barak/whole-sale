@@ -20,6 +20,7 @@ import CommentBankIcon from "@mui/icons-material/CommentBank";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import COLORS from "../constant/colors";
@@ -44,6 +45,7 @@ const mainListItems = [
   { text: "Bank", icon: <CommentBankIcon />, path: "/bank" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },
+  { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
 ];
 
 const secondaryListItems = [

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchLedgers } from "../actions/ledger.actions";
+import { fetchCashBox, fetchLedgers } from "../actions/ledger.actions";
 
 const initialState = {
   ledgers: [],
@@ -17,6 +17,14 @@ export const fetchLedgersAsync = createAsyncThunk(
   async ({ page, limit }) => {
     const ledgers = await fetchLedgers(page, limit);
     return ledgers;
+  }
+);
+
+export const fetchCashBoxAsync = createAsyncThunk(
+  "ledgers/fetchCashBox",
+  async () => {
+    const cashBox = await fetchCashBox();
+    return cashBox;
   }
 );
 
@@ -46,6 +54,10 @@ export const ledgersSlice = createSlice({
         state.totalPages = action.payload.totalPages;
         state.totalRows = action.payload.totalResults;
       });
+
+    builder.addCase(fetchCashBoxAsync.fulfilled, (state, action) => {
+      state.cashBox = action.payload.balance;
+    });
   },
 });
 

@@ -28,7 +28,7 @@
   "Create Ledger": "کهاته جوړول",
   "Quantity": "مقدار",
   "Add": "اضافه کول",
-  "Description": "تشریج",
+  "description": "تشریج",
   "Status": "حالت",
   "select ledger": "کهاته انتخابول",
   "select product": "تولید انتخابول",

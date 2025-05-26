@@ -28,10 +28,11 @@
   "Create Ledger": "Create Ledger",
   "Quantity": "Quantity",
   "Add": "Add",
-  "Description": "Description",
+  "description": "Description",
   "Status": "Status",
   "select ledger": "Select Ledger",
   "select product": "Select Product",
   "search": "Search",
-  "CashBox": "CashBox"
+  "CashBox": "CashBox",
+  "amount": "Amount"
 }

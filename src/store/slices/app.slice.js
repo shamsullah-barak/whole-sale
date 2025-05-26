@@ -4,7 +4,7 @@ const initialState = {
   language: "en",
   selectedDirection: "ltr",
   appLoading: false,
-  fontFamily: "Roboto, sans-serif",
+  fontFamily: "Nastalik",
   fontOptions: [
     { label: "Naskh", value: "Naskh" },
     { label: "Nastalik", value: "Nastalik" },

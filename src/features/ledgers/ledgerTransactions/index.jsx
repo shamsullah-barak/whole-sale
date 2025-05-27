@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../../theme/main/MainDashboard";
-import SubLedgerForm from "./subLedger";
+import LedgerTransactionForm from "./ledgerTransactionForm";
 import { useDispatch, useSelector } from "react-redux";
 import { getSelectedLedger } from "../../../store/selectors/ledgers.selector";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +45,7 @@ const columns = [
   },
 ];
 
-const SubLedgerList = () => {
+const LedgerTransactionsList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const SubLedgerList = () => {
   console.log({ ledgerTransactions, selectedLedger });
 
   useEffect(() => {
-    const loadSubLedgers = () => {
+    const loadLedgerTransactions = () => {
       dispatch(
         fetchLedgerTransactionsAsync({
           ledgerId: selectedLedger.id,
@@ -66,7 +66,7 @@ const SubLedgerList = () => {
         })
       );
     };
-    loadSubLedgers();
+    loadLedgerTransactions();
   }, []);
 
   const stateChanged = (data) => {
@@ -151,20 +151,17 @@ const SubLedgerList = () => {
   );
 };
 
-const SubLedger = () => {
+const LedgerTransactions = () => {
   return (
-    <MainDashboard title="Sub Ledger">
+    <MainDashboard title="Ledger Transactions">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
-          {/* <NavLink to="/accounts/add">
-            <Button variant="outlined">New Ledger</Button>
-          </NavLink> */}
-          <SubLedgerList />
-          <SubLedgerForm />
+          <LedgerTransactionsList />
+          <LedgerTransactionForm />
         </Grid>
       </Grid>
     </MainDashboard>
   );
 };
 
-export default SubLedger;
+export default LedgerTransactions;

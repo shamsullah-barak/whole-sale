@@ -33,5 +33,6 @@
   "select ledger": "کهاته انتخابول",
   "select product": "تولید انتخابول",
   "search": " پلټنه وکړی",
-  "CashBox": "تجرۍ"
+  "CashBox": "تجرۍ",
+  "createLedgerTransaction": "نوي حساب اضافه کول"
 }

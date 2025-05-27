@@ -34,5 +34,6 @@
   "select product": "Select Product",
   "search": "Search",
   "CashBox": "CashBox",
-  "amount": "Amount"
+  "amount": "Amount",
+  "createLedgerTransaction": "Create Ledger Transaction"
 }

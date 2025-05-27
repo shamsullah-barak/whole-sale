@@ -13,7 +13,7 @@ import Purchases from "../features/purchases/Purchase";
 import CreatePurchases from "../features/purchases/CreatePurchase";
 import Ledgers from "../features/ledgers/Ledgers";
 import CreateLedger from "../features/ledgers/CreateLedger";
-import SubLedger from "../features/ledgers/sub";
+import SubLedger from "../features/ledgers/ledgerTransactions";
 import Journal from "../features/journal";
 import Settings from "../features/settings";
 

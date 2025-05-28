@@ -4,7 +4,6 @@ import Loans from "../pages/Loan";
 import Customers from "../pages/Customers";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
-import Stock from "../pages/Stock";
 import Suppliers from "../pages/Suppliers";
 import Bank from "../pages/Bank";
 import Products from "../features/products/Product";
@@ -16,6 +15,8 @@ import CreateLedger from "../features/ledgers/CreateLedger";
 import SubLedger from "../features/ledgers/ledgerTransactions";
 import Journal from "../features/journal";
 import Settings from "../features/settings";
+import Stock from "../features/stock";
+import CreateStock from "../features/stock/createStock";
 
 // ----------------------------------------------------------------------
 
@@ -66,8 +67,12 @@ export default function Router() {
       element: <CreatePurchases />,
     },
     {
-      path: "/stock",
+      path: "/stocks",
       element: <Stock />,
+    },
+    {
+      path: "/stocks/create",
+      element: <CreateStock />,
     },
     {
       path: "/suppliers",

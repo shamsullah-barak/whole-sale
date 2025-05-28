@@ -165,44 +165,21 @@ const Journal = () => {
   );
 };
 
-const financialTerms = [
-  "Money deposit",
-  "Money withdrawal",
-  "Issuing a remittance",
-  "Receiving a remittance",
-  "Purchase of goods",
-  "Purchase return",
-  "Sale of goods",
-  "Sales return",
-  "Settlement of balance",
-  "Settlement of receivables",
-];
-
-const JournalForm = () => {
-  const dispatch = useDispatch();
+const MoneyDeposit = ({ statusId }) => {
+  const { t } = useTranslation();
   const journals = useSelector(selectJournals);
   const transactionTypes = useSelector(selectTransactionTypes);
   const products = useSelector(selectProducts).products;
-
   const ledgers = useSelector(selectLedgers);
   const selectedDirection = useSelector(selectDirection);
-  const { t } = useTranslation();
 
-  const [journalEntry, setJournalEntry] = useState({
-    description: "",
-    amount: 0,
-    status: "",
-    ledgerId: "",
-    ledgerInfo: "",
-    statusId: "",
-  });
+  const dispatch = useDispatch();
 
-  // journalEntry handler
-  const createJournalEntryHandler = async (event) => {
+  const journalEntryHandler = async (event) => {
     event.preventDefault(event);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/journalEntries",
+      await axios.post(
+        `http://localhost:5000/api/journalEntries?statusId=${statusId}`,
         journalEntry,
         {
           headers: {
@@ -214,121 +191,53 @@ const JournalForm = () => {
       setJournalEntry({
         description: "",
         amount: 0,
-        status: "",
       });
     } catch (error) {
       console.log({ error });
       toast.error(
-        error.response.data.message ?? "something went wrong! please try again"
+        error?.response?.data?.message ??
+          "something went wrong! please try again"
       );
     }
   };
 
+  const [journalEntry, setJournalEntry] = useState({
+    description: "",
+    amount: 0,
+    ledgerId: "",
+    ledgerInfo: "",
+  });
+
   return (
     <>
-      <ToastContainer />
-      <form>
+      <form style={{ marginTop: "15px" }}>
         <Grid container>
           <Grid xs={12} sm={6}>
             <TextField
               select
               fullWidth
-              label={t("Status")}
-              name="status"
-              value={journalEntry.statusId || ""} // default empty string if null
+              label={t("select ledger")}
+              style={{ minWidth: "200px" }}
+              dir={selectedDirection === "rtl" ? "right" : "left"}
+              value={journalEntry.ledgerId}
               onChange={(event) => {
-                const selectedId = event.target.value;
-                const selectedType = transactionTypes.find(
-                  (item) => item.id === selectedId
+                const selectedLedger = ledgers.ledgers.find(
+                  (ledger) => ledger.id === event.target.value
                 );
-
                 setJournalEntry({
                   ...journalEntry,
-                  statusId: selectedType.id,
-                  status: selectedType.engName,
+                  ledgerId: selectedLedger.id,
+                  ledgerInfo: selectedLedger.name,
                 });
               }}
-              style={{ minWidth: "200px" }}
             >
-              {transactionTypes.map((item) => (
-                <MenuItem key={item.id} value={item.id} dir={selectedDirection}>
-                  {t(`${item.engName}`)}
+              {ledgers.ledgers?.map((item, index) => (
+                <MenuItem key={index} value={item.id}>
+                  {item.ledgerType} د {item.name}
                 </MenuItem>
               ))}
             </TextField>
           </Grid>
-
-          {journalEntry.status === "Money Deposit" && (
-            <>
-              <Grid xs={12} sm={6}>
-                <TextField
-                  select
-                  fullWidth
-                  label={t("select ledger")}
-                  style={{ minWidth: "200px" }}
-                  dir={selectedDirection === "rtl" ? "right" : "left"}
-                  value={journalEntry.ledgerId} // ✅ بدل شو
-                  onChange={(event) => {
-                    const selectedLedger = ledgers.ledgers.find(
-                      (ledger) => ledger.id === event.target.value
-                    );
-                    setJournalEntry({
-                      ...journalEntry,
-                      ledgerId: selectedLedger.id,
-                      ledgerInfo: selectedLedger.name,
-                    });
-                  }}
-                >
-                  {ledgers.ledgers?.map((item, index) => (
-                    <MenuItem key={index} value={item.id}>
-                      {" "}
-                      {/* ✅ value د id شو */}
-                      {item.ledgerType} د {item.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-            </>
-          )}
-
-          {journalEntry.status === "Purchase of goods" && (
-            <>
-              <Autocomplete
-                disablePortal
-                disableClearable
-                popup
-                options={products}
-                getOptionLabel={(option) => option.name}
-                sx={{ width: 300 }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Movie" />
-                )}
-              />
-
-              {/* <Grid xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label={t("select product")}
-                name="productId"
-                value={journalEntry.productId}
-                onChange={(event) =>
-                  setJournalEntry({
-                    ...journalEntry,
-                    productId: event.target.value,
-                  })
-                }
-                style={{ minWidth: "200px" }}
-              >
-                {financialTerms.map((item, index) => (
-                  <MenuItem key={index} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
-                </TextField>
-                </Grid> */}
-            </>
-          )}
 
           <Grid xs={12} sm={6}>
             <TextField
@@ -348,7 +257,7 @@ const JournalForm = () => {
           <Grid xs={12} sm={6}>
             <TextField
               fullWidth
-              label={t("Description")}
+              label={t("description")}
               name="description"
               type="text"
               value={journalEntry.description}
@@ -372,11 +281,259 @@ const JournalForm = () => {
               theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
             color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
           })}
-          onClick={createJournalEntryHandler}
+          onClick={journalEntryHandler}
         >
           {t("Add")}
         </Button>
       </form>
+    </>
+  );
+};
+
+// unit types for purchase component
+const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
+const PurchaseOfGoods = ({ statusId }) => {
+  const dispatch = useDispatch();
+  const [status, setStatus] = useState({ statusId: "", statusName: "" });
+  const journals = useSelector(selectJournals);
+  const transactionTypes = useSelector(selectTransactionTypes);
+  const products = useSelector(selectProducts).products;
+  const ledgers = useSelector(selectLedgers);
+  const selectedDirection = useSelector(selectDirection);
+  const { t } = useTranslation();
+
+  const [journalEntry, setJournalEntry] = useState({});
+
+  const journalEntryHandler = () => {};
+
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid xs={12} sm={12}>
+          <Autocomplete
+            disablePortal
+            disableClearable
+            options={products}
+            getOptionLabel={(option) => option.name}
+            sx={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField {...params} label={t("Products")} variant="outlined" />
+            )}
+            onChange={(event, value) => {
+              if (value) {
+                setJournalEntry({ ...journalEntry, productId: value.id });
+              }
+            }}
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("expiryDate")}
+            name="expiryDate"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={journalEntry.expiryDate}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                expiryDate: event.target.value,
+              })
+            }
+            sx={{ height: "100%", width: "100%" }}
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("Quantity")}
+            name="amount"
+            type="number"
+            value={journalEntry.amount}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                amount: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            label={t("unitType")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.unitType}
+            onChange={(event) => {
+              console.log(event.target.value);
+            }}
+          >
+            {unitTypes.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("unitPerPackage")}
+            name="unitPerPackage"
+            type="number"
+            value={journalEntry.unitPerPackage}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                unitPerPackage: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("unitPrice")}
+            name="unitPrice"
+            type="number"
+            value={journalEntry.unitPrice}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                unitPrice: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("totalPrice")}
+            name="totalPrice"
+            type="number"
+            value={journalEntry.totalPrice}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                totalPrice: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("paymentMethod")}
+            name="paymentMethod"
+            type="text"
+            value={journalEntry.paymentMethod}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                paymentMethod: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("invoiceNo")}
+            name="invoiceNo"
+            type="number"
+            value={journalEntry.invoiceNo}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                invoiceNo: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("storageLocation")}
+            name="stockId"
+            type="number"
+            value={journalEntry.stockId}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                stockId: event.target.value,
+              })
+            }
+          />
+        </Grid>
+      </Grid>
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        color="inherit"
+        style={{ marginTop: 20 }}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
+        onClick={journalEntryHandler}
+      >
+        {t("Add")}
+      </Button>
+    </>
+  );
+};
+
+const JournalForm = () => {
+  const [status, setStatus] = useState({ statusId: "", statusName: "" });
+  const transactionTypes = useSelector(selectTransactionTypes);
+  const selectedDirection = useSelector(selectDirection);
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <ToastContainer />
+      <Grid xs={12} sm={12} marginTop={"15px"} padding={"3px"}>
+        <TextField
+          select
+          fullWidth
+          label={t("Status")}
+          name="status"
+          value={status.statusId || ""} // default empty string if null
+          onChange={(event) => {
+            const selectedId = event.target.value;
+            const selectedType = transactionTypes.find(
+              (item) => item.id === selectedId
+            );
+            setStatus({
+              statusName: selectedType.engName,
+              statusId: selectedId,
+            });
+          }}
+          style={{ minWidth: "200px" }}
+        >
+          {transactionTypes.map((item) => (
+            <MenuItem key={item.id} value={item.id} dir={selectedDirection}>
+              {t(`${item.engName}`)}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
+      {/* money deposit */}
+      {status.statusName === "Money Deposit" && (
+        <MoneyDeposit statusId={status.statusId} />
+      )}
+
+      {/* purchasing something */}
+      {status.statusName === "Purchase of goods" && (
+        <PurchaseOfGoods statusId={status.statusId} />
+      )}
     </>
   );
 };

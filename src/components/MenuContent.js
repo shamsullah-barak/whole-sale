@@ -41,7 +41,7 @@ const mainListItems = [
   { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
   { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
-  { text: "Stock", icon: <InventoryIcon />, path: "/stock" },
+  { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
   { text: "Bank", icon: <CommentBankIcon />, path: "/bank" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },

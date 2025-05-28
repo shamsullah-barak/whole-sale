@@ -155,7 +155,11 @@ const LedgerTransactions = () => {
   return (
     <MainDashboard title="Ledger Transactions">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid item xs={12} lg={9} sx={{ width: "100%", textAlign: "right" }}>
+        <Grid
+          xs={12}
+          lg={9}
+          sx={{ width: "100%", textAlign: "right", height: "100%" }}
+        >
           <LedgerTransactionsList />
           <LedgerTransactionForm />
         </Grid>

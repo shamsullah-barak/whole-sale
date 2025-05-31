@@ -1,2 +1,2 @@
-// select all purchases
+// select all stocks
 export const selectStocks = (state) => state.stocks;

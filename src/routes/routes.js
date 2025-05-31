@@ -17,6 +17,7 @@ import Journal from "../features/journal";
 import Settings from "../features/settings";
 import Stock from "../features/stock";
 import CreateStock from "../features/stock/createStock";
+import StockItems from "../features/stock/stockItems";
 
 // ----------------------------------------------------------------------
 
@@ -73,6 +74,10 @@ export default function Router() {
     {
       path: "/stocks/create",
       element: <CreateStock />,
+    },
+    {
+      path: "/stocks/:stockId",
+      element: <StockItems />,
     },
     {
       path: "/suppliers",

@@ -29,6 +29,7 @@ import { selectDirection } from "../store/selectors/app.selector";
 
 const mainListItems = [
   { text: "Dashboard", icon: <EqualizerIcon />, path: "/dashboard" },
+  { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
   { text: "Journal", icon: <NoteAltIcon />, path: "/journal" },
   { text: "Ledgers", icon: <ReceiptIcon />, path: "/ledgers" },
   { text: "Invoices", icon: <RequestQuoteIcon />, path: "/invoices" },

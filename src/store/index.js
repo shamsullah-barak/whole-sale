@@ -8,6 +8,7 @@ import transactionTypesSlice from "./reducers/transaction.types.reducer";
 import ledgerTransactionsSlice from "./reducers/ledger.transactions.reducer";
 import stockSlice from "./reducers/stock.reducer";
 import stockItemsSlice from "./reducers/stock.items.reducer";
+import investmentsSlice from "./reducers/investment.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     journals: journalSlice,
     transactionTypes: transactionTypesSlice,
     ledgerTransactions: ledgerTransactionsSlice,
+    investments: investmentsSlice,
   },
 });

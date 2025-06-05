@@ -18,6 +18,7 @@ import Settings from "../features/settings";
 import Stock from "../features/stock";
 import CreateStock from "../features/stock/createStock";
 import StockItems from "../features/stock/stockItems";
+import Investments from "../features/investment";
 
 // ----------------------------------------------------------------------
 
@@ -106,6 +107,10 @@ export default function Router() {
     {
       path: "/settings",
       element: <Settings />,
+    },
+    {
+      path: "/investments",
+      element: <Investments />,
     },
     {
       path: "404",

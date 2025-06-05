@@ -215,6 +215,7 @@ const Partners = () => {
           },
         }
       );
+      console.log({ response });
       if (response.status === "201") {
         dispatch(fetchPartnersAsync());
       }

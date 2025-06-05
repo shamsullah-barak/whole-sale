@@ -6,7 +6,6 @@ export const fetchPartners = async () => {
     const response = await axios.get(
       `http://localhost:5000/api/investments/partners`
     );
-    console.log({ res: response.data });
     return response.data;
   } catch (error) {
     console.log({ error });

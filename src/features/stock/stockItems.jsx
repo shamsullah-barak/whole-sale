@@ -162,8 +162,6 @@ const StockItems = () => {
   const selectedDirection = useSelector(selectDirection);
   const stockItems = useSelector(selectStockItems);
 
-  console.log({ stockItems });
-  const { t } = useTranslation();
   const stockId = useParams().stockId;
   const dispatch = useDispatch();
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
 import { createProductColumns } from '../internals/data/gridData';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductsAsync, deleteProductAsync, clearError } from '../store/slices/product.slice';
+import { fetchProductsAsync, deleteProductAsync } from '../store/slices/product.slice';
 import { selectProducts, selectProductsLoading, selectProductsError } from '../store/selectors/product.selector';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Alert, Snackbar } from '@mui/material';
 

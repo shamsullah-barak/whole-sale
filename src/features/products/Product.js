@@ -1,5 +1,3 @@
-import React, { useEffect } from 'react';
-import Grid from '@mui/material/Grid2';
 import MainDashboard from '../../theme/main/MainDashboard';
 import CustomizedDataGrid from '../../components/CustomizedDataGrid';
 import ProductFilters from './ProductFilters';

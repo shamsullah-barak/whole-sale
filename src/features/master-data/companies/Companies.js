@@ -29,6 +29,7 @@ const Companies = () => {
   const companies = useSelector(selectCompanies);
   const loading = useSelector(selectCompaniesLoading);
   const error = useSelector(selectCompaniesError);
+  const companiesList = useSelector((state) => state.companies.companies || []);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [companyToDelete, setCompanyToDelete] = React.useState(null);
@@ -87,43 +88,27 @@ const Companies = () => {
   );
 
   const columns = [
+    { field: 'name', headerName: 'Company Name', flex: 1, minWidth: 200, sortable: true },
+    { field: 'contactEmail', headerName: 'Email', flex: 1, minWidth: 200, sortable: true },
+    { field: 'contactPhone', headerName: 'Phone', flex: 0.8, minWidth: 150, sortable: true },
+    { field: 'businessType', headerName: 'Business Type', flex: 1, minWidth: 150, sortable: true },
+    { field: 'subscriptionStatus', headerName: 'Subscription Status', flex: 1, minWidth: 150, sortable: true },
     {
-      field: 'name',
-      headerName: 'Company Name',
-      flex: 1,
-      minWidth: 200,
+      field: 'isActive',
+      headerName: 'Active',
+      flex: 0.5,
+      minWidth: 100,
       sortable: true,
+      renderCell: (params) => (params.value ? 'Yes' : 'No'),
     },
-    {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1,
-      minWidth: 200,
-      sortable: true,
-    },
-    {
-      field: 'phone',
-      headerName: 'Phone',
-      flex: 0.8,
-      minWidth: 150,
-      sortable: true,
-    },
-    {
-      field: 'address',
-      headerName: 'Address',
-      flex: 1.2,
-      minWidth: 200,
-      sortable: true,
-    },
+    { field: 'address', headerName: 'Address', flex: 1.2, minWidth: 200, sortable: true },
     {
       field: 'createdAt',
       headerName: 'Created Date',
       flex: 1,
       minWidth: 150,
       sortable: true,
-      renderCell: (params) => {
-        return params.value ? new Date(params.value).toLocaleDateString() : '';
-      },
+      renderCell: (params) => (params.value ? new Date(params.value).toLocaleDateString() : ''),
     },
     {
       field: 'actions',
@@ -167,7 +152,7 @@ const Companies = () => {
         {/* Data Grid */}
         <Box sx={{ width: '100%', height: 600 }}>
           <DataGrid
-            rows={companies?.companies || []}
+            rows={companiesList}
             columns={columns}
             getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
             initialState={{

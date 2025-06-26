@@ -8,6 +8,8 @@ import transactionTypesSlice from "./reducers/transaction.types.reducer";
 import ledgerTransactionsSlice from "./reducers/ledger.transactions.reducer";
 import stockSlice from "./reducers/stock.reducer";
 import stockItemsSlice from "./reducers/stock.items.reducer";
+import categorySlice from "./reducers/category.reducer";
+import companySlice from "./reducers/company.reducer";
 import investmentsSlice from "./reducers/investment.reducer";
 
 export const store = configureStore({
@@ -22,5 +24,7 @@ export const store = configureStore({
     transactionTypes: transactionTypesSlice,
     ledgerTransactions: ledgerTransactionsSlice,
     investments: investmentsSlice,
+    categories: categorySlice,
+    companies: companySlice,
   },
 });

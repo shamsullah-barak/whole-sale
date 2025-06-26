@@ -143,6 +143,11 @@ const mainListItems = [
     icon: <ProductionQuantityLimitsIcon />,
     path: "/products",
   },
+  {
+    text: "Master Data",
+    icon: <StorageIcon />,
+    path: "/master-data",
+  },
 
   { text: "Customers", icon: <PeopleRoundedIcon />, path: "/customers" },
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },

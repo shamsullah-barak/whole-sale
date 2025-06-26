@@ -61,6 +61,41 @@ export default function Router() {
       element: <CreateProduct />,
     },
     {
+      path: "/products/edit/:productId",
+      element: <EditProduct />,
+    },
+    // Master Data routes
+    {
+      path: "/master-data",
+      element: <MasterData />,
+    },
+    // Category routes
+    {
+      path: "/master-data/categories",
+      element: <Categories />,
+    },
+    {
+      path: "/master-data/categories/add",
+      element: <CreateCategory />,
+    },
+    {
+      path: "/master-data/categories/edit/:categoryId",
+      element: <EditCategory />,
+    },
+    // Company routes
+    {
+      path: "/master-data/companies",
+      element: <Companies />,
+    },
+    {
+      path: "/master-data/companies/add",
+      element: <CreateCompany />,
+    },
+    {
+      path: "/master-data/companies/edit/:companyId",
+      element: <EditCompany />,
+    },
+    {
       path: "/purchases",
       element: <Purchases />,
     },

@@ -36,5 +36,8 @@
   "CashBox": "CashBox",
   "amount": "Amount",
   "createLedgerTransaction": "Create Ledger Transaction",
-  "Investment": "Investment"
+  "investments": "Investments",
+  "partners": "Partners",
+  "addInvest": "Add Invest",
+  "totalInvest": "Total Invest"
 }

@@ -34,6 +34,8 @@ import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { unstable_useTreeItem2 as useTreeItem2 } from "@mui/x-tree-view/useTreeItem2";
+import StorageIcon from "@mui/icons-material/Storage";
+
 import {
   TreeItem2Content,
   TreeItem2IconContainer,

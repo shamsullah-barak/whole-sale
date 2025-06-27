@@ -8,12 +8,14 @@ import { TextField, MenuItem, Button, Typography, Grid, Paper, Alert, CircularPr
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { createProductAsync, fetchCompaniesAsync, fetchCategoriesAsync, clearError } from '../../store/slices/product.slice';
+import { fetchUnitsAsync } from '../../store/slices/unit.slice';
 import {
   selectProductsLoading,
   selectProductsError,
   selectCompanies,
   selectCategories,
 } from '../../store/selectors/product.selector';
+import { selectUnits } from '../../store/selectors/unit.selector';
 
 const CreateProduct = () => {
   const dispatch = useDispatch();
@@ -23,10 +25,12 @@ const CreateProduct = () => {
   const error = useSelector(selectProductsError);
   const companies = useSelector(selectCompanies);
   const categories = useSelector(selectCategories);
+  const units = useSelector(selectUnits);
 
   useEffect(() => {
     dispatch(fetchCompaniesAsync());
     dispatch(fetchCategoriesAsync());
+    dispatch(fetchUnitsAsync()); // Fetch units
 
     // Clear any previous errors
     dispatch(clearError());
@@ -48,8 +52,6 @@ const CreateProduct = () => {
   };
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Product name is required'),
-    unit: Yup.number().min(1).required('Unit is required'),
     description: Yup.string(),
     sku: Yup.string().required('SKU is required'),
     barCode: Yup.string().required('Barcode is required'),
@@ -60,6 +62,7 @@ const CreateProduct = () => {
     status: Yup.string().required('Status is required'),
     companyId: Yup.string().required('Company is required'),
     categoryId: Yup.string().required('Category is required'),
+    unitId: Yup.string().required('Unit is required'),
   });
 
   return (
@@ -88,7 +91,6 @@ const CreateProduct = () => {
         <Formik
           initialValues={{
             name: '',
-            unit: 1,
             description: '',
             sku: '',
             barCode: '',
@@ -99,6 +101,7 @@ const CreateProduct = () => {
             status: 'active',
             companyId: '',
             categoryId: '',
+            unitId: '',
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -114,17 +117,6 @@ const CreateProduct = () => {
                     name="name"
                     error={touched.name && !!errors.name}
                     helperText={touched.name && errors.name}
-                  />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    fullWidth
-                    label="Unit"
-                    name="unit"
-                    type="number"
-                    error={touched.unit && !!errors.unit}
-                    helperText={touched.unit && errors.unit}
                   />
                 </Grid>
                 <Grid xs={12}>
@@ -200,6 +192,24 @@ const CreateProduct = () => {
                     {categories.map((category) => (
                       <MenuItem key={category.id} value={category.id}>
                         {category.name}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </Grid>
+                <Grid xs={12} sm={6}>
+                  <Field
+                    as={TextField}
+                    select
+                    fullWidth
+                    label="Unit"
+                    name="unitId"
+                    error={touched.unitId && !!errors.unitId}
+                    helperText={touched.unitId && errors.unitId}
+                  >
+                    <MenuItem value="">Select a unit</MenuItem>
+                    {units.map((unit) => (
+                      <MenuItem key={unit.id} value={unit.id}>
+                        {unit.name} ({unit.abbreviation})
                       </MenuItem>
                     ))}
                   </Field>

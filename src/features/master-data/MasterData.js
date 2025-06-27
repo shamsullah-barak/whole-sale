@@ -1,19 +1,11 @@
 import React from 'react';
 import MainDashboard from '../../theme/main/MainDashboard';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Button,
-  Avatar
-} from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, CardActions, Button, Avatar } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import CategoryIcon from '@mui/icons-material/Category';
 import BusinessIcon from '@mui/icons-material/Business';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import StraightenIcon from '@mui/icons-material/Straighten';
 
 const MasterData = () => {
   const masterDataItems = [
@@ -30,6 +22,13 @@ const MasterData = () => {
       icon: <BusinessIcon sx={{ fontSize: 40 }} />,
       path: '/master-data/companies',
       color: '#388e3c',
+    },
+    {
+      title: 'Units',
+      description: 'Manage measurement units (e.g., kg, piece)',
+      icon: <StraightenIcon sx={{ fontSize: 40 }} />,
+      path: '/master-data/units',
+      color: '#ff9800',
     },
   ];
 
@@ -50,8 +49,8 @@ const MasterData = () => {
         <Grid container spacing={3}>
           {masterDataItems.map((item, index) => (
             <Grid xs={12} sm={6} md={4} key={index}>
-              <Card 
-                sx={{ 
+              <Card
+                sx={{
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
@@ -59,7 +58,7 @@ const MasterData = () => {
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: 4,
-                  }
+                  },
                 }}
               >
                 <CardContent sx={{ flexGrow: 1, textAlign: 'center', pt: 3 }}>
@@ -83,15 +82,15 @@ const MasterData = () => {
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
                   <NavLink to={item.path} style={{ textDecoration: 'none' }}>
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       endIcon={<ArrowForwardIcon />}
-                      sx={{ 
+                      sx={{
                         bgcolor: item.color,
                         '&:hover': {
                           bgcolor: item.color,
                           filter: 'brightness(0.9)',
-                        }
+                        },
                       }}
                     >
                       Manage {item.title}
@@ -111,25 +110,22 @@ const MasterData = () => {
           <Grid container spacing={2}>
             <Grid xs={12} sm={6}>
               <NavLink to="/master-data/categories/add" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="outlined" 
-                  fullWidth 
-                  startIcon={<CategoryIcon />}
-                  sx={{ py: 1.5 }}
-                >
+                <Button variant="outlined" fullWidth startIcon={<CategoryIcon />} sx={{ py: 1.5 }}>
                   Add New Category
                 </Button>
               </NavLink>
             </Grid>
             <Grid xs={12} sm={6}>
               <NavLink to="/master-data/companies/add" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="outlined" 
-                  fullWidth 
-                  startIcon={<BusinessIcon />}
-                  sx={{ py: 1.5 }}
-                >
+                <Button variant="outlined" fullWidth startIcon={<BusinessIcon />} sx={{ py: 1.5 }}>
                   Add New Company
+                </Button>
+              </NavLink>
+            </Grid>
+            <Grid xs={12} sm={6}>
+              <NavLink to="/master-data/units/add" style={{ textDecoration: 'none' }}>
+                <Button variant="outlined" fullWidth startIcon={<StraightenIcon />} sx={{ py: 1.5 }}>
+                  Add New Unit
                 </Button>
               </NavLink>
             </Grid>

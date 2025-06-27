@@ -10,6 +10,7 @@ import stockSlice from './reducers/stock.reducer';
 import stockItemsSlice from './reducers/stock.items.reducer';
 import categorySlice from './reducers/category.reducer';
 import companySlice from './reducers/company.reducer';
+import unitReducer from './reducers/unit.slice';
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export const store = configureStore({
     ledgerTransactions: ledgerTransactionsSlice,
     categories: categorySlice,
     companies: companySlice,
+    units: unitReducer,
   },
 });

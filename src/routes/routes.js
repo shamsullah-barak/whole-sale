@@ -27,6 +27,9 @@ import Settings from '../features/settings';
 import Stock from '../features/stock';
 import CreateStock from '../features/stock/createStock';
 import StockItems from '../features/stock/stockItems';
+import Units from '../features/master-data/units/Units';
+import CreateUnit from '../features/master-data/units/CreateUnit';
+import EditUnit from '../features/master-data/units/EditUnit';
 
 // ----------------------------------------------------------------------
 
@@ -150,6 +153,18 @@ export default function Router() {
     {
       path: '/settings',
       element: <Settings />,
+    },
+    {
+      path: '/master-data/units',
+      element: <Units />,
+    },
+    {
+      path: '/master-data/units/add',
+      element: <CreateUnit />,
+    },
+    {
+      path: '/master-data/units/edit/:unitId',
+      element: <EditUnit />,
     },
     {
       path: '404',

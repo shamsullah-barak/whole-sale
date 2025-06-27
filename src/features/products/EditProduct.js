@@ -7,26 +7,26 @@ import { NavLink } from 'react-router-dom';
 import { TextField, MenuItem, Button, Typography, Grid, Paper, Alert, CircularProgress, Box } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { 
-  updateProductAsync, 
+import {
+  updateProductAsync,
   getProductByIdAsync,
-  fetchCompaniesAsync, 
+  fetchCompaniesAsync,
   fetchCategoriesAsync,
-  clearError 
+  clearError,
 } from '../../store/slices/product.slice';
-import { 
-  selectProductsLoading, 
-  selectProductsError, 
+import {
+  selectProductsLoading,
+  selectProductsError,
   selectSelectedProduct,
-  selectCompanies, 
-  selectCategories 
+  selectCompanies,
+  selectCategories,
 } from '../../store/selectors/product.selector';
 
 const EditProduct = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { productId } = useParams();
-  
+
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
   const selectedProduct = useSelector(selectSelectedProduct);
@@ -39,7 +39,7 @@ const EditProduct = () => {
     }
     dispatch(fetchCompaniesAsync());
     dispatch(fetchCategoriesAsync());
-    
+
     // Clear any previous errors
     dispatch(clearError());
   }, [dispatch, productId]);

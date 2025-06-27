@@ -80,7 +80,6 @@ const PurchaseOfGoods = ({ statusId }) => {
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       clearState();
     } catch (error) {
-      console.log({ error });
       toast.error(
         error?.response?.data?.message ??
           "something went wrong! please try again"

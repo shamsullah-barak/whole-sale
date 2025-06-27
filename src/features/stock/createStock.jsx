@@ -28,7 +28,6 @@ const CreateStockForm = () => {
         toast.success("stock create");
       }
     } catch (error) {
-      console.log({ error });
       toast.error(
         error?.response?.data?.message ??
           "something went wrong please try again"

@@ -35,7 +35,6 @@ const MoneyDeposit = ({ statusId }) => {
         amount: 0,
       });
     } catch (error) {
-      console.log({ error });
       toast.error(
         error?.response?.data?.message ??
           "something went wrong! please try again"

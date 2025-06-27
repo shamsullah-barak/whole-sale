@@ -11,11 +11,13 @@ import {
 } from "./store/slices/ledger.slice";
 import { fetchTransactionTypesAsync } from "./store/slices/transaction.types.slice";
 import { fetchStocksAsync } from "./store/slices/stock.slice";
+import { fetchPartnersAsync } from "./store/slices/investment.slice";
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(fetchPartnersAsync());
     dispatch(fetchCashBoxAsync());
     dispatch(fetchProductsAsync({ limit: 10, page: 1 }));
     dispatch(fetchJournalsAsync({ limit: 10, page: 1 }));

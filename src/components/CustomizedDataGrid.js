@@ -7,6 +7,7 @@ import { fetchProductsAsync, deleteProductAsync } from '../store/slices/product.
 import { selectProducts, selectProductsLoading, selectProductsError } from '../store/selectors/product.selector';
 import { selectUnits } from '../store/selectors/unit.selector';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Alert, Snackbar } from '@mui/material';
+import { fetchUnitsAsync } from '../store/slices/unit.slice';
 
 const CustomizedDataGrid = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,7 @@ const CustomizedDataGrid = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
+    dispatch(fetchUnitsAsync()); // Ensure units are loaded for mapping
     const loadProducts = () => {
       dispatch(fetchProductsAsync({ page: 1, limit: products.limitPerPage }));
     };

@@ -54,8 +54,6 @@ const LedgerTransactionsList = () => {
 
   const ledgerTransactions = useSelector(selectLedgerTransactions);
 
-  console.log({ ledgerTransactions, selectedLedger });
-
   useEffect(() => {
     const loadLedgerTransactions = () => {
       dispatch(

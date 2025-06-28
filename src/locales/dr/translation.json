@@ -34,5 +34,9 @@
   "select product": "تولید انتخابول",
   "search": " پلټنه وکړی",
   "CashBox": "تجرۍ",
-  "createLedgerTransaction": "نوي حساب اضافه کول"
+  "createLedgerTransaction": "نوي حساب اضافه کول",
+  "Investments": "سرمایه ګزاري",
+  "Partners": "شریکان",
+  "addInvest": "سرمایه اضافه کول",
+  "totalInvest": "ټوله سرمایه"
 }

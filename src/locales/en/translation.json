@@ -35,5 +35,9 @@
   "search": "Search",
   "CashBox": "CashBox",
   "amount": "Amount",
-  "createLedgerTransaction": "Create Ledger Transaction"
+  "createLedgerTransaction": "Create Ledger Transaction",
+  "investments": "Investments",
+  "partners": "Partners",
+  "addInvest": "Add Invest",
+  "totalInvest": "Total Invest"
 }

@@ -6,7 +6,6 @@ export const fetchJournals = async (page, limit) => {
     const response = await axios.get(
       `http://localhost:5000/api/journalEntries?page=${page}&limit=${limit}`
     );
-    console.log({ res: response.data });
     return response.data;
   } catch (error) {
     console.log({ error });

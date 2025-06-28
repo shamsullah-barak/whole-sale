@@ -15,7 +15,6 @@ function AppTheme(props) {
   const { children, disableCustomTheme, themeComponents } = props;
   const fontFamily = useSelector(selectFontFamily);
 
-  console.log({ fontFamily });
   const theme = React.useMemo(() => {
     return disableCustomTheme
       ? {}

@@ -27,6 +27,7 @@ import EditCategory from "../features/master-data/categories/EditCategory";
 import Companies from "../features/master-data/companies/Companies";
 import EditCompany from "../features/master-data/companies/EditCompany";
 import CreateCompany from "../features/master-data/companies/CreateCompany";
+import Partners from "../features/investment/partners";
 
 // ----------------------------------------------------------------------
 
@@ -154,6 +155,10 @@ export default function Router() {
     {
       path: "/investments",
       element: <Investments />,
+    },
+    {
+      path: "/partners",
+      element: <Partners />,
     },
     {
       path: "404",

@@ -43,98 +43,6 @@ import {
   TreeItem2Root,
 } from "@mui/x-tree-view/TreeItem2";
 
-const ITEMS = [
-  {
-    id: "2",
-    label: "investments",
-    children: [
-      { id: "1.1", label: "partners", color: "green" },
-      { id: "1.2", label: "addInvest", color: "green" },
-      { id: "1.3", label: "totalInvest", color: "green" },
-    ],
-  },
-];
-
-const AnimatedCollapse = animated(Collapse);
-
-const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
-  const { t } = useTranslation();
-
-  const { id, itemId, label, disabled, children, ...other } = props;
-
-  const {
-    getRootProps,
-    getContentProps,
-    getIconContainerProps,
-    getLabelProps,
-    getGroupTransitionProps,
-    status,
-    publicAPI,
-  } = useTreeItem2({
-    id,
-    itemId,
-    children,
-    label: t(`${label}`),
-    disabled,
-    rootRef: ref,
-  });
-
-  const item = publicAPI.getItem(itemId);
-  const color = item?.color;
-  return (
-    <TreeItem2Root {...getRootProps(other)}>
-      <TreeItem2Content
-        {...getContentProps({
-          className: clsx("content", {
-            expanded: status.expanded,
-            selected: status.selected,
-            focused: status.focused,
-            disabled: status.disabled,
-          }),
-        })}
-      >
-        {status.expandable && (
-          <TreeItem2IconContainer {...getIconContainerProps()}>
-            <TreeItem2Icon status={status} />
-          </TreeItem2IconContainer>
-        )}
-
-        <CustomLabel {...getLabelProps({ color })} />
-      </TreeItem2Content>
-      {children && (
-        <TransitionComponent
-          {...getGroupTransitionProps({ className: "groupTransition" })}
-        />
-      )}
-    </TreeItem2Root>
-  );
-});
-
-function CustomLabel({ color, expandable, children, ...other }) {
-  return (
-    <TreeItem2Label {...other} sx={{ display: "flex", alignItems: "center" }}>
-      <Typography
-        className="labelText"
-        variant="body2"
-        sx={{ color: "text.primary" }}
-      >
-        {children}
-      </Typography>
-    </TreeItem2Label>
-  );
-}
-
-function TransitionComponent(props) {
-  const style = useSpring({
-    to: {
-      opacity: props.in ? 1 : 0,
-      transform: `translate3d(0,${props.in ? 0 : 20}px,0)`,
-    },
-  });
-
-  return <AnimatedCollapse style={style} {...props} />;
-}
-
 const mainListItems = [
   { text: "Dashboard", icon: <EqualizerIcon />, path: "/dashboard" },
   { text: "Journal", icon: <NoteAltIcon />, path: "/journal" },
@@ -168,24 +76,142 @@ const secondaryListItems = [
   { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
 ];
 
+const ITEMS = [
+  {
+    id: "1",
+    label: "investments",
+    disabled: true,
+    children: [
+      { id: "2", label: "partners", path: "/partners" },
+      { id: "3", label: "addInvest", path: "/addInvest" },
+      { id: "4", label: "totalInvest", path: "/totalInvest" },
+    ],
+  },
+];
+
+const AnimatedCollapse = animated(Collapse);
+
+const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
+  const { t } = useTranslation();
+
+  const { id, itemId, label, disabled, children } = props;
+  const {
+    getContentProps,
+    getIconContainerProps,
+    getLabelProps,
+    getGroupTransitionProps,
+    status,
+    publicAPI,
+  } = useTreeItem2({
+    id,
+    itemId,
+    children,
+    label: t(label),
+    disabled,
+    rootRef: ref,
+  });
+
+  const item = publicAPI.getItem(itemId);
+  const color = item?.color;
+  return (
+    <React.Fragment key={itemId}>
+      <TreeItem2Content
+        {...getContentProps({
+          className: clsx("content", {
+            expanded: status.expanded,
+            selected: status.selected,
+            focused: status.focused,
+            disabled: status.disabled,
+          }),
+        })}
+      >
+        {status.expandable && (
+          <TreeItem2IconContainer {...getIconContainerProps()}>
+            <TreeItem2Icon status={status} />
+          </TreeItem2IconContainer>
+        )}
+
+        <CustomLabel
+          {...getLabelProps({ color })}
+          {...(item.path && { path: item.path })}
+        />
+      </TreeItem2Content>
+      {children && (
+        <TransitionComponent
+          {...getGroupTransitionProps({ className: "groupTransition" })}
+        />
+      )}
+    </React.Fragment>
+  );
+});
+
+function CustomLabel({ color, expandable, path, children, ...other }) {
+  const { pathname } = useLocation();
+  const isActive = pathname === path;
+  return (
+    <TreeItem2Label {...other} sx={{ display: "flex", alignItems: "center" }}>
+      <ListItem
+        disabled={true}
+        disablePadding
+        component={NavLink}
+        to={path}
+        style={{ textDecoration: "none" }}
+        sx={(theme) => ({
+          display: "block",
+          borderRadius: "5px",
+          color: theme.palette.mode === "dark" ? "#fff" : "#000",
+          textAlign: "right",
+          ...(isActive && {
+            color: COLORS.WHITE,
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? theme.palette.action.selected
+                : COLORS.PURPLE,
+            fontWeight: theme.typography.fontWeightBold,
+          }),
+        })}
+      >
+        <ListItemButton selected={pathname === path}>
+          <ListItemText primary={children} />
+        </ListItemButton>
+      </ListItem>
+    </TreeItem2Label>
+  );
+}
+
+function TransitionComponent(props) {
+  const style = useSpring({
+    to: {
+      opacity: props.in ? 1 : 0,
+      transform: `translate3d(0,${props.in ? 0 : 20}px,0)`,
+    },
+  });
+
+  return <AnimatedCollapse style={style} {...props} />;
+}
+
 export default function MenuContent() {
   const { pathname } = useLocation();
   const selectedDirection = useSelector(selectDirection);
   const { t } = useTranslation();
+
+  const isCollapsed =
+    pathname === "/partners" ||
+    pathname === "/addInvest" ||
+    pathname === "totalInvest";
 
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
         {mainListItems.map((item, index) => {
           return (
-            <>
+            <React.Fragment key={index}>
               {item.text === "Investment" ? (
                 <>
                   <RichTreeView
                     items={ITEMS}
+                    defaultExpandedItems={isCollapsed ? ["1"] : []}
                     aria-label="pages"
-                    defaultExpandedItems={["1", "1.1"]}
-                    defaultSelectedItems={["1.1", "1.1.1"]}
                     sx={{
                       m: "0 -8px",
                       pb: "8px",
@@ -232,7 +258,7 @@ export default function MenuContent() {
                   </ListItem>
                 </>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </List>

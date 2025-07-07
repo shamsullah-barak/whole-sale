@@ -5,7 +5,9 @@ import { createProductColumns } from '../internals/data/gridData';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductsAsync, deleteProductAsync } from '../store/slices/product.slice';
 import { selectProducts, selectProductsLoading, selectProductsError } from '../store/selectors/product.selector';
+import { selectUnits } from '../store/selectors/unit.selector';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Alert, Snackbar } from '@mui/material';
+import { fetchUnitsAsync } from '../store/slices/unit.slice';
 
 const CustomizedDataGrid = () => {
   const dispatch = useDispatch();
@@ -13,6 +15,7 @@ const CustomizedDataGrid = () => {
   const products = useSelector(selectProducts);
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
+  const units = useSelector(selectUnits);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -20,6 +23,7 @@ const CustomizedDataGrid = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
+    dispatch(fetchUnitsAsync()); // Ensure units are loaded for mapping
     const loadProducts = () => {
       dispatch(fetchProductsAsync({ page: 1, limit: products.limitPerPage }));
     };
@@ -61,7 +65,14 @@ const CustomizedDataGrid = () => {
     setProductToDelete(null);
   };
 
-  const columns = createProductColumns(handleEdit, handleDelete, handleView);
+  // Map unitId to unit name
+  const getUnitName = (unitId) => {
+    const unit = units.find((u) => u.id === unitId || u._id === unitId);
+    return unit ? unit.name : unitId;
+  };
+
+  // Pass getUnitName to columns
+  const columns = createProductColumns(handleEdit, handleDelete, handleView, getUnitName);
 
   return (
     <>

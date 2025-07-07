@@ -68,7 +68,7 @@ export function renderAvatar(params) {
 }
 
 // Create columns function that accepts action handlers
-export const createProductColumns = (onEdit, onDelete, onView) => [
+export const createProductColumns = (onEdit, onDelete, onView, getUnitName) => [
   {
     field: 'name',
     headerName: 'Product Name',
@@ -143,6 +143,7 @@ export const createProductColumns = (onEdit, onDelete, onView) => [
     flex: 0.8,
     minWidth: 80,
     sortable: true,
+    renderCell: (params) => (getUnitName ? getUnitName(params.value) : params.value),
   },
   {
     field: 'actions',

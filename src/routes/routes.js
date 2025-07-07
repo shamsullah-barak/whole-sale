@@ -32,6 +32,7 @@ import CreateUnit from "../features/master-data/units/CreateUnit";
 import EditUnit from "../features/master-data/units/EditUnit";
 import Partners from "../features/investment/partners";
 import AddInvest from "../features/investment/addInvest";
+import Investments from "../features/investment";
 
 // ----------------------------------------------------------------------
 

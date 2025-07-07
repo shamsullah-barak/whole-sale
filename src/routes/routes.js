@@ -30,6 +30,7 @@ import StockItems from '../features/stock/stockItems';
 import Units from '../features/master-data/units/Units';
 import CreateUnit from '../features/master-data/units/CreateUnit';
 import EditUnit from '../features/master-data/units/EditUnit';
+import ViewProduct from '../features/products/ViewProduct';
 
 // ----------------------------------------------------------------------
 
@@ -70,6 +71,10 @@ export default function Router() {
     {
       path: '/products/add',
       element: <CreateProduct />,
+    },
+    {
+      path: '/products/view/:productId',
+      element: <ViewProduct />,
     },
     {
       path: '/products/edit/:productId',

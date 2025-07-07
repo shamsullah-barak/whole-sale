@@ -28,6 +28,7 @@ import Companies from "../features/master-data/companies/Companies";
 import EditCompany from "../features/master-data/companies/EditCompany";
 import CreateCompany from "../features/master-data/companies/CreateCompany";
 import Partners from "../features/investment/partners";
+import AddInvest from "../features/investment/addInvest";
 
 // ----------------------------------------------------------------------
 
@@ -159,6 +160,10 @@ export default function Router() {
     {
       path: "/partners",
       element: <Partners />,
+    },
+    {
+      path: "/addInvest",
+      element: <AddInvest />,
     },
     {
       path: "404",

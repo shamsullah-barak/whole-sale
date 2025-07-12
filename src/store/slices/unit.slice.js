@@ -11,7 +11,6 @@ const initialState = {
 export const fetchUnitsAsync = createAsyncThunk('units/fetchUnits', async (companyId, { rejectWithValue }) => {
   try {
     const units = await fetchUnits(companyId);
-    console.log(units);
     return units;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch units');

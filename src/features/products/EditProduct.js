@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import MainDashboard from '../../theme/main/MainDashboard';
 import { NavLink } from 'react-router-dom';
-
 import { TextField, MenuItem, Button, Typography, Grid, Paper, Alert, CircularProgress, Box } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -21,6 +20,8 @@ import {
   selectCompanies,
   selectCategories,
 } from '../../store/selectors/product.selector';
+import { fetchUnitsAsync } from '../../store/slices/unit.slice';
+import { selectUnits } from '../../store/selectors/unit.selector';
 
 const EditProduct = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const EditProduct = () => {
   const selectedProduct = useSelector(selectSelectedProduct);
   const companies = useSelector(selectCompanies);
   const categories = useSelector(selectCategories);
+  const units = useSelector(selectUnits);
 
   useEffect(() => {
     if (productId) {
@@ -39,8 +41,7 @@ const EditProduct = () => {
     }
     dispatch(fetchCompaniesAsync());
     dispatch(fetchCategoriesAsync());
-
-    // Clear any previous errors
+    dispatch(fetchUnitsAsync()); // Fetch units for dropdown
     dispatch(clearError());
   }, [dispatch, productId]);
 
@@ -60,7 +61,7 @@ const EditProduct = () => {
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Product name is required'),
-    unit: Yup.number().min(1).required('Unit is required'),
+    unitId: Yup.string().required('Unit is required'),
     description: Yup.string(),
     sku: Yup.string().required('SKU is required'),
     barCode: Yup.string().required('Barcode is required'),
@@ -112,7 +113,7 @@ const EditProduct = () => {
           <Formik
             initialValues={{
               name: selectedProduct.name || '',
-              unit: selectedProduct.unit || 1,
+              unitId: selectedProduct.unitId || '',
               description: selectedProduct.description || '',
               sku: selectedProduct.sku || '',
               barCode: selectedProduct.barCode || '',
@@ -144,13 +145,20 @@ const EditProduct = () => {
                   <Grid xs={12} sm={6}>
                     <Field
                       as={TextField}
+                      select
                       fullWidth
                       label="Unit"
-                      name="unit"
-                      type="number"
-                      error={touched.unit && !!errors.unit}
-                      helperText={touched.unit && errors.unit}
-                    />
+                      name="unitId"
+                      error={touched.unitId && !!errors.unitId}
+                      helperText={touched.unitId && errors.unitId}
+                    >
+                      <MenuItem value="">Select a unit</MenuItem>
+                      {units.map((unit) => (
+                        <MenuItem key={unit.id} value={unit.id}>
+                          {unit.name} ({unit.abbreviation})
+                        </MenuItem>
+                      ))}
+                    </Field>
                   </Grid>
                   <Grid xs={12}>
                     <Field as={TextField} fullWidth label="Description" name="description" />

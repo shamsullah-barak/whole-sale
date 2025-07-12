@@ -43,12 +43,12 @@ const EntryForm = () => {
       </Grid>
 
       {/* money deposit */}
-      {status.statusName === "Money Deposit" && (
+      {status.statusName === "money deposit" && (
         <MoneyDeposit statusId={status.statusId} />
       )}
 
       {/* purchasing something */}
-      {status.statusName === "Purchase of goods" && (
+      {status.statusName === "purchase of goods" && (
         <PurchaseOfGoods statusId={status.statusId} />
       )}
     </>

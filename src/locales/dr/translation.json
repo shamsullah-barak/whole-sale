@@ -41,5 +41,6 @@
   "totalInvest": "ټوله سرمایه",
   "reason": "سبب",
   "shopExpense": "د دکان مصارف",
-  "type": "ډول"
+  "type": "ډول",
+  "expenses": "مصارف"
 }

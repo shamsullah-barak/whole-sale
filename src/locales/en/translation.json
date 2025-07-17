@@ -42,5 +42,6 @@
   "totalInvest": "Total Invest",
   "reason": "Reason",
   "shopExpense": "Shop Expenses",
-  "type": "Type"
+  "type": "Type",
+  "expenses": "Expenses"
 }

@@ -33,6 +33,7 @@ import EditUnit from "../features/master-data/units/EditUnit";
 import Partners from "../features/investment/partners";
 import AddInvest from "../features/investment/addInvest";
 import Investments from "../features/investment";
+import Expenses from "../features/expenses";
 
 // ----------------------------------------------------------------------
 
@@ -168,6 +169,10 @@ export default function Router() {
     {
       path: "/addInvest",
       element: <AddInvest />,
+    },
+    {
+      path: "/expenses",
+      element: <Expenses />,
     },
     {
       path: "404",

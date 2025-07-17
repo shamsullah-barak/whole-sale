@@ -6,6 +6,7 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import { selectTransactionTypes } from "../../store/selectors/transaction.types.selector";
 import MoneyDeposit from "./moneyDepositEntry";
 import PurchaseOfGoods from "./purchaseEntry";
+import MoneyWithdrawal from "./moneyWithdrawal";
 
 const EntryForm = () => {
   const [status, setStatus] = useState({ statusId: "", statusName: "" });
@@ -50,6 +51,11 @@ const EntryForm = () => {
       {/* purchasing something */}
       {status.statusName === "purchase of goods" && (
         <PurchaseOfGoods statusId={status.statusId} />
+      )}
+
+      {/* purchasing something */}
+      {status.statusName === "money withdrawal" && (
+        <MoneyWithdrawal transactionTypeId={status.statusId} />
       )}
     </>
   );

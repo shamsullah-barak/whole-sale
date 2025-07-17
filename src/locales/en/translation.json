@@ -39,5 +39,8 @@
   "investments": "Investments",
   "partners": "Partners",
   "addInvest": "Add Invest",
-  "totalInvest": "Total Invest"
+  "totalInvest": "Total Invest",
+  "reason": "Reason",
+  "shopExpense": "Shop Expenses",
+  "type": "Type"
 }

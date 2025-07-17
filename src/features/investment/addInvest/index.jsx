@@ -18,6 +18,8 @@ import COLORS from "../../../constant/colors";
 import { fetchPartnersAsync } from "../../../store/slices/investment.slice";
 import { BarChart, BarSeries, ChartContainer, Axis } from "@mui/x-charts";
 
+const types = ["deposit", "withdraw"];
+
 const dataset = [
   {
     total_invest: 59,
@@ -135,8 +137,6 @@ function BasicLineChart() {
   );
 }
 
-const types = ["deposit", "withdraw"];
-
 const AddNewInvest = () => {
   const { t } = useTranslation();
   const selectedDirection = useSelector(selectDirection);
@@ -155,28 +155,56 @@ const AddNewInvest = () => {
   const handleNewInvest = async (event) => {
     event.preventDefault(event);
 
-    try {
-      setLoading(true);
-      await axios.post(
-        `http://localhost:5000/api/investments/invests`,
-        newInvest,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setOpen(false);
-      setLoading(false);
-      toast.success("data added");
-    } catch (error) {
-      console.log(error);
-      setOpen(false);
-      setLoading(false);
-      setNewInvest({ amount: "", investorId: "", type: "" });
-      toast.error(
-        error?.response.data.message ?? "something went wrong! please try again"
-      );
+    if (newInvest.type === "deposit") {
+      try {
+        setLoading(true);
+        await axios.post(
+          `http://localhost:5000/api/investments/deposit`,
+          newInvest,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setOpen(false);
+        setLoading(false);
+        toast.success("data added");
+      } catch (error) {
+        console.log(error);
+        setOpen(false);
+        setLoading(false);
+        setNewInvest({ amount: "", investorId: "", type: "" });
+        toast.error(
+          error?.response.data.message ??
+            "something went wrong! please try again"
+        );
+      }
+    } else if (newInvest.type === "withdraw") {
+      try {
+        setLoading(true);
+        await axios.post(
+          `http://localhost:5000/api/investments/withdraw`,
+          newInvest,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setOpen(false);
+        setLoading(false);
+        toast.success("data added");
+      } catch (error) {
+        console.log(error);
+        setOpen(false);
+        setLoading(false);
+        setNewInvest({ amount: "", investorId: "", type: "" });
+        toast.error(
+          error?.response.data.message ??
+            "something went wrong! please try again"
+        );
+      }
     }
   };
 
@@ -190,7 +218,7 @@ const AddNewInvest = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 600,
             bgcolor: "background.paper",
             borderRadius: 2,
             boxShadow: 24,
@@ -202,17 +230,6 @@ const AddNewInvest = () => {
           </Typography>
 
           <Stack spacing={2}>
-            <TextField
-              label="amount"
-              name="amount"
-              value={newInvest.amount}
-              onChange={(event) =>
-                setNewInvest({ ...newInvest, amount: event.target.value })
-              }
-              fullWidth
-              size="small"
-              type="number"
-            />
             <TextField
               select
               fullWidth
@@ -229,6 +246,18 @@ const AddNewInvest = () => {
                 </MenuItem>
               ))}
             </TextField>
+            <TextField
+              label="amount"
+              name="amount"
+              value={newInvest.amount}
+              onChange={(event) =>
+                setNewInvest({ ...newInvest, amount: event.target.value })
+              }
+              fullWidth
+              size="small"
+              type="number"
+            />
+
             <TextField
               select
               fullWidth

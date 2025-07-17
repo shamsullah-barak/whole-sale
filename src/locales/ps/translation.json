@@ -39,5 +39,8 @@
   "investments": "سرمایه ګزاري",
   "partners": "شریکان",
   "addInvest": "سرمایه اضافه کول",
-  "totalInvest": "ټوله سرمایه"
+  "totalInvest": "ټوله سرمایه",
+  "reason": "سبب",
+  "shopExpense": "د دکان مصارف",
+  "type": "ډول"
 }

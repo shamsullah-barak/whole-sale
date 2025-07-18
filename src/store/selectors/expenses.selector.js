@@ -1,2 +1,2 @@
-// select all partners
-export const selectPartners = (state) => state.investments.expenses;
+// select all expenses
+export const selectExpenses = (state) => state.expenses;

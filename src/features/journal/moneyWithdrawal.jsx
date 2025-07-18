@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { TextField, MenuItem, Button, Grid2 as Grid } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { ToastContainer, toast } from "react-toastify";
+import { fetchExpensesAsync } from "../../store/slices/expenses.slice";
 
 const reasons = ["shopExpense"];
 const shopExpenses = [
   "rent",
   "electricityBill",
+  "waterBill",
   "internetBill",
   "salariesOfEmployees",
   "cleaningSupplies",
@@ -44,6 +46,8 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
   const [type, setShopExpense] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
+
   const selectedDirection = useSelector(selectDirection);
 
   const journalEntryHandler = async (event) => {
@@ -62,6 +66,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
         }
       );
       setLoading(false);
+      dispatch(fetchExpensesAsync());
       toast.success("data added");
     } catch (error) {
       setLoading(false);

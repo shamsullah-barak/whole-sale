@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import MainDashboard from "../../../theme/main/MainDashboard";
+import MainDashboard from "../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPartners } from "../../../store/selectors/investment.selector";
+import { selectPartners } from "../../store/selectors/investment.selector";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
@@ -13,154 +13,18 @@ import { Modal, Typography, TextField, Stack } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { selectDirection } from "../../../store/selectors/app.selector";
-import COLORS from "../../../constant/colors";
-import { fetchPartnersAsync } from "../../../store/slices/investment.slice";
+import { selectDirection } from "../../store/selectors/app.selector";
+import COLORS from "../../constant/colors";
+import { fetchPartnersAsync } from "../../store/slices/investment.slice";
+import { selectExpenses } from "../../store/selectors/expenses.selector";
 
-const currencyTypes = ["afn", "dollar", "rupee"];
-
-const CreatePartnerModal = ({ open, setOpen }) => {
+const ExpensesList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  //   states
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    currencyType: "",
-  });
-
-  //   selectors
   const selectedDirection = useSelector(selectDirection);
 
-  // methods
-  const handleClose = () => {
-    setOpen(false);
-    setFormData({ name: "", location: "", currencyType: "" }); // reset form
-  };
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      await axios.post(
-        `http://localhost:5000/api/investments/partners`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setOpen(false);
-      setLoading(false);
-      toast.success("data added");
-      dispatch(fetchPartnersAsync());
-    } catch (error) {
-      console.log(error);
-      setOpen(false);
-      setLoading(false);
-      toast.error(
-        error?.response.data.message ?? "something went wrong! please try again"
-      );
-    }
-  };
-
-  return (
-    <>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            نوی شریک اضافه کړئ
-          </Typography>
-
-          <Stack spacing={2}>
-            <TextField
-              label="نوم"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              label="موقعیت"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              select
-              fullWidth
-              label={t("currencyType")}
-              name="currencyType"
-              value={formData.currencyType}
-              onChange={(event) => {
-                setFormData({
-                  ...formData,
-                  currencyType: event.target.value,
-                });
-              }}
-            >
-              {currencyTypes.map((item) => (
-                <MenuItem key={item} value={item} dir={selectedDirection}>
-                  {t(`${item}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={handleClose}
-                variant="outlined"
-                color="secondary"
-              >
-                لغوه
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-              >
-                ثبت
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
-    </>
-  );
-};
-
-const PartnerList = () => {
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
-
-  const partners = useSelector(selectPartners);
-  const selectedDirection = useSelector(selectDirection);
+  const expenses = useSelector(selectExpenses);
 
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
@@ -198,7 +62,7 @@ const PartnerList = () => {
     try {
       setLoading(true);
       await axios.patch(
-        `http://localhost:5000/api/investments/partners/${selectedItem.id}`,
+        `http://localhost:5000/api/investments/expenses/${selectedItem.id}`,
         updatedData,
         {
           headers: {
@@ -224,7 +88,7 @@ const PartnerList = () => {
     try {
       setLoading(true);
       await axios.delete(
-        `http://localhost:5000/api/investments/partners/${selectedId}`
+        `http://localhost:5000/api/investments/expenses/${selectedId}`
       );
       setOpen(false);
       setLoading(false);
@@ -240,6 +104,7 @@ const PartnerList = () => {
     }
   };
 
+  console.log({ e: expenses.expenses });
   const handleUpdateOpen = (item) => {
     setSelectedItem({ ...item });
     setUpdateOpen(true);
@@ -250,22 +115,30 @@ const PartnerList = () => {
 
   const columns = [
     {
-      field: "name",
-      headerName: "Name",
+      field: "reason",
+      headerName: "reason",
       flex: 0.5,
       minWidth: 80,
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: "type",
+      headerName: "type",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 50,
     },
     {
-      field: "currencyType",
-      headerName: "Currency Type",
+      field: "amount",
+      headerName: "amount",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 50,
+    },
+    {
+      field: "description",
+      headerName: "description",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -309,7 +182,7 @@ const PartnerList = () => {
   return (
     <>
       <ToastContainer />
-      {partners?.length === 0 ? (
+      {expenses?.expenses?.length === 0 ? (
         <div
           style={{
             textAlign: "center",
@@ -365,6 +238,7 @@ const PartnerList = () => {
               </Box>
             </Modal>
             <Modal open={updateOpen} onClose={handleCloseUpdate}>
+              {/* update data model here */}
               <Box
                 sx={{
                   position: "absolute",
@@ -381,68 +255,11 @@ const PartnerList = () => {
                 <Typography variant="h6" mb={2}>
                   معلومات اپډیټ کړي
                 </Typography>
-
-                <Stack spacing={2}>
-                  <TextField
-                    label="نوم"
-                    name="name"
-                    value={selectedItem.name ?? ""}
-                    onChange={handleUpdateChanges}
-                    fullWidth
-                    size="small"
-                  />
-                  <TextField
-                    label="موقعیت"
-                    name="location"
-                    value={selectedItem.location ?? ""}
-                    onChange={handleUpdateChanges}
-                    fullWidth
-                    size="small"
-                  />
-                  <TextField
-                    select
-                    fullWidth
-                    label={t("currencyType")}
-                    name="currencyType"
-                    value={selectedItem.currencyType ?? ""}
-                    onChange={(event) => {
-                      setSelectedItem({
-                        ...selectedItem,
-                        currencyType: event.target.value,
-                      });
-                    }}
-                  >
-                    {currencyTypes.map((item) => (
-                      <MenuItem key={item} value={item} dir={selectedDirection}>
-                        {t(`${item}`)}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <Stack direction="row" spacing={2} justifyContent="flex-end">
-                    <Button
-                      onClick={handleCloseUpdate}
-                      variant="outlined"
-                      color="secondary"
-                    >
-                      لغوه
-                    </Button>
-                    <Button
-                      onClick={handleUpdateSubmit}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      loading={loading}
-                      loadingPosition="start"
-                    >
-                      ثبت
-                    </Button>
-                  </Stack>
-                </Stack>
               </Box>
             </Modal>
           </div>
           <DataGrid
-            rows={partners || []}
+            rows={expenses.expenses}
             columns={columns}
             getRowId={(row) => row.id}
             onRowClick={handleRowClick}
@@ -451,18 +268,18 @@ const PartnerList = () => {
             }
             initialState={{
               pagination: {
-                paginationModel: { pageSize: partners?.limitPerPage },
+                paginationModel: { pageSize: expenses?.limitPerPage },
               },
             }}
             pageSizeOptions={[10, 20, 50]}
             onPaginationModelChange={(data) => stateChanged(data)}
             disableColumnResize
-            rowCount={partners?.totalRows}
+            rowCount={expenses?.totalRows}
             paginationMode="server"
             pagination
-            page={partners?.currentPage}
-            pageSize={partners?.limitPerPage}
-            loading={partners?.loading}
+            page={expenses?.currentPage}
+            pageSize={expenses?.limitPerPage}
+            loading={expenses?.loading}
             density="compact"
             slots={{
               footer: () => null,
@@ -500,13 +317,13 @@ const PartnerList = () => {
   );
 };
 
-const Partners = () => {
+const Expenses = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const selectedDirection = useSelector(selectDirection);
 
   return (
-    <MainDashboard title={t("partners")}>
+    <MainDashboard title={t("expenses")}>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -527,18 +344,17 @@ const Partners = () => {
             })}
             onClick={() => setOpen(true)}
           >
-            {t("newPartner")}
+            {t("newExpense")}
           </Button>
         </Grid>
       </Grid>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%" }}>
-          <PartnerList />
-          <CreatePartnerModal open={open} setOpen={setOpen} />
+          <ExpensesList />
         </Grid>
       </Grid>
     </MainDashboard>
   );
 };
 
-export default Partners;
+export default Expenses;

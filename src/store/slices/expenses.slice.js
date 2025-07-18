@@ -3,7 +3,11 @@ import { fetchExpenses } from "../actions/expenses.actions";
 
 const initialState = {
   expenses: [],
+  currentPage: 1,
+  totalPages: 1,
+  limitPerPage: 10,
   loading: false,
+  totalRows: 0,
 };
 
 // async reducers
@@ -26,7 +30,11 @@ export const expensesSlice = createSlice({
       })
       .addCase(fetchExpensesAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.expenses = action.payload;
+        state.expenses = action.payload.results;
+        state.currentPage = action.payload.page;
+        state.limitPerPage = action.payload.limit;
+        state.totalPages = action.payload.totalPages;
+        state.totalRows = action.payload.totalResults;
       });
   },
 });

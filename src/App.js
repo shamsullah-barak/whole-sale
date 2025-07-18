@@ -12,6 +12,7 @@ import {
 import { fetchTransactionTypesAsync } from "./store/slices/transaction.types.slice";
 import { fetchStocksAsync } from "./store/slices/stock.slice";
 import { fetchPartnersAsync } from "./store/slices/investment.slice";
+import { fetchExpensesAsync } from "./store/slices/expenses.slice";
 
 function App() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ function App() {
     dispatch(fetchJournalsAsync({ limit: 10, page: 1 }));
     dispatch(fetchLedgersAsync({ limit: 10, page: 1 }));
     dispatch(fetchStocksAsync({ limit: 10, page: 1 }));
+    dispatch(fetchExpensesAsync({ limit: 10, page: 1 }));
     dispatch(fetchTransactionTypesAsync());
   }, []);
   return <Router />;

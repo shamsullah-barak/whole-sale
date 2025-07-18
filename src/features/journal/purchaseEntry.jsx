@@ -19,7 +19,7 @@ import { selectStocks } from "../../store/selectors/stock.selector";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
-const paymentMethods = ["cash", "bankTransfer", "credit", "cashAndCredit"];
+const paymentMethods = ["cash", "credit", "cashAndCredit"];
 
 const PurchaseOfGoods = ({ statusId }) => {
   const { t } = useTranslation();
@@ -67,10 +67,16 @@ const PurchaseOfGoods = ({ statusId }) => {
   const journalEntryHandler = async (event) => {
     event.preventDefault(event);
 
+    const cleanedEntry = { ...journalEntry };
+
+    if (!cleanedEntry.expiryDate) delete cleanedEntry.expiryDate;
+    if (!cleanedEntry.purchaseDate) delete cleanedEntry.purchaseDate;
+    if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+
     try {
       await axios.post(
-        `http://localhost:5000/api/journalEntries/purchase?statusId=${statusId}`,
-        journalEntry,
+        `http://localhost:5000/api/purchases?transactionTypeId=${statusId}`,
+        cleanedEntry,
         {
           headers: {
             "Content-Type": "application/json",
@@ -78,6 +84,7 @@ const PurchaseOfGoods = ({ statusId }) => {
         }
       );
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
+      toast.success("data added");
       clearState();
     } catch (error) {
       toast.error(
@@ -91,15 +98,19 @@ const PurchaseOfGoods = ({ statusId }) => {
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid xs={12} sm={12}>
+        <Grid size={6} xs={12} sm={12}>
           <Autocomplete
             disablePortal
             disableClearable
             options={products}
             getOptionLabel={(option) => option.name}
-            sx={{ width: 300 }}
             renderInput={(params) => (
-              <TextField {...params} label={t("Products")} variant="outlined" />
+              <TextField
+                {...params}
+                label={t("Products")}
+                variant="outlined"
+                required
+              />
             )}
             onChange={(event, value) => {
               if (value) {
@@ -108,7 +119,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("expiryDate")}
@@ -127,7 +138,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("purchaseDate")}
@@ -146,9 +157,10 @@ const PurchaseOfGoods = ({ statusId }) => {
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
+            required
             label={t("Quantity")}
             name="quantity"
             type="number"
@@ -165,10 +177,11 @@ const PurchaseOfGoods = ({ statusId }) => {
             }
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
             label={t("unitType")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
@@ -182,33 +195,39 @@ const PurchaseOfGoods = ({ statusId }) => {
           >
             {unitTypes.map((item, index) => (
               <MenuItem key={index} value={item}>
-                {item}
+                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("unitPerPackage")}
-            name="unitPerPackage"
-            type="number"
-            value={journalEntry.unitPerPackage}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                unitPerPackage: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
-          />
+        <Grid size={4} xs={12} sm={6}>
+          {journalEntry.unitType !== "kg" &&
+            journalEntry.unitType !== "piece" &&
+            journalEntry.unitType !== "liter" && (
+              <TextField
+                fullWidth
+                required
+                label={t("unitPerPackage")}
+                name="unitPerPackage"
+                type="number"
+                value={journalEntry.unitPerPackage}
+                onChange={(event) =>
+                  setJournalEntry({
+                    ...journalEntry,
+                    unitPerPackage: event.target.value,
+                    totalPrice:
+                      journalEntry.unitPerPackage *
+                      event.target.value *
+                      journalEntry.quantity,
+                  })
+                }
+              />
+            )}
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
+            required
             label={t("unitPrice")}
             name="unitPrice"
             type="number"
@@ -225,7 +244,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             }
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
             disabled
@@ -235,10 +254,11 @@ const PurchaseOfGoods = ({ statusId }) => {
             value={journalEntry.totalPrice}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
             label={t("paymentMethod")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
@@ -252,12 +272,12 @@ const PurchaseOfGoods = ({ statusId }) => {
           >
             {paymentMethods.map((item, index) => (
               <MenuItem key={index} value={item}>
-                {item}
+                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={6} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("invoiceNo")}
@@ -273,14 +293,15 @@ const PurchaseOfGoods = ({ statusId }) => {
           />
         </Grid>
 
-        <Grid xs={12} sm={6}>
+        <Grid size={6} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
             label={t("stockName")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.stockId} // بدل شو
+            value={journalEntry.stockId}
             onChange={(event) => {
               const selectedId = event.target.value;
               const selectedType = stocks.find(
@@ -296,7 +317,7 @@ const PurchaseOfGoods = ({ statusId }) => {
           >
             {stocks.map((item, index) => (
               <MenuItem key={index} value={item.id}>
-                {item.name}
+                {t(`${item.name}`)}
               </MenuItem>
             ))}
           </TextField>

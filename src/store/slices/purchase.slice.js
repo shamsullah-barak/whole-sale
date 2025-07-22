@@ -8,6 +8,10 @@ const initialState = {
   limitPerPage: 10,
   loading: false,
   totalRows: 0,
+  totalPurchases: 0,
+  totalCashPurchases: 0,
+  totalCreditPurchases: 0,
+  totalCashAndCreditPurchases: 0,
 };
 
 // async reducers
@@ -35,6 +39,11 @@ export const purchaseSlice = createSlice({
         state.limitPerPage = action.payload.limit;
         state.totalPages = action.payload.totalPages;
         state.totalRows = action.payload.totalResults;
+        state.totalPurchases = action.payload.totalPurchases;
+        state.totalCashPurchases = action.payload.totalCashPurchases;
+        state.totalCreditPurchases = action.payload.totalCreditPurchases;
+        state.totalCashAndCreditPurchases =
+          action.payload.totalCashAndCreditPurchases;
       });
   },
 });

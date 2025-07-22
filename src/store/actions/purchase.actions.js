@@ -6,7 +6,36 @@ export const fetchPurchases = async (page, limit) => {
     const response = await axios.get(
       `http://localhost:5000/api/purchases?page=${page}&limit=${limit}`
     );
-    return response.data;
+
+    let totalCashPurchases = 0;
+    let totalCreditPurchases = 0;
+    let totalCashAndCreditPurchases = 0;
+    let totalPurchases = 0;
+
+    response.data.results.forEach((item) => {
+      const price = Number(item.totalPrice);
+      totalPurchases += price;
+
+      switch (item.paymentMethod) {
+        case "cash":
+          totalCashPurchases += price;
+          break;
+        case "credit":
+          totalCreditPurchases += price;
+          break;
+        case "cashAndCredit":
+          totalCashAndCreditPurchases += price;
+          break;
+      }
+    });
+
+    return {
+      ...response.data,
+      totalCashAndCreditPurchases,
+      totalCreditPurchases,
+      totalPurchases,
+      totalCashPurchases,
+    };
   } catch (error) {
     console.log({ error });
   }

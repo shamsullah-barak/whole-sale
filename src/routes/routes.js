@@ -127,7 +127,7 @@ export default function Router() {
       element: <CreateStock />,
     },
     {
-      path: "/stocks/:stockId",
+      path: "/stocks/:stockName",
       element: <StockItems />,
     },
     {

@@ -21,7 +21,12 @@ const StockList = () => {
       aria-label="contacts"
     >
       {stocks.map((item) => (
-        <ListItem disablePadding key={item.id} component={NavLink} to={item.id}>
+        <ListItem
+          disablePadding
+          key={item.id}
+          component={NavLink}
+          to={item.name}
+        >
           <ListItemButton>
             <ListItemText primary={item.name} />
           </ListItemButton>

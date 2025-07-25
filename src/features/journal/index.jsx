@@ -12,7 +12,7 @@ const JournalEntry = () => {
     <MainDashboard title={t("JournalEntry")}>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", height: "100%" }}>
-          <EntryList />
+          {/* <EntryList /> */}
           <EntryForm />
         </Grid>
       </Grid>

@@ -88,5 +88,8 @@
   "dozen": "Dozen",
   "cash": "Cash",
   "credit": "Credit",
-  "cashAndCredit": "Credit and Cash"
+  "cashAndCredit": "Credit and Cash",
+  "givingCash": "Giving Cash",
+  "remainingCash": "Remaining Cash",
+  "shop": "Shop"
 }

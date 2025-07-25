@@ -92,14 +92,14 @@ const columns = [
 
 const StockItemsList = () => {
   const dispatch = useDispatch();
-  const stockId = useParams().stockId;
+  const stockName = useParams().stockName;
   const stockItems = useSelector(selectStockItems);
   const selectedDirection = useSelector(selectDirection);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
     dispatch(
-      fetchStockItemsAsync({ stockId, page: page + 1, limit: pageSize })
+      fetchStockItemsAsync({ stockName, page: page + 1, limit: pageSize })
     );
   };
 
@@ -162,14 +162,14 @@ const StockItems = () => {
   const selectedDirection = useSelector(selectDirection);
   const stockItems = useSelector(selectStockItems);
 
-  const stockId = useParams().stockId;
+  const stockName = useParams().stockName;
   const dispatch = useDispatch();
 
   useEffect(() => {
     const loadStockItems = () => {
       dispatch(
         fetchStockItemsAsync({
-          stockId,
+          stockName,
           page: stockItems.currentPage,
           limit: stockItems.limitPerPage,
         })

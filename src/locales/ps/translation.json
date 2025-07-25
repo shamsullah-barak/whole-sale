@@ -88,5 +88,8 @@
   "dozen": "درزن",
   "cash": "په نغدو",
   "credit": "په پور",
-  "cashAndCredit": "په نغدو او پور"
+  "cashAndCredit": "په نغدو او پور",
+  "givingCash": "نغدي پیسې ورکول",
+  "remainingCash": "پاته پیسې",
+  "shop": "دوکان"
 }

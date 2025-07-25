@@ -16,6 +16,7 @@ import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
 import { ToastContainer, toast } from "react-toastify";
 import { selectStocks } from "../../store/selectors/stock.selector";
+import moment from "moment/moment";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -34,16 +35,17 @@ const PurchaseOfGoods = ({ statusId }) => {
     productId: "",
     expiryDate: "",
     quantity: "",
-    unitType: "",
+    unitType: "kg",
     unitPerPackage: "",
     unitPrice: "",
     totalPrice: "",
-    paymentMethod: "",
+    paymentMethod: "cash",
     invoiceNo: "",
     stockName: "",
-    stockId: "",
     discount: 0,
-    purchaseDate: "",
+    givingCash: 0,
+    remainingCash: 0,
+    purchaseDate: moment().format("YYYY-MM-DD"),
   });
 
   const clearState = () => {
@@ -60,7 +62,47 @@ const PurchaseOfGoods = ({ statusId }) => {
       stockName: "",
       stockId: "",
       discount: 0,
-      purchaseDate: "",
+      givingCash: 0,
+      remainingCash: 0,
+      purchaseDate: moment().format("YYYY-MM-DD"),
+    });
+  };
+
+  // handle input changes
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
+
+    setJournalEntry((prevState) => {
+      let updatedEntry = { ...prevState, [name]: value };
+      const {
+        discount,
+        givingCash,
+        quantity,
+        unitPerPackage,
+        unitPrice,
+        unitType,
+        paymentMethod,
+      } = updatedEntry;
+
+      // Set unitPerPackage = 1 for specific unit types
+      if (["kg", "piece", "liter"].includes(unitType)) {
+        updatedEntry.unitPerPackage = 1;
+      }
+
+      const totalPrice = quantity * unitPerPackage * unitPrice - discount;
+      updatedEntry.totalPrice = totalPrice;
+
+      if (paymentMethod === "credit") {
+        updatedEntry.remainingCash = totalPrice;
+        updatedEntry.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedEntry.remainingCash = 0;
+        updatedEntry.givingCash = totalPrice;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedEntry.remainingCash = totalPrice - givingCash;
+      }
+
+      return updatedEntry;
     });
   };
 
@@ -85,7 +127,7 @@ const PurchaseOfGoods = ({ statusId }) => {
       );
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       toast.success("data added");
-      clearState();
+      // clearState();
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??
@@ -129,12 +171,7 @@ const PurchaseOfGoods = ({ statusId }) => {
               shrink: true,
             }}
             value={journalEntry.expiryDate}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                expiryDate: event.target.value,
-              })
-            }
+            onChange={inputHandler}
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
@@ -148,12 +185,7 @@ const PurchaseOfGoods = ({ statusId }) => {
               shrink: true,
             }}
             value={journalEntry.purchaseDate}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                purchaseDate: event.target.value,
-              })
-            }
+            onChange={inputHandler}
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
@@ -165,16 +197,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             name="quantity"
             type="number"
             value={journalEntry.quantity}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                quantity: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
         <Grid size={4} xs={12} sm={6}>
@@ -182,16 +205,12 @@ const PurchaseOfGoods = ({ statusId }) => {
             select
             fullWidth
             required
+            name="unitType"
             label={t("unitType")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.unitType}
-            onChange={(event) => {
-              setJournalEntry({
-                ...journalEntry,
-                unitType: event.target.value,
-              });
-            }}
+            onChange={inputHandler}
           >
             {unitTypes.map((item, index) => (
               <MenuItem key={index} value={item}>
@@ -201,30 +220,22 @@ const PurchaseOfGoods = ({ statusId }) => {
           </TextField>
         </Grid>
         <Grid size={4} xs={12} sm={6}>
-          {journalEntry.unitType !== "kg" &&
-            journalEntry.unitType !== "piece" &&
-            journalEntry.unitType !== "liter" && (
-              <TextField
-                fullWidth
-                required
-                label={t("unitPerPackage")}
-                name="unitPerPackage"
-                type="number"
-                value={journalEntry.unitPerPackage}
-                onChange={(event) =>
-                  setJournalEntry({
-                    ...journalEntry,
-                    unitPerPackage: event.target.value,
-                    totalPrice:
-                      journalEntry.unitPerPackage *
-                      event.target.value *
-                      journalEntry.quantity,
-                  })
-                }
-              />
-            )}
+          <TextField
+            fullWidth
+            required
+            disabled={
+              journalEntry.unitType === "kg" ||
+              journalEntry.unitType === "piece" ||
+              journalEntry.unitType === "liter"
+            }
+            label={t("unitPerPackage")}
+            name="unitPerPackage"
+            type="number"
+            value={journalEntry.unitPerPackage}
+            onChange={inputHandler}
+          />
         </Grid>
-        <Grid size={4} xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             required
@@ -232,19 +243,10 @@ const PurchaseOfGoods = ({ statusId }) => {
             name="unitPrice"
             type="number"
             value={journalEntry.unitPrice}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                unitPrice: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid size={4} xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             disabled
@@ -254,21 +256,17 @@ const PurchaseOfGoods = ({ statusId }) => {
             value={journalEntry.totalPrice}
           />
         </Grid>
-        <Grid size={4} xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             select
             fullWidth
             required
+            name="paymentMethod"
             label={t("paymentMethod")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.paymentMethod}
-            onChange={(event) => {
-              setJournalEntry({
-                ...journalEntry,
-                paymentMethod: event.target.value,
-              });
-            }}
+            onChange={inputHandler}
           >
             {paymentMethods.map((item, index) => (
               <MenuItem key={index} value={item}>
@@ -277,43 +275,63 @@ const PurchaseOfGoods = ({ statusId }) => {
             ))}
           </TextField>
         </Grid>
-        <Grid size={6} xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            disabled={
+              journalEntry.paymentMethod === "cash" ||
+              journalEntry.paymentMethod === "credit"
+            }
+            label={t("givingCash")}
+            name="givingCash"
+            type="number"
+            value={journalEntry.givingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("remainingCash")}
+            name="remainingCash"
+            type="number"
+            value={journalEntry.remainingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("discount")}
+            name="discount"
+            type="number"
+            value={journalEntry.discount}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("invoiceNo")}
             name="invoiceNo"
             type="number"
             value={journalEntry.invoiceNo}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                invoiceNo: event.target.value,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
-
-        <Grid size={6} xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             select
             fullWidth
             required
+            name="stockName"
             label={t("stockName")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.stockId}
-            onChange={(event) => {
-              const selectedId = event.target.value;
-              const selectedType = stocks.find(
-                (item) => item.id === selectedId
-              );
-
-              setJournalEntry({
-                ...journalEntry,
-                stockName: selectedType?.name || "",
-                stockId: selectedId,
-              });
-            }}
+            value={journalEntry.stockName}
+            onChange={inputHandler}
           >
             {stocks.map((item, index) => (
               <MenuItem key={index} value={item.id}>

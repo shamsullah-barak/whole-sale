@@ -4,7 +4,6 @@ import Loans from "../pages/Loan";
 import Customers from "../pages/Customers";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
-import Suppliers from "../pages/Suppliers";
 import Bank from "../pages/Bank";
 import Products from "../features/products/Product";
 import CreateProduct from "../features/products/CreateProduct";
@@ -34,6 +33,7 @@ import Partners from "../features/investment/partners";
 import AddInvest from "../features/investment/addInvest";
 import Investments from "../features/investment";
 import Expenses from "../features/expenses";
+import Supplier from "../features/suppliers";
 
 // ----------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ export default function Router() {
     },
     {
       path: "/suppliers",
-      element: <Suppliers />,
+      element: <Supplier />,
     },
     {
       path: "/bank",

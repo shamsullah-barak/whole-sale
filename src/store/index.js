@@ -13,6 +13,7 @@ import companySlice from "./reducers/company.reducer";
 import unitReducer from "./reducers/unit.slice";
 import investmentReducer from "./reducers/investment.reducer";
 import expensesReducer from "./reducers/expenses.reducer";
+import businessEntityReducer from "./reducers/businessEntity.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -30,5 +31,6 @@ export const store = configureStore({
     units: unitReducer,
     investments: investmentReducer,
     expenses: expensesReducer,
+    businessEntity: businessEntityReducer,
   },
 });

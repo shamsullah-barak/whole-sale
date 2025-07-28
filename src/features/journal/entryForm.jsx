@@ -57,6 +57,11 @@ const EntryForm = () => {
       {status.statusName === "money withdrawal" && (
         <MoneyWithdrawal transactionTypeId={status.statusId} />
       )}
+
+      {/* purchase return */}
+      {status.statusName === "purchase return" && (
+        <MoneyWithdrawal transactionTypeId={status.statusId} />
+      )}
     </>
   );
 };

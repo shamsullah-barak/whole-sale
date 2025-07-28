@@ -1,7 +1,6 @@
 import { useRoutes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import Loans from "../pages/Loan";
-import Customers from "../pages/Customers";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
 import Bank from "../pages/Bank";
@@ -33,7 +32,8 @@ import Partners from "../features/investment/partners";
 import AddInvest from "../features/investment/addInvest";
 import Investments from "../features/investment";
 import Expenses from "../features/expenses";
-import Supplier from "../features/suppliers";
+import Suppliers from "../features/suppliers";
+import Customers from "../features/customers";
 
 // ----------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ export default function Router() {
     },
     {
       path: "/suppliers",
-      element: <Supplier />,
+      element: <Suppliers />,
     },
     {
       path: "/bank",

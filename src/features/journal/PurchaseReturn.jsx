@@ -1,168 +1,140 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { TextField, MenuItem, Button, Grid2 as Grid } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
-import { selectDirection } from "../../store/selectors/app.selector";
-import COLORS from "../../constant/colors";
-import { ToastContainer, toast } from "react-toastify";
-import { fetchExpensesAsync } from "../../store/slices/expenses.slice";
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+  Button,
+} from "@mui/material";
 
-const reasons = ["shopExpense"];
-const shopExpenses = [
-  "rent",
-  "electricityBill",
-  "waterBill",
-  "internetBill",
-  "salariesOfEmployees",
-  "cleaningSupplies",
-  "packagingMaterials",
-  "transportationCost",
-  "maintenanceAndRepairs",
-  "securityServices",
-  "shopInsurance",
-  "marketingAndAdvertising",
-  "licensingAndPermits",
-  "POSSystemSubscription",
-  "inventoryPurchase",
-  "uniformsForStaff",
-  "furnitureAndFixtures",
-  "stationery",
-  "softwareSubscriptions",
-  "wasteDisposal",
-  "mobileRechargeForBusiness",
-  "refreshmentsForStaff",
-  "bankCharges",
-  "loanInstallments",
-  "emergencyFundExpenses",
-  "others",
+const dummyPurchases = [
+  {
+    id: "purchase1",
+    supplier: "Ahmad Ltd.",
+    items: [
+      { id: "item1", name: "Sugar", quantity: 10 },
+      { id: "item2", name: "Oil", quantity: 5 },
+    ],
+  },
+  {
+    id: "purchase2",
+    supplier: "Karimi Store",
+    items: [{ id: "item3", name: "Flour", quantity: 8 }],
+  },
 ];
 
-const PurchaseReturn = ({ transactionTypeId }) => {
-  const { t } = useTranslation();
-  const [description, setDescription] = useState("");
-  const [reason, setReason] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [type, setShopExpense] = useState("");
-  const [loading, setLoading] = useState(false);
+const PurchaseReturnForm = () => {
+  const [selectedPurchaseId, setSelectedPurchaseId] = useState("");
+  const [returnQuantities, setReturnQuantities] = useState({});
 
-  const dispatch = useDispatch();
-
-  const selectedDirection = useSelector(selectDirection);
-
-  const journalEntryHandler = async (event) => {
-    event.preventDefault(event);
-
-    setLoading(true);
-    const data = { reason, type, description, amount };
-    try {
-      await axios.post(
-        `http://localhost:5000/api/expenses?transactionTypeId=${transactionTypeId}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setLoading(false);
-      dispatch(fetchExpensesAsync());
-      toast.success("data added");
-    } catch (error) {
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
-    }
+  const handleSelectChange = (e) => {
+    setSelectedPurchaseId(e.target.value);
+    setReturnQuantities({});
   };
 
+  const handleReturnQtyChange = (itemId, value) => {
+    setReturnQuantities((prev) => ({
+      ...prev,
+      [itemId]: Number(value),
+    }));
+  };
+
+  const handleSubmit = () => {
+    const selectedPurchase = dummyPurchases.find(
+      (p) => p.id === selectedPurchaseId
+    );
+    const returnedItems = selectedPurchase.items.map((item) => ({
+      ...item,
+      returnQty: returnQuantities[item.id] || 0,
+    }));
+    console.log("Returned Items:", returnedItems);
+    alert("Purchase return submitted!");
+  };
+
+  const selectedPurchase = dummyPurchases.find(
+    (p) => p.id === selectedPurchaseId
+  );
+
   return (
-    <>
-      <ToastContainer />
-      <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            label={t("reason")}
-            style={{ minWidth: "200px" }}
-            dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={reason}
-            onChange={(event) => {
-              setReason(event.target.value);
-            }}
-          >
-            {reasons.map((item, index) => (
-              <MenuItem key={index} value={item}>
-                {t(`${item}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        {/* {reason === "shopExpense" && (
-          <Grid xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label={t("type")}
-              style={{ minWidth: "200px" }}
-              dir={selectedDirection === "rtl" ? "right" : "left"}
-              value={type}
-              onChange={(event) => {
-                setShopExpense(event.target.value);
-              }}
-            >
-              {shopExpenses.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {t(`${item}`)}
-                </MenuItem>
+    <Box
+      sx={{
+        mx: "auto",
+        mt: 3,
+        p: 3,
+        border: "1px solid #ccc",
+        borderRadius: 2,
+      }}
+    >
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Select Purchase</InputLabel>
+        <Select
+          value={selectedPurchaseId}
+          onChange={handleSelectChange}
+          label="Select Purchase"
+        >
+          {dummyPurchases.map((purchase) => (
+            <MenuItem key={purchase.id} value={purchase.id}>
+              {purchase.supplier} - #{purchase.id}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {selectedPurchase && (
+        <TableContainer component={Paper} sx={{ mt: 3 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Item</TableCell>
+                <TableCell>Purchased Qty</TableCell>
+                <TableCell>Return Qty</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {selectedPurchase.items.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      size="small"
+                      inputProps={{ min: 0, max: item.quantity }}
+                      value={returnQuantities[item.id] || ""}
+                      onChange={(e) =>
+                        handleReturnQtyChange(item.id, e.target.value)
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
               ))}
-            </TextField>
-          </Grid>
-        )} */}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-        <Grid xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t(`amount`)}
-            name="amount"
-            type="number"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("description")}
-            name="description"
-            type="text"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </Grid>
-      </Grid>
-      <Button
-        fullWidth
-        type="submit"
-        variant="contained"
-        color="inherit"
-        disabled={loading}
-        loading={loading}
-        style={{ marginTop: 20 }}
-        sx={(theme) => ({
-          backgroundColor:
-            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-        })}
-        onClick={journalEntryHandler}
-      >
-        {t("Add")}
-      </Button>
-    </>
+      {selectedPurchase && (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 3 }}
+          onClick={handleSubmit}
+        >
+          Submit Return
+        </Button>
+      )}
+    </Box>
   );
 };
 
-export default PurchaseReturn;
+export default PurchaseReturnForm;

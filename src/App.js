@@ -14,6 +14,7 @@ import {
   fetchCustomersAsync,
   fetchSuppliersAsync,
 } from "./store/slices/businessEntity.slice";
+import { fetchNextInvoiceAsync } from "./store/slices/purchase.slice";
 
 function App() {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ function App() {
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));
     dispatch(fetchProductsAsync({ limit: 10, page: 1 }));
+    dispatch(fetchNextInvoiceAsync());
     dispatch(fetchJournalsAsync({ limit: 10, page: 1 }));
     dispatch(fetchLedgersAsync({ limit: 10, page: 1 }));
     dispatch(fetchStocksAsync({ limit: 10, page: 1 }));

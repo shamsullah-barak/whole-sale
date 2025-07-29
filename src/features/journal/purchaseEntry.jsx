@@ -17,6 +17,9 @@ import { selectProducts } from "../../store/selectors/product.selector";
 import { ToastContainer, toast } from "react-toastify";
 import { selectStocks } from "../../store/selectors/stock.selector";
 import moment from "moment/moment";
+import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import { fetchNextInvoiceAsync } from "../../store/slices/purchase.slice";
+import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -27,10 +30,11 @@ const PurchaseOfGoods = ({ statusId }) => {
   const dispatch = useDispatch();
 
   const journals = useSelector(selectJournals);
+  const nextInvoiceNo = useSelector(selectNextInvoiceNo);
   const stocks = useSelector(selectStocks).stocks;
   const products = useSelector(selectProducts).products;
+  const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);
-
   const [journalEntry, setJournalEntry] = useState({
     productId: "",
     expiryDate: "",
@@ -45,6 +49,7 @@ const PurchaseOfGoods = ({ statusId }) => {
     discount: 0,
     givingCash: 0,
     remainingCash: 0,
+    supplierId: "",
     purchaseDate: moment().format("YYYY-MM-DD"),
   });
 
@@ -125,6 +130,7 @@ const PurchaseOfGoods = ({ statusId }) => {
           },
         }
       );
+      dispatch(fetchNextInvoiceAsync());
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       toast.success("data added");
       // clearState();
@@ -317,10 +323,11 @@ const PurchaseOfGoods = ({ statusId }) => {
             label={t("invoiceNo")}
             name="invoiceNo"
             type="number"
-            value={journalEntry.invoiceNo}
-            onChange={inputHandler}
+            value={nextInvoiceNo}
+            disabled
           />
         </Grid>
+
         <Grid size={3} xs={12} sm={6}>
           <TextField
             select
@@ -336,6 +343,27 @@ const PurchaseOfGoods = ({ statusId }) => {
             {stocks.map((item, index) => (
               <MenuItem key={index} value={item.id}>
                 {t(`${item.name}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={12} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="supplierId"
+            label={t("supplier")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.supplierId}
+            onChange={inputHandler}
+          >
+            {suppliers.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
+                {t(`${item.phone}`)}
               </MenuItem>
             ))}
           </TextField>

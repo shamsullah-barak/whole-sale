@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchPurchases } from "../actions/purchase.actions";
+import {
+  fetchNextInvoiceNo,
+  fetchPurchases,
+} from "../actions/purchase.actions";
 
 const initialState = {
   purchases: [],
@@ -8,6 +11,7 @@ const initialState = {
   limitPerPage: 10,
   loading: false,
   totalRows: 0,
+  nextInvoiceNo: "",
   totalPurchases: 0,
   totalCashPurchases: 0,
   totalCreditPurchases: 0,
@@ -20,6 +24,15 @@ export const fetchPurchasesAsync = createAsyncThunk(
   async ({ page, limit }) => {
     const purchases = await fetchPurchases(page, limit);
     return purchases;
+  }
+);
+
+// async reducers
+export const fetchNextInvoiceAsync = createAsyncThunk(
+  "purchases/fetchNextInvoiceNo",
+  async () => {
+    const nextInvoice = await fetchNextInvoiceNo();
+    return nextInvoice;
   }
 );
 
@@ -44,6 +57,15 @@ export const purchaseSlice = createSlice({
         state.totalCreditPurchases = action.payload.totalCreditPurchases;
         state.totalCashAndCreditPurchases =
           action.payload.totalCashAndCreditPurchases;
+      });
+
+    builder
+      .addCase(fetchNextInvoiceAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchNextInvoiceAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.nextInvoiceNo = action.payload.counter;
       });
   },
 });

@@ -21,7 +21,7 @@ const MoneyDeposit = ({ statusId }) => {
     event.preventDefault(event);
     try {
       await axios.post(
-        `http://localhost:5000/api/journalEntries/moneyDeposit?statusId=${statusId}`,
+        `http://localhost:5000/api/journal-entries/moneyDeposit?statusId=${statusId}`,
         journalEntry,
         {
           headers: {

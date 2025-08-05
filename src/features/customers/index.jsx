@@ -53,11 +53,15 @@ const CreateCustomers = ({ open, setOpen }) => {
     formData.type = "customer";
     try {
       setLoading(true);
-      await axios.post(`http://localhost:5000/api/businessEntities`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.post(
+        `http://localhost:5000/api/business-entities`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       setOpen(false);
       setLoading(false);
       toast.success("data added");

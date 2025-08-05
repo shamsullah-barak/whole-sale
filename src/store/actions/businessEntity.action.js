@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchSuppliers = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/businessEntities?type=supplier`
+      `http://localhost:5000/api/business-entities?type=supplier`
     );
     return response.data;
   } catch (error) {
@@ -16,7 +16,7 @@ export const fetchSuppliers = async () => {
 export const fetchCustomers = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/businessEntities?type=customer`
+      `http://localhost:5000/api/business-entities?type=customer`
     );
     return response.data;
   } catch (error) {

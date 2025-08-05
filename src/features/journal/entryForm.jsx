@@ -8,6 +8,7 @@ import MoneyDeposit from "./moneyDepositEntry";
 import PurchaseOfGoods from "./purchaseEntry";
 import MoneyWithdrawal from "./moneyWithdrawal";
 import PurchaseReturnForm from "./PurchaseReturn";
+import Sales from "./Sales";
 
 const EntryForm = () => {
   const [status, setStatus] = useState({ statusId: "", statusName: "" });
@@ -62,6 +63,11 @@ const EntryForm = () => {
       {/* purchase return */}
       {status.statusName === "purchase return" && (
         <PurchaseReturnForm transactionTypeId={status.statusId} />
+      )}
+
+      {/* sale */}
+      {status.statusName === "sale of goods" && (
+        <Sales transactionTypeId={status.statusId} />
       )}
     </>
   );

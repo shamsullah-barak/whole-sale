@@ -45,7 +45,6 @@ export const fetchPurchases = async (page, limit) => {
 
 // A mock function to mimic making an async request for data
 export const fetchNextInvoiceNo = async () => {
-  console.log("requesting");
   try {
     const response = await axios.get(
       `http://localhost:5000/api/purchases/next-invoice`

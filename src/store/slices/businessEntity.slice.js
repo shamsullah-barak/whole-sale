@@ -10,7 +10,7 @@ const initialState = {
     currentPage: 1,
     totalPages: 1,
     limitPerPage: 10,
-    Loading: false,
+    loading: false,
     totalRows: 0,
   },
   customers: {
@@ -18,7 +18,7 @@ const initialState = {
     currentPage: 1,
     totalPages: 1,
     limitPerPage: 10,
-    Loading: false,
+    loading: false,
     totalRows: 0,
   },
 };
@@ -48,7 +48,7 @@ export const businessEntitySlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchSuppliersAsync.pending, (state) => {
-        state.sLoading = true;
+        state.suppliers.loading = true;
       })
       .addCase(fetchSuppliersAsync.fulfilled, (state, action) => {
         state.loading = false;
@@ -60,10 +60,10 @@ export const businessEntitySlice = createSlice({
       });
     builder
       .addCase(fetchCustomersAsync.pending, (state) => {
-        state.cLoading = true;
+        state.customers.loading = true;
       })
       .addCase(fetchCustomersAsync.fulfilled, (state, action) => {
-        state.cLoading = false;
+        state.customers.loading = false;
         state.customers.customers = action.payload.results;
         state.customers.currentPage = action.payload.page;
         state.customers.limitPerPage = action.payload.limit;

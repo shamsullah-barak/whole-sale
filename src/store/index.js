@@ -14,6 +14,7 @@ import unitReducer from "./reducers/unit.slice";
 import investmentReducer from "./reducers/investment.reducer";
 import expensesReducer from "./reducers/expenses.reducer";
 import businessEntityReducer from "./reducers/businessEntity.reducer";
+import saleReducer from "./reducers/sale.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -32,5 +33,6 @@ export const store = configureStore({
     investments: investmentReducer,
     expenses: expensesReducer,
     businessEntity: businessEntityReducer,
+    sales: saleReducer,
   },
 });

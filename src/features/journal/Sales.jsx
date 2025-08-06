@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { TextField, MenuItem, Grid, Button, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import COLORS from "../../constant/colors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { selectCustomers } from "../../store/selectors/businessEntity.selector";
 import { selectStocks } from "../../store/selectors/stock.selector";
 import { InputAdornment, CircularProgress } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+import { fetchSalesAsync } from "../../store/slices/sale.slice";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -16,6 +17,7 @@ const paymentMethods = ["cash", "credit", "cashAndCredit"];
 
 const Sales = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -23,17 +25,18 @@ const Sales = () => {
   const customers = useSelector(selectCustomers).customers;
   const stocks = useSelector(selectStocks).stocks;
   const [sale, setSale] = useState({
-    stockId: "",
-    stockName: "",
-    quantity: "",
+    unitType: "",
+    unitPerPackage: "",
     unitPrice: "",
     totalPrice: "",
     paymentMethod: "",
+    givingCash: "",
+    remainingCash: "",
+    invoiceNo: "",
     customerId: "",
-    productId: "",
-    productName: "",
-    purchaseId: "",
-    unitType: "",
+    discount: 0,
+    quantity: "",
+    unitPerPackage: "",
   });
 
   // API call
@@ -61,30 +64,60 @@ const Sales = () => {
     fetchData();
   }, [sale.stockName]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  // handle input changes
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
 
-    let updatedData = { ...sale, [name]: value };
+    setSale((prevState) => {
+      let updatedSale = { ...prevState, [name]: value };
+      const {
+        discount,
+        givingCash,
+        quantity,
+        unitPerPackage,
+        unitPrice,
+        unitType,
+        paymentMethod,
+      } = updatedSale;
 
-    if (name === "quantity" || name === "unitPrice") {
-      const quantity = parseFloat(updatedData.quantity || 0);
-      const price = parseFloat(updatedData.unitPrice || 0);
-      updatedData.totalPrice = (quantity * price).toFixed(2);
-    }
+      // Set unitPerPackage = 1 for specific unit types
+      if (["kg", "piece", "liter"].includes(unitType)) {
+        updatedSale.unitPerPackage = 1;
+      }
 
-    setSale(updatedData);
+      const totalPrice = quantity * unitPerPackage * unitPrice - discount;
+      updatedSale.totalPrice = totalPrice;
+
+      if (paymentMethod === "credit") {
+        updatedSale.remainingCash = totalPrice;
+        updatedSale.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedSale.remainingCash = 0;
+        updatedSale.givingCash = totalPrice;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedSale.remainingCash = totalPrice - givingCash;
+      }
+
+      return updatedSale;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault(event);
 
+    const cleanedSale = { ...sale };
+
+    delete cleanedSale.productId;
+    delete cleanedSale.productName;
+    delete cleanedSale.invoiceNo;
+
     try {
-      await axios.post(`http://localhost:5000/api/sales`, sale, {
+      await axios.post(`http://localhost:5000/api/sales`, cleanedSale, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      // dispatch(fetchNextInvoiceAsync());
+      dispatch(fetchSalesAsync());
       // dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       toast.success("data added");
       // clearState();
@@ -189,91 +222,138 @@ const Sales = () => {
                 </Grid> */}
 
                 <Grid item xs={12} sm={4}>
-                  {unitTypes.length > 0 && (
-                    <TextField
-                      select
-                      fullWidth
-                      name="unitType"
-                      label="unitType"
-                      style={{ minWidth: "100px" }}
-                      dir={selectedDirection === "rtl" ? "right" : "left"}
-                      value={sale.unitType}
-                      onChange={handleChange}
-                    >
-                      {unitTypes.map((item, index) => (
-                        <MenuItem key={index} value={item}>
-                          {t(`${item}`)}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                </Grid>
-                {/* <Grid item xs={12} sm={4}>
                   <TextField
-                    type="number"
-                    name="unitPerPackage"
-                    label="unitPerPackage"
-                    value={sale.unitPerPackage}
-                    onChange={handleChange}
                     fullWidth
                     required
-                    inputProps={{ min: 1 }}
-                  />
-                </Grid> */}
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    type="number"
+                    label={t("Quantity")}
                     name="quantity"
-                    label="quantity"
+                    type="number"
                     value={sale.quantity}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                    inputProps={{ min: 1 }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    type="number"
-                    name="unitPrice"
-                    label="Unit Price"
-                    value={sale.unitPrice}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                    inputProps={{ min: 1 }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    type="number"
-                    name="totalPrice"
-                    label="Total Price"
-                    value={sale.totalPrice}
-                    fullWidth
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                    onChange={inputHandler}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <TextField
                     select
-                    name="paymentMethod"
-                    label="paymentMethod"
-                    value={sale.paymentMethod}
-                    onChange={handleChange}
                     fullWidth
                     required
+                    name="unitType"
+                    label={t("unitType")}
+                    style={{ minWidth: "200px" }}
+                    dir={selectedDirection === "rtl" ? "right" : "left"}
+                    value={sale.unitType}
+                    onChange={inputHandler}
                   >
-                    {paymentMethods.map((method) => (
-                      <MenuItem key={method} value={method}>
-                        {t(`${method}`)}
+                    {unitTypes.map((item, index) => (
+                      <MenuItem key={index} value={item}>
+                        {t(`${item}`)}
                       </MenuItem>
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={12} sm={6} md={4}>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    required
+                    disabled={
+                      sale.unitType === "kg" ||
+                      sale.unitType === "piece" ||
+                      sale.unitType === "liter"
+                    }
+                    label={t("unitPerPackage")}
+                    name="unitPerPackage"
+                    type="number"
+                    value={sale.unitPerPackage}
+                    onChange={inputHandler}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    required
+                    label={t("unitPrice")}
+                    name="unitPrice"
+                    type="number"
+                    value={sale.unitPrice}
+                    onChange={inputHandler}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    label={t("totalPrice")}
+                    name="totalPrice"
+                    type="number"
+                    value={sale.totalPrice}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    select
+                    fullWidth
+                    required
+                    name="paymentMethod"
+                    label={t("paymentMethod")}
+                    style={{ minWidth: "200px" }}
+                    dir={selectedDirection === "rtl" ? "right" : "left"}
+                    value={sale.paymentMethod}
+                    onChange={inputHandler}
+                  >
+                    {paymentMethods.map((item, index) => (
+                      <MenuItem key={index} value={item}>
+                        {t(`${item}`)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    required
+                    disabled={
+                      sale.paymentMethod === "cash" ||
+                      sale.paymentMethod === "credit"
+                    }
+                    label={t("givingCash")}
+                    name="givingCash"
+                    type="number"
+                    value={sale.givingCash}
+                    onChange={inputHandler}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    label={t("remainingCash")}
+                    name="remainingCash"
+                    type="number"
+                    value={sale.remainingCash}
+                    onChange={inputHandler}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label={t("discount")}
+                    name="discount"
+                    type="number"
+                    value={sale.discount}
+                    onChange={inputHandler}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label={t("invoiceNo")}
+                    name="invoiceNo"
+                    type="number"
+                    value={1}
+                    disabled
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} md={8}>
                   <TextField
                     select
                     fullWidth
@@ -283,7 +363,7 @@ const Sales = () => {
                     style={{ minWidth: "200px" }}
                     dir={selectedDirection === "rtl" ? "right" : "left"}
                     value={sale.customerId}
-                    onChange={handleChange}
+                    onChange={inputHandler}
                   >
                     {customers.map((item, index) => (
                       <MenuItem key={index} value={item.id}>
@@ -293,26 +373,28 @@ const Sales = () => {
                     ))}
                   </TextField>
                 </Grid>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  color="inherit"
-                  style={{ marginTop: 20 }}
-                  sx={(theme) => ({
-                    backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? COLORS.WHITE
-                        : COLORS.PURPLE,
-                    color:
-                      theme.palette.mode === "dark"
-                        ? COLORS.BLACK
-                        : COLORS.WHITE,
-                  })}
-                  onClick={handleSubmit}
-                >
-                  {t("Add")}
-                </Button>
+                <Grid item xs={12} sm={12} md={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    color="inherit"
+                    style={{ marginTop: 20 }}
+                    sx={(theme) => ({
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? COLORS.WHITE
+                          : COLORS.PURPLE,
+                      color:
+                        theme.palette.mode === "dark"
+                          ? COLORS.BLACK
+                          : COLORS.WHITE,
+                    })}
+                    onClick={handleSubmit}
+                  >
+                    {t("Add")}
+                  </Button>
+                </Grid>
               </>
             )}
           </>

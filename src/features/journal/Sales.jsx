@@ -9,7 +9,10 @@ import { selectStocks } from "../../store/selectors/stock.selector";
 import { InputAdornment, CircularProgress } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { fetchSalesAsync } from "../../store/slices/sale.slice";
+import {
+  fetchNextSaleNumberAsync,
+  fetchSalesAsync,
+} from "../../store/slices/sale.slice";
 import { selectNextSaleNumber } from "../../store/selectors/sale.selectors";
 
 // unit types for purchase component
@@ -121,8 +124,9 @@ const Sales = () => {
           "Content-Type": "application/json",
         },
       });
-      dispatch(fetchSalesAsync());
       toast.success("data added");
+      dispatch(fetchSalesAsync());
+      dispatch(fetchNextSaleNumberAsync());
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??
@@ -130,27 +134,6 @@ const Sales = () => {
       );
     }
   };
-
-  // const selectProduct = (event) => {
-  //   const { value } = event.target;
-
-  //   const selected = stockData.find((p) => p._id === value);
-
-  //   if (selected) {
-  //     const { _id, productName } = selected;
-
-  //     setSelectedProduct(selected);
-
-  //     setSale({
-  //       ...sale,
-  //       stockItemId: _id,
-  //       productName: productName,
-  //       purchaseId: selected.purchaseId,
-  //     });
-  //   } else {
-  //     setSelectedProduct(null);
-  //   }
-  // };
 
   const selectStock = (event) => {
     const { value } = event.target;

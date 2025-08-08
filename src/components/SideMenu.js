@@ -39,7 +39,7 @@ const SideMenu = () => {
         },
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           mt: "calc(var(--template-frame-height, 0px) + 4px)",
@@ -48,7 +48,7 @@ const SideMenu = () => {
       >
         <SelectContent />
       </Box>
-      <Divider />
+      <Divider /> */}
       <Box
         sx={{
           overflow: "auto",

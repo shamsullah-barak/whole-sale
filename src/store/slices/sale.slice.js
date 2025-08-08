@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchSales } from "../actions/sale.action";
+import { fetchSales, fetchNextSaleNumber } from "../actions/sale.action";
 
 const initialState = {
   sales: [],
@@ -8,6 +8,7 @@ const initialState = {
   limitPerPage: 10,
   loading: false,
   totalRows: 0,
+  nextSaleNumber: 0,
 };
 
 // async reducers
@@ -16,6 +17,15 @@ export const fetchSalesAsync = createAsyncThunk(
   async () => {
     const sales = await fetchSales();
     return sales;
+  }
+);
+
+// async reducers
+export const fetchNextSaleNumberAsync = createAsyncThunk(
+  "sales/fetchNextSaleNumber",
+  async () => {
+    const nextInvoice = await fetchNextSaleNumber();
+    return nextInvoice;
   }
 );
 
@@ -35,6 +45,15 @@ export const saleSlice = createSlice({
         state.limitPerPage = action?.payload?.limit;
         state.totalPages = action?.payload?.totalPages;
         state.totalRows = action?.payload?.totalResults;
+      });
+
+    builder
+      .addCase(fetchNextSaleNumberAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchNextSaleNumberAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.nextSaleNumber = action.payload.counter;
       });
   },
 });

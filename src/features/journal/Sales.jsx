@@ -10,6 +10,7 @@ import { InputAdornment, CircularProgress } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { fetchSalesAsync } from "../../store/slices/sale.slice";
+import { selectNextSaleNumber } from "../../store/selectors/sale.selectors";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -18,9 +19,13 @@ const paymentMethods = ["cash", "credit", "cashAndCredit"];
 const Sales = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const nextSaleNumber = useSelector(selectNextSaleNumber);
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedStock, setSelectedStock] = useState({
+    name: "",
+    id: "",
+  });
   const selectedDirection = useSelector(selectDirection);
   const customers = useSelector(selectCustomers).customers;
   const stocks = useSelector(selectStocks).stocks;
@@ -29,25 +34,25 @@ const Sales = () => {
     unitPerPackage: "",
     unitPrice: "",
     totalPrice: "",
-    paymentMethod: "",
+    paymentMethod: "cash",
     givingCash: "",
     remainingCash: "",
-    invoiceNo: "",
+    nextSaleNumber: nextSaleNumber,
     customerId: "",
     discount: 0,
     quantity: "",
-    unitPerPackage: "",
+    stockItemId: "",
   });
 
   // API call
   useEffect(() => {
     const fetchData = async () => {
-      if (!sale.stockName) return;
+      if (!selectedStock.name) return;
 
       setLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/stocks/stock-items?stockName=${sale.stockName}`
+          `http://localhost:5000/api/stocks/stock-items?stockName=${selectedStock.name}`
         );
 
         setStockData(res.data);
@@ -62,7 +67,7 @@ const Sales = () => {
     };
 
     fetchData();
-  }, [sale.stockName]);
+  }, [selectedStock.name]);
 
   // handle input changes
   const inputHandler = (event) => {
@@ -107,9 +112,8 @@ const Sales = () => {
 
     const cleanedSale = { ...sale };
 
-    delete cleanedSale.productId;
     delete cleanedSale.productName;
-    delete cleanedSale.invoiceNo;
+    delete cleanedSale.nextSaleNumber;
 
     try {
       await axios.post(`http://localhost:5000/api/sales`, cleanedSale, {
@@ -118,9 +122,7 @@ const Sales = () => {
         },
       });
       dispatch(fetchSalesAsync());
-      // dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       toast.success("data added");
-      // clearState();
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??
@@ -129,32 +131,32 @@ const Sales = () => {
     }
   };
 
-  const selectProduct = (event) => {
-    const { value } = event.target;
+  // const selectProduct = (event) => {
+  //   const { value } = event.target;
 
-    const selected = stockData.find((p) => p._id === value);
+  //   const selected = stockData.find((p) => p._id === value);
 
-    if (selected) {
-      const { _id, productName } = selected;
+  //   if (selected) {
+  //     const { _id, productName } = selected;
 
-      setSelectedProduct(selected);
+  //     setSelectedProduct(selected);
 
-      setSale({
-        ...sale,
-        productId: _id,
-        productName: productName,
-        purchaseId: selected.purchaseId,
-      });
-    } else {
-      setSelectedProduct(null);
-    }
-  };
+  //     setSale({
+  //       ...sale,
+  //       stockItemId: _id,
+  //       productName: productName,
+  //       purchaseId: selected.purchaseId,
+  //     });
+  //   } else {
+  //     setSelectedProduct(null);
+  //   }
+  // };
 
   const selectStock = (event) => {
     const { value } = event.target;
     const stock = stocks.find((s) => s.id === value);
 
-    setSale({ ...sale, stockId: value, stockName: stock.name });
+    setSelectedStock({ name: stock.name, id: stock.id });
   };
 
   return (
@@ -165,8 +167,8 @@ const Sales = () => {
           <TextField
             select
             label="Stock"
-            name="stockId"
-            value={sale.stockId}
+            name="stock"
+            value={selectedStock.id}
             fullWidth
             required
             type="text"
@@ -187,21 +189,21 @@ const Sales = () => {
           </TextField>
         </Grid>
 
-        {sale.stockName && (
+        {selectedStock.name && (
           <>
             <Grid item xs={12} sm={12} md={12}>
               <TextField
                 select
-                label="Product"
-                name="productId"
+                label="stockItem"
+                name="stockItemId"
                 fullWidth
                 required
-                value={sale.productId || ""}
-                onChange={selectProduct}
+                value={sale.stockItemId}
+                onChange={inputHandler}
               >
                 {stockData.map((item) => (
                   <MenuItem
-                    key={item.productId + item.unitType}
+                    key={item.stockItemId + item.unitType}
                     value={item._id}
                   >
                     {item.productName}
@@ -210,7 +212,7 @@ const Sales = () => {
               </TextField>
             </Grid>
 
-            {selectedProduct && (
+            {sale.stockItemId && (
               <>
                 {/* <Grid item xs={12} sm={12} md={12}>
                   <Typography item xs={12} sm={6} md={6}>
@@ -346,10 +348,10 @@ const Sales = () => {
                 <Grid item xs={12} sm={4}>
                   <TextField
                     fullWidth
-                    label={t("invoiceNo")}
-                    name="invoiceNo"
+                    label={t("nextSaleNumber")}
+                    name="nextSaleNumber"
                     type="number"
-                    value={1}
+                    value={sale.nextSaleNumber}
                     disabled
                   />
                 </Grid>

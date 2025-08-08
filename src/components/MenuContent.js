@@ -73,8 +73,8 @@ const mainListItems = [
 
 const secondaryListItems = [
   { text: "Settings", icon: <SettingsRoundedIcon />, path: "/settings" },
-  { text: "About", icon: <InfoRoundedIcon />, path: "/about" },
-  { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
+  // { text: "About", icon: <InfoRoundedIcon />, path: "/about" },
+  // { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
 ];
 
 const ITEMS = [

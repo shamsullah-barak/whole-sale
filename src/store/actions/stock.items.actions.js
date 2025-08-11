@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchStockItems = async (stockName, page, limit) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/stocks/stockItems?stockName=${stockName}&page=${page}&limit=${limit}`
+      `http://localhost:5000/api/stocks/stock-items?stockName=${stockName}&page=${page}&limit=${limit}`
     );
     return response.data;
   } catch (error) {

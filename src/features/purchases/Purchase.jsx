@@ -178,7 +178,7 @@ const StatCard = ({
     <Card
       sx={{
         p: 2,
-        borderRadius: 3,
+        borderRadius: 1,
         boxShadow: 3,
         height: "100%",
         width: "100%",

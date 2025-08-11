@@ -3,7 +3,6 @@ import Dashboard from "../pages/Dashboard";
 import Loans from "../pages/Loan";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
-import Bank from "../pages/Bank";
 import Products from "../features/products/Product";
 import CreateProduct from "../features/products/CreateProduct";
 import EditProduct from "../features/products/EditProduct";
@@ -133,10 +132,6 @@ export default function Router() {
     {
       path: "/suppliers",
       element: <Suppliers />,
-    },
-    {
-      path: "/bank",
-      element: <Bank />,
     },
     {
       path: "/ledgers",

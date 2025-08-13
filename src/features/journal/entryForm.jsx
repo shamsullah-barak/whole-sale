@@ -47,32 +47,32 @@ const EntryForm = () => {
       </Grid>
 
       {/* money deposit */}
-      {status.statusName === "money deposit" && (
+      {status.statusName === "Money Deposit" && (
         <MoneyDeposit statusId={status.statusId} />
       )}
 
       {/* purchasing something */}
-      {status.statusName === "purchase of goods" && (
+      {status.statusName === "Purchase of Goods" && (
         <PurchaseOfGoods statusId={status.statusId} />
       )}
 
       {/* purchasing something */}
-      {status.statusName === "money withdrawal" && (
+      {status.statusName === "Money Withdrawal" && (
         <MoneyWithdrawal transactionTypeId={status.statusId} />
       )}
 
       {/* purchase return */}
-      {status.statusName === "purchase return" && (
+      {status.statusName === "Purchase Return" && (
         <PurchaseReturnForm transactionTypeId={status.statusId} />
       )}
 
       {/* sale */}
-      {status.statusName === "sale of goods" && (
+      {status.statusName === "Sale of Goods" && (
         <Sales transactionTypeId={status.statusId} />
       )}
 
       {/* sale */}
-      {status.statusName === "sales return" && (
+      {status.statusName === "Sales Return" && (
         <SaleReturn transactionTypeId={status.statusId} />
       )}
     </>

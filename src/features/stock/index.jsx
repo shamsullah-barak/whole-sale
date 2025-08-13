@@ -25,10 +25,10 @@ const StockList = () => {
           disablePadding
           key={item.id}
           component={NavLink}
-          to={item.name}
+          to={item.engName}
         >
           <ListItemButton>
-            <ListItemText primary={item.name} />
+            <ListItemText primary={item.engName} />
           </ListItemButton>
         </ListItem>
       ))}

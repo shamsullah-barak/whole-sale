@@ -81,7 +81,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             select
             fullWidth
@@ -101,7 +101,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
           </TextField>
         </Grid>
         {reason === "shopExpense" && (
-          <Grid xs={12} sm={6}>
+          <Grid size={3} xs={12} sm={6}>
             <TextField
               select
               fullWidth
@@ -122,7 +122,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
           </Grid>
         )}
 
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t(`amount`)}
@@ -133,7 +133,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
           />
         </Grid>
 
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("description")}

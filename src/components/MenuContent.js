@@ -58,9 +58,9 @@ const mainListItems = [
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },
-  { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
+  { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
 ];
 
 const secondaryListItems = [

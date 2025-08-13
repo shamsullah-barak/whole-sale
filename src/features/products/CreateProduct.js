@@ -1,21 +1,39 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import MainDashboard from '../../theme/main/MainDashboard';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import MainDashboard from "../../theme/main/MainDashboard";
+import { NavLink } from "react-router-dom";
 
-import { TextField, MenuItem, Button, Typography, Grid, Paper, Alert, CircularProgress, Box } from '@mui/material';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import { createProductAsync, fetchCompaniesAsync, fetchCategoriesAsync, clearError } from '../../store/slices/product.slice';
-import { fetchUnitsAsync } from '../../store/slices/unit.slice';
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Typography,
+  Grid,
+  Paper,
+  Alert,
+  CircularProgress,
+  Box,
+} from "@mui/material";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import {
+  createProductAsync,
+  fetchCompaniesAsync,
+  fetchCategoriesAsync,
+  clearError,
+} from "../../store/slices/product.slice";
+import { fetchUnitsAsync } from "../../store/slices/unit.slice";
 import {
   selectProductsLoading,
   selectProductsError,
   selectCompanies,
   selectCategories,
-} from '../../store/selectors/product.selector';
-import { selectUnits } from '../../store/selectors/unit.selector';
+} from "../../store/selectors/product.selector";
+import { selectUnits } from "../../store/selectors/unit.selector";
+import { useTranslation } from "react-i18next";
+import { selectDirection } from "../../store/selectors/app.selector";
+import COLORS from "../../constant/colors";
 
 const CreateProduct = () => {
   const dispatch = useDispatch();
@@ -27,210 +45,249 @@ const CreateProduct = () => {
   const categories = useSelector(selectCategories);
   const units = useSelector(selectUnits);
 
-  useEffect(() => {
-    dispatch(fetchCompaniesAsync());
-    dispatch(fetchCategoriesAsync());
-    dispatch(fetchUnitsAsync()); // Fetch units
+  const { t } = useTranslation();
+  const selectedDirection = useSelector(selectDirection);
+  const [open, setOpen] = useState(false);
 
-    // Clear any previous errors
-    dispatch(clearError());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchCompaniesAsync());
+  //   dispatch(fetchCategoriesAsync());
+  //   dispatch(fetchUnitsAsync()); // Fetch units
 
-  const handleSubmit = async (values, { setSubmitting, resetForm, setFieldError }) => {
-    try {
-      await dispatch(createProductAsync(values)).unwrap();
-      resetForm();
-      navigate('/products');
-    } catch (error) {
-      // Handle validation errors
-      if (error.includes('SKU already exists')) {
-        setFieldError('sku', 'This SKU already exists');
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  //   // Clear any previous errors
+  //   dispatch(clearError());
+  // }, [dispatch]);
 
-  const validationSchema = Yup.object().shape({
-    description: Yup.string(),
-    sku: Yup.string().required('SKU is required'),
-    barCode: Yup.string().required('Barcode is required'),
-    currentStock: Yup.number().min(0).required('Current stock is required'),
-    mainStockLevel: Yup.number().min(0).required('Main stock level is required'),
-    purchasedPrice: Yup.number().min(0).required('Purchased price is required'),
-    salePrice: Yup.number().min(0).required('Sale price is required'),
-    status: Yup.string().required('Status is required'),
-    companyId: Yup.string().required('Company is required'),
-    categoryId: Yup.string().required('Category is required'),
-    unitId: Yup.string().required('Unit is required'),
-  });
+  // const handleSubmit = async (
+  //   values,
+  //   { setSubmitting, resetForm, setFieldError }
+  // ) => {
+  //   try {
+  //     await dispatch(createProductAsync(values)).unwrap();
+  //     resetForm();
+  //     navigate("/products");
+  //   } catch (error) {
+  //     // Handle validation errors
+  //     if (error.includes("SKU already exists")) {
+  //       setFieldError("sku", "This SKU already exists");
+  //     }
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+  // const validationSchema = Yup.object().shape({
+  //   description: Yup.string(),
+  //   sku: Yup.string().required("SKU is required"),
+  //   barCode: Yup.string().required("Barcode is required"),
+  //   currentStock: Yup.number().min(0).required("Current stock is required"),
+  //   mainStockLevel: Yup.number()
+  //     .min(0)
+  //     .required("Main stock level is required"),
+  //   purchasedPrice: Yup.number().min(0).required("Purchased price is required"),
+  //   salePrice: Yup.number().min(0).required("Sale price is required"),
+  //   status: Yup.string().required("Status is required"),
+  //   companyId: Yup.string().required("Company is required"),
+  //   categoryId: Yup.string().required("Category is required"),
+  //   unitId: Yup.string().required("Unit is required"),
+  // });
 
   return (
-    <MainDashboard title="Products">
-      <Grid container spacing={2} columns={12} sx={{ width: '100%' }}>
-        <Grid xs={12} lg={9} sx={{ width: '100%', textAlign: 'left' }}>
-          <NavLink to="/products">
-            <Button variant="outlined" sx={{ width: '100px' }}>
-              Back
-            </Button>
-          </NavLink>
+    <MainDashboard title={t("suppliers")}>
+      {/* <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+        <Grid
+          xs={12}
+          lg={9}
+          sx={{
+            width: "100%",
+            textAlign: selectedDirection === "rtl" ? "left" : "right",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="inherit"
+            sx={(theme) => ({
+              backgroundColor:
+                theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+              color:
+                theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+            })}
+            onClick={() => setOpen(true)}
+          >
+            {t("newProduct")}
+          </Button>
+        </Grid>
+      </Grid> */}
+      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%" }}>
+          {/* <SupplierList /> */}
+          {/* <CreateSupplier open={open} setOpen={setOpen} /> */}
         </Grid>
       </Grid>
+      {/* <Grid container spacing={2} columns={12} sx={{ width: '100%' }}>
+      <Grid xs={12} lg={9} sx={{ width: '100%', textAlign: 'left' }}>
+        <NavLink to="/products">
+          <Button variant="outlined" sx={{ width: '100px' }}>
+            Back
+          </Button>
+        </NavLink>
+      </Grid>
+    </Grid>
 
-      <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
-        <Typography variant="h5" gutterBottom>
-          Create Product
-        </Typography>
+    <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
+      <Typography variant="h5" gutterBottom>
+        Create Product
+      </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-        <Formik
-          initialValues={{
-            name: '',
-            description: '',
-            sku: '',
-            barCode: '',
-            currentStock: 0,
-            mainStockLevel: 0,
-            purchasedPrice: 0,
-            salePrice: 0,
-            status: 'active',
-            companyId: '',
-            categoryId: '',
-            unitId: '',
-          }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ handleChange, values, errors, touched, isSubmitting }) => (
-            <Form>
-              <Grid container spacing={2}>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    fullWidth
-                    label="Product Name"
-                    name="name"
-                    error={touched.name && !!errors.name}
-                    helperText={touched.name && errors.name}
-                  />
-                </Grid>
-                <Grid xs={12}>
-                  <Field as={TextField} fullWidth label="Description" name="description" />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    fullWidth
-                    label="SKU"
-                    name="sku"
-                    error={touched.sku && !!errors.sku}
-                    helperText={touched.sku && errors.sku}
-                  />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    fullWidth
-                    label="Barcode"
-                    name="barCode"
-                    error={touched.barCode && !!errors.barCode}
-                    helperText={touched.barCode && errors.barCode}
-                  />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field as={TextField} fullWidth label="Current Stock" name="currentStock" type="number" />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field as={TextField} fullWidth label="Main Stock Level" name="mainStockLevel" type="number" />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field as={TextField} fullWidth label="Purchased Price" name="purchasedPrice" type="number" />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field as={TextField} fullWidth label="Sale Price" name="salePrice" type="number" />
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field as={TextField} select fullWidth label="Status" name="status">
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="inactive">Inactive</MenuItem>
-                  </Field>
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    select
-                    fullWidth
-                    label="Company"
-                    name="companyId"
-                    error={touched.companyId && !!errors.companyId}
-                    helperText={touched.companyId && errors.companyId}
-                  >
-                    <MenuItem value="">Select a company</MenuItem>
-                    {companies.map((company) => (
-                      <MenuItem key={company.id} value={company.id}>
-                        {company.name}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    select
-                    fullWidth
-                    label="Category"
-                    name="categoryId"
-                    error={touched.categoryId && !!errors.categoryId}
-                    helperText={touched.categoryId && errors.categoryId}
-                  >
-                    <MenuItem value="">Select a category</MenuItem>
-                    {categories.map((category) => (
-                      <MenuItem key={category.id} value={category.id}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </Grid>
-                <Grid xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    select
-                    fullWidth
-                    label="Unit"
-                    name="unitId"
-                    error={touched.unitId && !!errors.unitId}
-                    helperText={touched.unitId && errors.unitId}
-                  >
-                    <MenuItem value="">Select a unit</MenuItem>
-                    {units.map((unit) => (
-                      <MenuItem key={unit.id} value={unit.id}>
-                        {unit.name} ({unit.abbreviation})
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </Grid>
-              </Grid>
-              <Box sx={{ mt: 3, position: 'relative' }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
+      <Formik
+        initialValues={{
+          name: '',
+          description: '',
+          sku: '',
+          barCode: '',
+          currentStock: 0,
+          mainStockLevel: 0,
+          purchasedPrice: 0,
+          salePrice: 0,
+          status: 'active',
+          companyId: '',
+          categoryId: '',
+          unitId: '',
+        }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ handleChange, values, errors, touched, isSubmitting }) => (
+          <Form>
+            <Grid container spacing={2}>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
                   fullWidth
-                  disabled={isSubmitting || loading}
-                  startIcon={loading ? <CircularProgress size={20} /> : null}
+                  label="Product Name"
+                  name="name"
+                  error={touched.name && !!errors.name}
+                  helperText={touched.name && errors.name}
+                />
+              </Grid>
+              <Grid xs={12}>
+                <Field as={TextField} fullWidth label="Description" name="description" />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="SKU"
+                  name="sku"
+                  error={touched.sku && !!errors.sku}
+                  helperText={touched.sku && errors.sku}
+                />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  label="Barcode"
+                  name="barCode"
+                  error={touched.barCode && !!errors.barCode}
+                  helperText={touched.barCode && errors.barCode}
+                />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field as={TextField} fullWidth label="Current Stock" name="currentStock" type="number" />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field as={TextField} fullWidth label="Main Stock Level" name="mainStockLevel" type="number" />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field as={TextField} fullWidth label="Purchased Price" name="purchasedPrice" type="number" />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field as={TextField} fullWidth label="Sale Price" name="salePrice" type="number" />
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field as={TextField} select fullWidth label="Status" name="status">
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="inactive">Inactive</MenuItem>
+                </Field>
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  select
+                  fullWidth
+                  label="Company"
+                  name="companyId"
+                  error={touched.companyId && !!errors.companyId}
+                  helperText={touched.companyId && errors.companyId}
                 >
-                  {loading ? 'Creating Product...' : 'Create Product'}
-                </Button>
-              </Box>
-            </Form>
-          )}
-        </Formik>
-      </Paper>
+                  <MenuItem value="">Select a company</MenuItem>
+                  {companies.map((company) => (
+                    <MenuItem key={company.id} value={company.id}>
+                      {company.name}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  select
+                  fullWidth
+                  label="Category"
+                  name="categoryId"
+                  error={touched.categoryId && !!errors.categoryId}
+                  helperText={touched.categoryId && errors.categoryId}
+                >
+                  <MenuItem value="">Select a category</MenuItem>
+                  {categories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+              <Grid xs={12} sm={6}>
+                <Field
+                  as={TextField}
+                  select
+                  fullWidth
+                  label="Unit"
+                  name="unitId"
+                  error={touched.unitId && !!errors.unitId}
+                  helperText={touched.unitId && errors.unitId}
+                >
+                  <MenuItem value="">Select a unit</MenuItem>
+                  {units.map((unit) => (
+                    <MenuItem key={unit.id} value={unit.id}>
+                      {unit.name} ({unit.abbreviation})
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 3, position: 'relative' }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={isSubmitting || loading}
+                startIcon={loading ? <CircularProgress size={20} /> : null}
+              >
+                {loading ? 'Creating Product...' : 'Create Product'}
+              </Button>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+    </Paper> */}
     </MainDashboard>
   );
 };

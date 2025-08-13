@@ -342,7 +342,7 @@ const PurchaseOfGoods = ({ statusId }) => {
           >
             {stocks.map((item, index) => (
               <MenuItem key={index} value={item.id}>
-                {t(`${item.name}`)}
+                {t(`${item.engName}`)}
               </MenuItem>
             ))}
           </TextField>

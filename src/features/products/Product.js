@@ -22,30 +22,25 @@ import { fetchPartnersAsync } from "../../store/slices/investment.slice";
 import { fetchCustomersAsync } from "../../store/slices/businessEntity.slice";
 import { selectCustomers } from "../../store/selectors/businessEntity.selector";
 import { selectProducts } from "../../store/selectors/product.selector";
+import { fetchProductsAsync } from "../../store/slices/product.slice";
+import { selectCategories } from "../../store/selectors/category.selector";
 
 const CreateProduct = ({ open, setOpen }) => {
-  const { t } = useTranslation();
   const dispatch = useDispatch();
-
-  //   states
+  const categories = useSelector(selectCategories).categories;
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [product, setProduct] = useState({
     productName: "",
-    productType: "",
-    address: "",
+    categoryId: "",
   });
-
-  //   selectors
-  const selectedDirection = useSelector(selectDirection);
 
   // methods
   const handleClose = () => {
     setOpen(false);
-    setFormData({ productName: "", productType: "", address: "" }); // reset form
   };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
+    setProduct((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -54,10 +49,10 @@ const CreateProduct = ({ open, setOpen }) => {
   const handleSubmit = async (event) => {
     event.preventDefault(event);
 
-    formData.type = "customer";
+    const data = { name: product.productName, categoryId: product.categoryId };
     try {
       setLoading(true);
-      await axios.post(`http://localhost:5000/api/products`, formData, {
+      await axios.post(`http://localhost:5000/api/products`, data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,10 +60,8 @@ const CreateProduct = ({ open, setOpen }) => {
       setOpen(false);
       setLoading(false);
       toast.success("data added");
-      dispatch(fetchCustomersAsync({ page: 1, limit: 10 }));
+      dispatch(fetchProductsAsync({ page: 1, limit: 10 }));
     } catch (error) {
-      console.log(error);
-      setOpen(false);
       setLoading(false);
       toast.error(
         error?.response.data.message ?? "something went wrong! please try again"
@@ -100,20 +93,26 @@ const CreateProduct = ({ open, setOpen }) => {
             <TextField
               label="productName"
               name="productName"
-              value={formData.productName}
+              value={product.productName}
               onChange={handleChange}
               fullWidth
               size="small"
             />
             <TextField
-              label="productType"
-              name="productType"
-              type="text"
-              value={formData.productType}
-              onChange={handleChange}
+              select
               fullWidth
-              size="small"
-            />
+              required
+              name="categoryId"
+              label={"category"}
+              value={product.categoryId}
+              onChange={handleChange}
+            >
+              {categories.map((item, index) => (
+                <MenuItem key={index} value={item.id}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </TextField>
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               <Button
                 onClick={handleClose}
@@ -125,10 +124,18 @@ const CreateProduct = ({ open, setOpen }) => {
               <Button
                 onClick={handleSubmit}
                 variant="contained"
-                color="primary"
                 disabled={loading}
                 loading={loading}
                 loadingPosition="start"
+                color="inherit"
+                sx={(theme) => ({
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? COLORS.WHITE
+                      : COLORS.PURPLE,
+                  color:
+                    theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+                })}
               >
                 submit
               </Button>
@@ -147,15 +154,16 @@ const ProductList = () => {
   const selectedDirection = useSelector(selectDirection);
 
   const products = useSelector(selectProducts);
-
+  const categories = useSelector(selectCategories).categories;
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [disableUpdate, setDisableUpdate] = useState("");
   const [selectedItem, setSelectedItem] = useState({
     productName: "",
-    productType: "",
+    categoryId: "",
   });
-  const [loading, setLoading] = useState(false);
 
   const handleOpen = (id) => {
     setSelectedId(id);
@@ -163,10 +171,13 @@ const ProductList = () => {
   };
 
   const handleUpdateChanges = (e) => {
-    setSelectedItem((prev) => ({
-      ...prev,
-      [e.target.productName]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setSelectedItem((preS) => {
+      return {
+        ...preS,
+        [name]: value,
+      };
+    });
   };
 
   const handleClose = () => setOpen(false);
@@ -176,14 +187,13 @@ const ProductList = () => {
     event.preventDefault(event);
 
     const updatedData = {
-      productName: selectedItem.productName,
-      type: selectedItem.type,
-      address: selectedItem.address,
+      name: selectedItem.productName,
+      categoryId: selectedItem.categoryId,
     };
     try {
       setLoading(true);
       await axios.patch(
-        `http://localhost:5000/api/investments/expenses/${selectedItem.id}`,
+        `http://localhost:5000/api/products/${selectedItem.id}`,
         updatedData,
         {
           headers: {
@@ -194,7 +204,7 @@ const ProductList = () => {
       setUpdateOpen(false);
       setLoading(false);
       toast.success("data updated");
-      dispatch(fetchPartnersAsync());
+      dispatch(fetchProductsAsync({ page: 1, limit: 10 }));
     } catch (error) {
       console.log(error);
       setUpdateOpen(false);
@@ -208,15 +218,12 @@ const ProductList = () => {
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:5000/api/investments/expenses/${selectedId}`
-      );
+      await axios.delete(`http://localhost:5000/api/products/${selectedId}`);
       setOpen(false);
       setLoading(false);
       toast.success("data deleted");
-      dispatch(fetchPartnersAsync());
+      dispatch(fetchProductsAsync({ page: 1, limit: 10 }));
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(
@@ -226,7 +233,7 @@ const ProductList = () => {
   };
 
   const handleUpdateOpen = (item) => {
-    setSelectedItem({ ...item });
+    setSelectedItem({ ...item, productName: item.name });
     setUpdateOpen(true);
   };
 
@@ -235,27 +242,20 @@ const ProductList = () => {
 
   const columns = [
     {
-      field: "productName",
-      headerName: "Name",
+      field: "name",
+      headerName: "Product Name",
       flex: 0.5,
       minWidth: 80,
     },
     {
-      field: "type",
-      headerName: "Phone",
+      field: "categoryId",
+      headerName: "Category",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 50,
     },
-    {
-      field: "address",
-      headerName: "Address",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 50,
-    },
+
     {
       field: "actions",
       headerName: "Actions",
@@ -322,10 +322,10 @@ const ProductList = () => {
                 }}
               >
                 <Typography variant="h6" component="h2">
-                  آیا ډاډه یې؟
+                  Are you sure
                 </Typography>
                 <Typography sx={{ mt: 2 }}>
-                  که ته دا عمل ترسره کوې، نو بیا نه شي بېرته اخیستل کېدای!
+                  this action cannot be undo
                 </Typography>
 
                 <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
@@ -334,7 +334,7 @@ const ProductList = () => {
                     color="secondary"
                     variant="outlined"
                   >
-                    لغوه
+                    cancel
                   </Button>
                   <Button
                     onClick={handleConfirm}
@@ -343,8 +343,18 @@ const ProductList = () => {
                     disabled={loading}
                     loading={loading}
                     loadingPosition="start"
+                    sx={(theme) => ({
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? COLORS.WHITE
+                          : COLORS.PURPLE,
+                      color:
+                        theme.palette.mode === "dark"
+                          ? COLORS.BLACK
+                          : COLORS.WHITE,
+                    })}
                   >
-                    تائید
+                    delete
                   </Button>
                 </Box>
               </Box>
@@ -364,9 +374,63 @@ const ProductList = () => {
                   p: 4,
                 }}
               >
-                <Typography variant="h6" mb={2}>
-                  معلومات اپډیټ کړي
-                </Typography>
+                <Stack spacing={2}>
+                  <Typography variant="h6" mb={2}>
+                    update product details
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="productName"
+                    name="productName"
+                    value={selectedItem.productName}
+                    onChange={handleUpdateChanges}
+                  />
+                  <TextField
+                    select
+                    fullWidth
+                    required
+                    name="categoryId"
+                    label={"category"}
+                    value={selectedItem.categoryId}
+                    onChange={handleUpdateChanges}
+                  >
+                    {categories.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Stack>
+                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
+                  <Button
+                    onClick={handleCloseUpdate}
+                    color="secondary"
+                    variant="outlined"
+                  >
+                    cancel
+                  </Button>
+                  <Button
+                    onClick={handleUpdateSubmit}
+                    color="error"
+                    variant="contained"
+                    disabled={disableUpdate === selectedItem.productName}
+                    loading={loading}
+                    loadingPosition="start"
+                    sx={(theme) => ({
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? COLORS.WHITE
+                          : COLORS.PURPLE,
+                      color:
+                        theme.palette.mode === "dark"
+                          ? COLORS.BLACK
+                          : COLORS.WHITE,
+                    })}
+                  >
+                    update
+                  </Button>
+                </Box>
               </Box>
             </Modal>
           </div>

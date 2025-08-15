@@ -4,8 +4,6 @@ import Loans from "../pages/Loan";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
 import Products from "../features/products/Product";
-import CreateProduct from "../features/products/CreateProduct";
-import EditProduct from "../features/products/EditProduct";
 import MasterData from "../features/master-data/MasterData";
 import Categories from "../features/master-data/categories/Categories";
 import Companies from "../features/master-data/companies/Companies";
@@ -66,14 +64,6 @@ export default function Router() {
     {
       path: "/products",
       element: <Products />,
-    },
-    {
-      path: "/products/add",
-      element: <CreateProduct />,
-    },
-    {
-      path: "/products/edit/:productId",
-      element: <EditProduct />,
     },
     // Master Data routes
     {

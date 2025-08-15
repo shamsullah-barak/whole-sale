@@ -19,6 +19,7 @@ import {
   fetchNextSaleNumberAsync,
   fetchSalesAsync,
 } from "./store/slices/sale.slice";
+import { fetchCategoriesAsync } from "./store/slices/category.slice";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,16 +28,18 @@ function App() {
     dispatch(fetchPartnersAsync());
     dispatch(fetchTransactionTypesAsync());
     dispatch(fetchSalesAsync());
+    dispatch(fetchNextInvoiceAsync());
+    dispatch(fetchNextSaleNumberAsync());
+    dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));
     dispatch(fetchProductsAsync({ limit: 10, page: 1 }));
-    dispatch(fetchNextInvoiceAsync());
-    dispatch(fetchNextSaleNumberAsync());
     dispatch(fetchJournalsAsync({ limit: 10, page: 1 }));
     dispatch(fetchLedgersAsync({ limit: 10, page: 1 }));
     dispatch(fetchStocksAsync({ limit: 10, page: 1 }));
     dispatch(fetchExpensesAsync({ limit: 10, page: 1 }));
   }, []);
+
   return <Router />;
 }
 

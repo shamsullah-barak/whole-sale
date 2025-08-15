@@ -1,293 +1,318 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import MainDashboard from "../../theme/main/MainDashboard";
-import { NavLink } from "react-router-dom";
-
+import React, { useState } from "react";
+import axios from "axios";
 import {
   TextField,
   MenuItem,
   Button,
-  Typography,
-  Grid,
-  Paper,
-  Alert,
-  CircularProgress,
-  Box,
+  Grid2 as Grid,
+  Autocomplete,
 } from "@mui/material";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
-import {
-  createProductAsync,
-  fetchCompaniesAsync,
-  fetchCategoriesAsync,
-  clearError,
-} from "../../store/slices/product.slice";
-import { fetchUnitsAsync } from "../../store/slices/unit.slice";
-import {
-  selectProductsLoading,
-  selectProductsError,
-  selectCompanies,
-  selectCategories,
-} from "../../store/selectors/product.selector";
-import { selectUnits } from "../../store/selectors/unit.selector";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchJournalsAsync } from "../../store/slices/journal.slice";
+import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
+import { selectProducts } from "../../store/selectors/product.selector";
+import { ToastContainer, toast } from "react-toastify";
+import { selectStocks } from "../../store/selectors/stock.selector";
+import moment from "moment/moment";
+import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import { fetchNextInvoiceAsync } from "../../store/slices/purchase.slice";
+import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
+import MainDashboard from "../../theme/main/MainDashboard";
 
-const CreateProduct = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+// unit types for purchase component
+const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
+const paymentMethods = ["cash", "credit", "cashAndCredit"];
 
-  const loading = useSelector(selectProductsLoading);
-  const error = useSelector(selectProductsError);
-  const companies = useSelector(selectCompanies);
-  const categories = useSelector(selectCategories);
-  const units = useSelector(selectUnits);
-
+const CreateProduct = ({ statusId }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+
+  const journals = useSelector(selectJournals);
+  const nextInvoiceNo = useSelector(selectNextInvoiceNo);
+  const stocks = useSelector(selectStocks).stocks;
+  const products = useSelector(selectProducts).products;
+  const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);
-  const [open, setOpen] = useState(false);
+  const [product, setproduct] = useState({
+    productId: "",
+    name: "",
+    company: "",
+    unitType: "kg",
+    unitPerPackage: "",
+    unitPrice: "",
+    totalPrice: "",
+    paymentMethod: "cash",
+    invoiceNo: "",
+    stockName: "",
+    discount: 0,
+    givingCash: 0,
+    remainingCash: 0,
+    supplierId: "",
+    type: moment().format("YYYY-MM-DD"),
+  });
 
-  // useEffect(() => {
-  //   dispatch(fetchCompaniesAsync());
-  //   dispatch(fetchCategoriesAsync());
-  //   dispatch(fetchUnitsAsync()); // Fetch units
+  const clearState = () => {
+    setproduct({
+      productId: "",
+      name: "",
+      company: "",
+      unitType: "",
+      unitPerPackage: "",
+      unitPrice: "",
+      totalPrice: "",
+      paymentMethod: "",
+      invoiceNo: "",
+      stockName: "",
+      stockId: "",
+      discount: 0,
+      givingCash: 0,
+      remainingCash: 0,
+      type: moment().format("YYYY-MM-DD"),
+    });
+  };
 
-  //   // Clear any previous errors
-  //   dispatch(clearError());
-  // }, [dispatch]);
+  // handle input changes
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
 
-  // const handleSubmit = async (
-  //   values,
-  //   { setSubmitting, resetForm, setFieldError }
-  // ) => {
-  //   try {
-  //     await dispatch(createProductAsync(values)).unwrap();
-  //     resetForm();
-  //     navigate("/products");
-  //   } catch (error) {
-  //     // Handle validation errors
-  //     if (error.includes("SKU already exists")) {
-  //       setFieldError("sku", "This SKU already exists");
-  //     }
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
+    setproduct((prevState) => {
+      let updatedEntry = { ...prevState, [name]: value };
+      const {
+        discount,
+        givingCash,
+        company,
+        unitPerPackage,
+        unitPrice,
+        unitType,
+        paymentMethod,
+      } = updatedEntry;
 
-  // const validationSchema = Yup.object().shape({
-  //   description: Yup.string(),
-  //   sku: Yup.string().required("SKU is required"),
-  //   barCode: Yup.string().required("Barcode is required"),
-  //   currentStock: Yup.number().min(0).required("Current stock is required"),
-  //   mainStockLevel: Yup.number()
-  //     .min(0)
-  //     .required("Main stock level is required"),
-  //   purchasedPrice: Yup.number().min(0).required("Purchased price is required"),
-  //   salePrice: Yup.number().min(0).required("Sale price is required"),
-  //   status: Yup.string().required("Status is required"),
-  //   companyId: Yup.string().required("Company is required"),
-  //   categoryId: Yup.string().required("Category is required"),
-  //   unitId: Yup.string().required("Unit is required"),
-  // });
+      // Set unitPerPackage = 1 for specific unit types
+      if (["kg", "piece", "liter"].includes(unitType)) {
+        updatedEntry.unitPerPackage = 1;
+      }
+
+      const totalPrice = company * unitPerPackage * unitPrice - discount;
+      updatedEntry.totalPrice = totalPrice;
+
+      if (paymentMethod === "credit") {
+        updatedEntry.remainingCash = totalPrice;
+        updatedEntry.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedEntry.remainingCash = 0;
+        updatedEntry.givingCash = totalPrice;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedEntry.remainingCash = totalPrice - givingCash;
+      }
+
+      return updatedEntry;
+    });
+  };
+
+  const submitHandler = async (event) => {
+    event.preventDefault(event);
+
+    const cleanedEntry = { ...product };
+
+    if (!cleanedEntry.name) delete cleanedEntry.name;
+    if (!cleanedEntry.type) delete cleanedEntry.type;
+    if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/purchases?transactionTypeId=${statusId}`,
+        cleanedEntry,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      dispatch(fetchNextInvoiceAsync());
+      dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
+      toast.success("data added");
+      // clearState();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ??
+          "something went wrong! please try again"
+      );
+    }
+  };
 
   return (
-    <MainDashboard title={t("suppliers")}>
-      {/* <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid
-          xs={12}
-          lg={9}
-          sx={{
-            width: "100%",
-            textAlign: selectedDirection === "rtl" ? "left" : "right",
-          }}
-        >
-          <Button
-            variant="contained"
-            color="inherit"
-            sx={(theme) => ({
-              backgroundColor:
-                theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-              color:
-                theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-            })}
-            onClick={() => setOpen(true)}
+    <MainDashboard>
+      <ToastContainer />
+      <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("name")}
+            name="name"
+            type="text"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={product.name}
+            onChange={inputHandler}
+            sx={{ height: "100%", width: "100%" }}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("type")}
+            name="type"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={product.type}
+            onChange={inputHandler}
+            sx={{ height: "100%", width: "100%" }}
+          />
+        </Grid>
+        <Grid size={4} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            label={t("company")}
+            name="company"
+            type="text"
+            value={product.company}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={4} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="unitType"
+            label={t("unitType")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={product.unitType}
+            onChange={inputHandler}
           >
-            {t("newProduct")}
-          </Button>
+            {unitTypes.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
-      </Grid> */}
-      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid xs={12} lg={9} sx={{ width: "100%" }}>
-          {/* <SupplierList /> */}
-          {/* <CreateSupplier open={open} setOpen={setOpen} /> */}
+        <Grid size={4} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            disabled={
+              product.unitType === "kg" ||
+              product.unitType === "piece" ||
+              product.unitType === "liter"
+            }
+            label={t("unitPerPackage")}
+            name="unitPerPackage"
+            type="number"
+            value={product.unitPerPackage}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            label={t("unitPrice")}
+            name="unitPrice"
+            type="number"
+            value={product.unitPrice}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("totalPrice")}
+            name="totalPrice"
+            type="number"
+            value={product.totalPrice}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="paymentMethod"
+            label={t("paymentMethod")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={product.paymentMethod}
+            onChange={inputHandler}
+          >
+            {paymentMethods.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            disabled={
+              product.paymentMethod === "cash" ||
+              product.paymentMethod === "credit"
+            }
+            label={t("givingCash")}
+            name="givingCash"
+            type="number"
+            value={product.givingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("remainingCash")}
+            name="remainingCash"
+            type="number"
+            value={product.remainingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("discount")}
+            name="discount"
+            type="number"
+            value={product.discount}
+            onChange={inputHandler}
+          />
         </Grid>
       </Grid>
-      {/* <Grid container spacing={2} columns={12} sx={{ width: '100%' }}>
-      <Grid xs={12} lg={9} sx={{ width: '100%', textAlign: 'left' }}>
-        <NavLink to="/products">
-          <Button variant="outlined" sx={{ width: '100px' }}>
-            Back
-          </Button>
-        </NavLink>
-      </Grid>
-    </Grid>
-
-    <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
-      <Typography variant="h5" gutterBottom>
-        Create Product
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Formik
-        initialValues={{
-          name: '',
-          description: '',
-          sku: '',
-          barCode: '',
-          currentStock: 0,
-          mainStockLevel: 0,
-          purchasedPrice: 0,
-          salePrice: 0,
-          status: 'active',
-          companyId: '',
-          categoryId: '',
-          unitId: '',
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        color="inherit"
+        style={{ marginTop: 20 }}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
+        onClick={submitHandler}
       >
-        {({ handleChange, values, errors, touched, isSubmitting }) => (
-          <Form>
-            <Grid container spacing={2}>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  fullWidth
-                  label="Product Name"
-                  name="name"
-                  error={touched.name && !!errors.name}
-                  helperText={touched.name && errors.name}
-                />
-              </Grid>
-              <Grid xs={12}>
-                <Field as={TextField} fullWidth label="Description" name="description" />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  fullWidth
-                  label="SKU"
-                  name="sku"
-                  error={touched.sku && !!errors.sku}
-                  helperText={touched.sku && errors.sku}
-                />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  fullWidth
-                  label="Barcode"
-                  name="barCode"
-                  error={touched.barCode && !!errors.barCode}
-                  helperText={touched.barCode && errors.barCode}
-                />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field as={TextField} fullWidth label="Current Stock" name="currentStock" type="number" />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field as={TextField} fullWidth label="Main Stock Level" name="mainStockLevel" type="number" />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field as={TextField} fullWidth label="Purchased Price" name="purchasedPrice" type="number" />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field as={TextField} fullWidth label="Sale Price" name="salePrice" type="number" />
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field as={TextField} select fullWidth label="Status" name="status">
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
-                </Field>
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  select
-                  fullWidth
-                  label="Company"
-                  name="companyId"
-                  error={touched.companyId && !!errors.companyId}
-                  helperText={touched.companyId && errors.companyId}
-                >
-                  <MenuItem value="">Select a company</MenuItem>
-                  {companies.map((company) => (
-                    <MenuItem key={company.id} value={company.id}>
-                      {company.name}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  select
-                  fullWidth
-                  label="Category"
-                  name="categoryId"
-                  error={touched.categoryId && !!errors.categoryId}
-                  helperText={touched.categoryId && errors.categoryId}
-                >
-                  <MenuItem value="">Select a category</MenuItem>
-                  {categories.map((category) => (
-                    <MenuItem key={category.id} value={category.id}>
-                      {category.name}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  select
-                  fullWidth
-                  label="Unit"
-                  name="unitId"
-                  error={touched.unitId && !!errors.unitId}
-                  helperText={touched.unitId && errors.unitId}
-                >
-                  <MenuItem value="">Select a unit</MenuItem>
-                  {units.map((unit) => (
-                    <MenuItem key={unit.id} value={unit.id}>
-                      {unit.name} ({unit.abbreviation})
-                    </MenuItem>
-                  ))}
-                </Field>
-              </Grid>
-            </Grid>
-            <Box sx={{ mt: 3, position: 'relative' }}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                disabled={isSubmitting || loading}
-                startIcon={loading ? <CircularProgress size={20} /> : null}
-              >
-                {loading ? 'Creating Product...' : 'Create Product'}
-              </Button>
-            </Box>
-          </Form>
-        )}
-      </Formik>
-    </Paper> */}
+        {t("AddNewProduct")}
+      </Button>
     </MainDashboard>
   );
 };

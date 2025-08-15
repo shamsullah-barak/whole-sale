@@ -6,11 +6,8 @@ import Invoices from "../pages/Invoices";
 import Products from "../features/products/Product";
 import CreateProduct from "../features/products/CreateProduct";
 import EditProduct from "../features/products/EditProduct";
-// Master Data imports
 import MasterData from "../features/master-data/MasterData";
 import Categories from "../features/master-data/categories/Categories";
-import CreateCategory from "../features/master-data/categories/CreateCategory";
-import EditCategory from "../features/master-data/categories/EditCategory";
 import Companies from "../features/master-data/companies/Companies";
 import CreateCompany from "../features/master-data/companies/CreateCompany";
 import EditCompany from "../features/master-data/companies/EditCompany";
@@ -87,14 +84,6 @@ export default function Router() {
     {
       path: "/master-data/categories",
       element: <Categories />,
-    },
-    {
-      path: "/master-data/categories/add",
-      element: <CreateCategory />,
-    },
-    {
-      path: "/master-data/categories/edit/:categoryId",
-      element: <EditCategory />,
     },
     // Company routes
     {

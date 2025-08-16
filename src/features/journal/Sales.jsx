@@ -139,7 +139,7 @@ const Sales = () => {
     const { value } = event.target;
     const stock = stocks.find((s) => s.id === value);
 
-    setSelectedStock({ name: stock.name, id: stock.id });
+    setSelectedStock({ name: stock.engName, id: stock.id });
   };
 
   return (
@@ -166,7 +166,7 @@ const Sales = () => {
           >
             {stocks.map((item) => (
               <MenuItem key={item.id} value={item.id}>
-                {item.name}
+                {item.engName}
               </MenuItem>
             ))}
           </TextField>

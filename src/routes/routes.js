@@ -1,6 +1,5 @@
 import { useRoutes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
-import Loans from "../pages/Loan";
 import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
 import Products from "../features/products/Product";
@@ -28,6 +27,7 @@ import Investments from "../features/investment";
 import Expenses from "../features/expenses";
 import Suppliers from "../features/suppliers";
 import Customers from "../features/customers";
+import Loan from "../features/loan";
 
 // ----------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ export default function Router() {
     },
     {
       path: "/loan",
-      element: <Loans />,
+      element: <Loan />,
     },
     {
       path: "/incomes",

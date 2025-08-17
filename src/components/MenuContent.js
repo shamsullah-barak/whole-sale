@@ -29,6 +29,8 @@ import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
 import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { unstable_useTreeItem2 as useTreeItem2 } from "@mui/x-tree-view/useTreeItem2";
 import StorageIcon from "@mui/icons-material/Storage";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 import {
   TreeItem2Content,
@@ -57,8 +59,9 @@ const mainListItems = [
   { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
-  { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
+  { text: "Payable", icon: <PaymentsIcon />, path: "/payable" },
+  { text: "Receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
   { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
 ];

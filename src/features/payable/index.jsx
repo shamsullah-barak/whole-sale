@@ -6,7 +6,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { selectProducts } from "../../store/selectors/product.selector";
 
-const LoanList = () => {
+const PayableList = () => {
   const { t } = useTranslation();
 
   const selectedDirection = useSelector(selectDirection);
@@ -107,14 +107,14 @@ const LoanList = () => {
   );
 };
 
-const Loan = () => {
+const Payable = () => {
   return (
     <>
-      <MainDashboard title="Loan">
-        <LoanList />
+      <MainDashboard title="Payable">
+        <PayableList />
       </MainDashboard>
     </>
   );
 };
 
-export default Loan;
+export default Payable;

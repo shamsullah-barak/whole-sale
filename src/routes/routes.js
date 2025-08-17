@@ -27,7 +27,8 @@ import Investments from "../features/investment";
 import Expenses from "../features/expenses";
 import Suppliers from "../features/suppliers";
 import Customers from "../features/customers";
-import Loan from "../features/loan";
+import Payable from "../features/payable";
+import Receivable from "../features/receivable";
 
 // ----------------------------------------------------------------------
 
@@ -48,10 +49,6 @@ export default function Router() {
     {
       path: "/customers",
       element: <Customers />,
-    },
-    {
-      path: "/loan",
-      element: <Loan />,
     },
     {
       path: "/incomes",
@@ -103,6 +100,14 @@ export default function Router() {
     {
       path: "/stocks/create",
       element: <CreateStock />,
+    },
+    {
+      path: "/payable",
+      element: <Payable />,
+    },
+    {
+      path: "/receivable",
+      element: <Receivable />,
     },
     {
       path: "/stocks/:stockName",

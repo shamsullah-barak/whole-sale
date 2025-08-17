@@ -14,6 +14,7 @@ import {
   fetchSalesAsync,
 } from "../../store/slices/sale.slice";
 import { selectNextSaleNumber } from "../../store/selectors/sale.selectors";
+import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -126,6 +127,7 @@ const Sales = () => {
       });
       toast.success("data added");
       dispatch(fetchSalesAsync());
+      dispatch(fetchReceivablesAsync());
       dispatch(fetchNextSaleNumberAsync());
     } catch (error) {
       toast.error(

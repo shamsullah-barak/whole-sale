@@ -20,6 +20,8 @@ import {
   fetchSalesAsync,
 } from "./store/slices/sale.slice";
 import { fetchCategoriesAsync } from "./store/slices/category.slice";
+import { fetchPayableAsync } from "./store/slices/payable.slice";
+import { fetchReceivablesAsync } from "./store/slices/receivable.slice";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +30,8 @@ function App() {
     dispatch(fetchPartnersAsync());
     dispatch(fetchTransactionTypesAsync());
     dispatch(fetchSalesAsync());
+    dispatch(fetchPayableAsync());
+    dispatch(fetchReceivablesAsync());
     dispatch(fetchNextInvoiceAsync());
     dispatch(fetchNextSaleNumberAsync());
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));

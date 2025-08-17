@@ -20,6 +20,7 @@ import moment from "moment/moment";
 import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
 import { fetchNextInvoiceAsync } from "../../store/slices/purchase.slice";
 import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
+import { fetchPayableAsync } from "../../store/slices/payable.slice";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -131,6 +132,7 @@ const PurchaseOfGoods = ({ statusId }) => {
         }
       );
       dispatch(fetchNextInvoiceAsync());
+      dispatch(fetchPayableAsync());
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       toast.success("data added");
       // clearState();

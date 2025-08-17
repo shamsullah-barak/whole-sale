@@ -4,38 +4,30 @@ import MainDashboard from "../../theme/main/MainDashboard";
 import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectDirection } from "../../store/selectors/app.selector";
-import { selectProducts } from "../../store/selectors/product.selector";
+import { selectPayable } from "../../store/selectors/payable.selector";
 
 const PayableList = () => {
   const { t } = useTranslation();
 
   const selectedDirection = useSelector(selectDirection);
 
-  const products = useSelector(selectProducts);
+  const payable = useSelector(selectPayable);
 
   const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
     {
-      field: "name",
-      headerName: "Product Name",
+      field: "amount",
+      headerName: "Total Amount",
       flex: 0.5,
       minWidth: 80,
-    },
-    {
-      field: "categoryId",
-      headerName: "Category",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 50,
     },
   ];
 
   return (
     <>
-      {products.products.length === 0 ? (
+      {payable.payable.length === 0 ? (
         <div
           style={{
             textAlign: "center",
@@ -48,7 +40,7 @@ const PayableList = () => {
       ) : (
         <div style={{ width: "100%" }}>
           <DataGrid
-            rows={products?.products}
+            rows={payable?.payable}
             style={{
               cursor: "pointer",
               textAlign: selectedDirection === "rtl" ? "left" : "right",
@@ -61,18 +53,18 @@ const PayableList = () => {
             }
             initialState={{
               pagination: {
-                paginationModel: { pageSize: products?.limitPerPage },
+                paginationModel: { pageSize: payable?.limitPerPage },
               },
             }}
             pageSizeOptions={[10, 20, 50]}
             onPaginationModelChange={(data) => stateChanged(data)}
             disableColumnResize
-            rowCount={products?.totalRows}
+            rowCount={payable?.totalRows}
             paginationMode="server"
             pagination
-            page={products?.currentPage}
-            pageSize={products?.limitPerPage}
-            loading={products?.loading}
+            page={payable?.currentPage}
+            pageSize={payable?.limitPerPage}
+            loading={payable?.loading}
             density="compact"
             slotProps={{
               filterPanel: {

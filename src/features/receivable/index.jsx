@@ -5,37 +5,30 @@ import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { selectProducts } from "../../store/selectors/product.selector";
+import { selectReceivables } from "../../store/selectors/receivable.selector";
 
 const ReceivableList = () => {
   const { t } = useTranslation();
 
   const selectedDirection = useSelector(selectDirection);
 
-  const products = useSelector(selectProducts);
+  const receivables = useSelector(selectReceivables);
 
   const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
     {
-      field: "name",
-      headerName: "Product Name",
+      field: "amount",
+      headerName: "Total Amount",
       flex: 0.5,
       minWidth: 80,
-    },
-    {
-      field: "categoryId",
-      headerName: "Category",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 50,
     },
   ];
 
   return (
     <>
-      {products.products.length === 0 ? (
+      {receivables.receivables.length === 0 ? (
         <div
           style={{
             textAlign: "center",
@@ -48,7 +41,7 @@ const ReceivableList = () => {
       ) : (
         <div style={{ width: "100%" }}>
           <DataGrid
-            rows={products?.products}
+            rows={receivables?.receivables}
             style={{
               cursor: "pointer",
               textAlign: selectedDirection === "rtl" ? "left" : "right",
@@ -61,18 +54,18 @@ const ReceivableList = () => {
             }
             initialState={{
               pagination: {
-                paginationModel: { pageSize: products?.limitPerPage },
+                paginationModel: { pageSize: receivables?.limitPerPage },
               },
             }}
             pageSizeOptions={[10, 20, 50]}
             onPaginationModelChange={(data) => stateChanged(data)}
             disableColumnResize
-            rowCount={products?.totalRows}
+            rowCount={receivables?.totalRows}
             paginationMode="server"
             pagination
-            page={products?.currentPage}
-            pageSize={products?.limitPerPage}
-            loading={products?.loading}
+            page={receivables?.currentPage}
+            pageSize={receivables?.limitPerPage}
+            loading={receivables?.loading}
             density="compact"
             slotProps={{
               filterPanel: {

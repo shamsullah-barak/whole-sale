@@ -29,12 +29,14 @@ export const payableSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchPayableAsync.fulfilled, (state, action) => {
+        // console.log({ payload: action.payload });
+        // state.loading = false;
+        state.payable = action?.payload;
         state.loading = false;
-        state.payable = action?.payload?.results;
-        state.currentPage = action?.payload?.page;
-        state.limitPerPage = action?.payload?.limit;
-        state.totalPages = action?.payload?.totalPages;
-        state.totalRows = action?.payload?.totalResults;
+        // state.currentPage = action?.payload?.page;
+        // state.limitPerPage = action?.payload?.limit;
+        // state.totalPages = action?.payload?.totalPages;
+        // state.totalRows = action?.payload?.totalResults;
       });
   },
 });

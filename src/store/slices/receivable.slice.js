@@ -30,11 +30,11 @@ export const receivablesSlice = createSlice({
       })
       .addCase(fetchReceivablesAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.receivables = action?.payload?.results;
-        state.currentPage = action?.payload?.page;
-        state.limitPerPage = action?.payload?.limit;
-        state.totalPages = action?.payload?.totalPages;
-        state.totalRows = action?.payload?.totalResults;
+        state.receivables = action?.payload;
+        // state.currentPage = action?.payload?.page;
+        // state.limitPerPage = action?.payload?.limit;
+        // state.totalPages = action?.payload?.totalPages;
+        // state.totalRows = action?.payload?.totalResults;
       });
   },
 });

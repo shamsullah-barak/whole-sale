@@ -10,6 +10,7 @@ import MoneyWithdrawal from "./moneyWithdrawal";
 import PurchaseReturnForm from "./PurchaseReturn";
 import Sales from "./Sales";
 import SaleReturn from "./SaleReturn";
+import Receivable from "./Receivable";
 
 const EntryForm = () => {
   const [status, setStatus] = useState({ statusId: "", statusName: "" });
@@ -71,9 +72,14 @@ const EntryForm = () => {
         <Sales transactionTypeId={status.statusId} />
       )}
 
-      {/* sale */}
+      {/* sale return */}
       {status.statusName === "Sales Return" && (
         <SaleReturn transactionTypeId={status.statusId} />
+      )}
+
+      {/* sale return */}
+      {status.statusName === "Settlement of Receivables" && (
+        <Receivable transactionTypeId={status.statusId} />
       )}
     </>
   );

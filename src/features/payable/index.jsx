@@ -18,6 +18,18 @@ const PayableList = () => {
 
   const columns = [
     {
+      field: "name",
+      headerName: "Name",
+      flex: 0.5,
+      minWidth: 80,
+    },
+    {
+      field: "address",
+      headerName: "address",
+      flex: 0.5,
+      minWidth: 80,
+    },
+    {
       field: "amount",
       headerName: "Total Amount",
       flex: 0.5,

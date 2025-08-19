@@ -51,7 +51,7 @@ export const businessEntitySlice = createSlice({
         state.suppliers.loading = true;
       })
       .addCase(fetchSuppliersAsync.fulfilled, (state, action) => {
-        state.loading = false;
+        state.suppliers.loading = false;
         state.suppliers.suppliers = action.payload.results;
         state.suppliers.currentPage = action.payload.page;
         state.suppliers.limitPerPage = action.payload.limit;

@@ -4,30 +4,30 @@ import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
-import { selectReceivables } from "../../store/selectors/receivable.selector";
-import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
+import { selectPayable } from "../../store/selectors/payable.selector";
 
-const Receivable = () => {
+const Payable = () => {
   const { t } = useTranslation();
   const selectedDirection = useSelector(selectDirection);
 
-  const dispatch = useDispatch();
-  const receivables = useSelector(selectReceivables).receivables;
+  const payables = useSelector(selectPayable).payable;
 
   const [loading, setLoading] = useState(false);
-  const [receivable, setReceivable] = useState({
+  const [payable, setPayable] = useState({
     loanId: "",
     amount: "",
-    type: "AR",
+    type: "AP",
   });
 
   const handleSubmit = async () => {
+    console.log("trying......");
     setLoading(true);
+
     try {
-      await axios.post("http://localhost:5000/api/installments", receivable, {
+      await axios.post("http://localhost:5000/api/installments", payable, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -35,7 +35,6 @@ const Receivable = () => {
 
       setLoading(false);
       toast.success("data added");
-      dispatch(fetchReceivablesAsync());
     } catch (error) {
       setLoading(false);
       toast.error(
@@ -47,7 +46,7 @@ const Receivable = () => {
 
   const inputHandler = (event) => {
     const { name, value } = event.target;
-    setReceivable((preS) => {
+    setPayable((preS) => {
       return {
         ...preS,
         [name]: value,
@@ -68,10 +67,10 @@ const Receivable = () => {
             label={t("customer")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={receivable.loanId}
+            value={payable.loanId}
             onChange={inputHandler}
           >
-            {receivables.map((item, index) => (
+            {payables.map((item, index) => (
               <MenuItem key={index} value={item.id}>
                 {t(`${item.name}`)}-#{t(`${item.address}`)}-#
                 {t(`${item.amount}`)}
@@ -87,7 +86,7 @@ const Receivable = () => {
             label={t("amount")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={receivable.amount}
+            value={payable.amount}
             type="number"
             onChange={inputHandler}
           />
@@ -114,4 +113,4 @@ const Receivable = () => {
   );
 };
 
-export default Receivable;
+export default Payable;

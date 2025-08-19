@@ -11,6 +11,7 @@ import PurchaseReturnForm from "./PurchaseReturn";
 import Sales from "./Sales";
 import SaleReturn from "./SaleReturn";
 import Receivable from "./Receivable";
+import Payable from "./Payable";
 
 const EntryForm = () => {
   const [status, setStatus] = useState({ statusId: "", statusName: "" });
@@ -77,9 +78,14 @@ const EntryForm = () => {
         <SaleReturn transactionTypeId={status.statusId} />
       )}
 
-      {/* sale return */}
+      {/* Settlement of Receivable */}
       {status.statusName === "Settlement of Receivables" && (
         <Receivable transactionTypeId={status.statusId} />
+      )}
+
+      {/* Settlement of Balance */}
+      {status.statusName === "Settlement of Balance" && (
+        <Payable transactionTypeId={status.statusId} />
       )}
     </>
   );

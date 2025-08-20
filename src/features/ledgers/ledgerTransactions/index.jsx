@@ -159,7 +159,7 @@ const LedgerTransactions = () => {
           sx={{ width: "100%", textAlign: "right", height: "100%" }}
         >
           <LedgerTransactionsList />
-          <LedgerTransactionForm />
+          {/* <LedgerTransactionForm /> */}
         </Grid>
       </Grid>
     </MainDashboard>

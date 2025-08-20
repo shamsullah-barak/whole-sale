@@ -6,6 +6,7 @@ export const fetchLedgers = async (page, limit) => {
     const response = await axios.get(
       `http://localhost:5000/api/ledgers?page=${page}&limit=${limit}`
     );
+    console.log(response);
     return response.data;
   } catch (error) {
     console.log({ error });

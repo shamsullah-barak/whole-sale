@@ -48,11 +48,11 @@ export const ledgersSlice = createSlice({
       })
       .addCase(fetchLedgersAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.ledgers = action.payload.results;
-        state.currentPage = action.payload.page;
-        state.limitPerPage = action.payload.limit;
-        state.totalPages = action.payload.totalPages;
-        state.totalRows = action.payload.totalResults;
+        state.ledgers = action.payload;
+        // state.currentPage = action.payload.page;
+        // state.limitPerPage = action.payload.limit;
+        // state.totalPages = action.payload.totalPages;
+        // state.totalRows = action.payload.totalResults;
       });
 
     // builder.addCase(fetchCashBoxAsync.fulfilled, (state, action) => {

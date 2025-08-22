@@ -7,8 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
+import { Typography, TextField, Stack } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
@@ -17,6 +16,7 @@ import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
 import { fetchProductsAsync } from "../../store/slices/product.slice";
 import { selectCategories } from "../../store/selectors/category.selector";
+import Model from "../../components/Model";
 
 const CreateProduct = ({ open, setOpen }) => {
   const dispatch = useDispatch();
@@ -64,78 +64,45 @@ const CreateProduct = ({ open, setOpen }) => {
 
   return (
     <>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Add new Product
-          </Typography>
+      <Model
+        open={open}
+        handleClose={handleClose}
+        handleSubmit={handleSubmit}
+        cancel="cancel"
+        submit="submit"
+        loading={loading}
+        disabled={loading}
+      >
+        <Typography variant="h6" mb={2}>
+          Add new Product
+        </Typography>
 
-          <Stack spacing={2}>
-            <TextField
-              label="productName"
-              name="productName"
-              value={product.productName}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              select
-              fullWidth
-              required
-              name="categoryId"
-              label={"category"}
-              value={product.categoryId}
-              onChange={handleChange}
-            >
-              {categories.map((item, index) => (
-                <MenuItem key={index} value={item.id}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={handleClose}
-                variant="outlined"
-                color="secondary"
-              >
-                cancel
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-                color="inherit"
-                sx={(theme) => ({
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? COLORS.WHITE
-                      : COLORS.PURPLE,
-                  color:
-                    theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-                })}
-              >
-                submit
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
+        <Stack spacing={2}>
+          <TextField
+            label="productName"
+            name="productName"
+            value={product.productName}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            select
+            fullWidth
+            required
+            name="categoryId"
+            label={"category"}
+            value={product.categoryId}
+            onChange={handleChange}
+          >
+            {categories.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+      </Model>
     </>
   );
 };
@@ -300,7 +267,7 @@ const ProductList = () => {
       ) : (
         <>
           <div>
-            <Modal open={open} onClose={handleClose}>
+            {/* <Modal open={open} onClose={handleClose}>
               <Box
                 sx={{
                   position: "absolute",
@@ -336,96 +303,63 @@ const ProductList = () => {
                     disabled={loading}
                     loading={loading}
                     loadingPosition="start"
-                    sx={(theme) => ({
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? COLORS.WHITE
-                          : COLORS.PURPLE,
-                      color:
-                        theme.palette.mode === "dark"
-                          ? COLORS.BLACK
-                          : COLORS.WHITE,
-                    })}
                   >
                     delete
                   </Button>
                 </Box>
               </Box>
-            </Modal>
-            <Modal open={updateOpen} onClose={handleCloseUpdate}>
-              {/* update data model here */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Stack spacing={2}>
-                  <Typography variant="h6" mb={2}>
-                    update product details
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="productName"
-                    name="productName"
-                    value={selectedItem.productName}
-                    onChange={handleUpdateChanges}
-                  />
-                  <TextField
-                    select
-                    fullWidth
-                    required
-                    name="categoryId"
-                    label={"category"}
-                    value={selectedItem.categoryId}
-                    onChange={handleUpdateChanges}
-                  >
-                    {categories.map((item, index) => (
-                      <MenuItem key={index} value={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Stack>
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleCloseUpdate}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    cancel
-                  </Button>
-                  <Button
-                    onClick={handleUpdateSubmit}
-                    color="error"
-                    variant="contained"
-                    disabled={disableUpdate === selectedItem.productName}
-                    loading={loading}
-                    loadingPosition="start"
-                    sx={(theme) => ({
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? COLORS.WHITE
-                          : COLORS.PURPLE,
-                      color:
-                        theme.palette.mode === "dark"
-                          ? COLORS.BLACK
-                          : COLORS.WHITE,
-                    })}
-                  >
-                    update
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
+            </Modal> */}
+            <Model
+              open={open}
+              handleClose={handleClose}
+              handleSubmit={handleConfirm}
+              loading={loading}
+              submit="delete"
+              cancel="cancel"
+              disabled={loading}
+            >
+              <Typography variant="h6" component="h2">
+                Are you sure
+              </Typography>
+              <Typography sx={{ mt: 2 }}>this action cannot be undo</Typography>
+            </Model>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={disableUpdate === selectedItem.productName}
+            >
+              <Stack spacing={2}>
+                <Typography variant="h6" mb={2}>
+                  update product details
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="productName"
+                  name="productName"
+                  value={selectedItem.productName}
+                  onChange={handleUpdateChanges}
+                />
+                <TextField
+                  select
+                  fullWidth
+                  required
+                  name="categoryId"
+                  label={"category"}
+                  value={selectedItem.categoryId}
+                  onChange={handleUpdateChanges}
+                >
+                  {categories.map((item, index) => (
+                    <MenuItem key={index} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Stack>
+            </Model>
           </div>
           <DataGrid
             rows={products?.products}

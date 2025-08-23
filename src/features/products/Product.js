@@ -17,6 +17,7 @@ import { selectProducts } from "../../store/selectors/product.selector";
 import { fetchProductsAsync } from "../../store/slices/product.slice";
 import { selectCategories } from "../../store/selectors/category.selector";
 import Model from "../../components/Model";
+import Datagrid from "../../components/DataGrid";
 
 const CreateProduct = ({ open, setOpen }) => {
   const dispatch = useDispatch();
@@ -197,7 +198,6 @@ const ProductList = () => {
     setUpdateOpen(true);
   };
 
-  const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
@@ -267,48 +267,6 @@ const ProductList = () => {
       ) : (
         <>
           <div>
-            {/* <Modal open={open} onClose={handleClose}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" component="h2">
-                  Are you sure
-                </Typography>
-                <Typography sx={{ mt: 2 }}>
-                  this action cannot be undo
-                </Typography>
-
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    cancel
-                  </Button>
-                  <Button
-                    onClick={handleConfirm}
-                    color="error"
-                    variant="contained"
-                    disabled={loading}
-                    loading={loading}
-                    loadingPosition="start"
-                  >
-                    delete
-                  </Button>
-                </Box>
-              </Box>
-            </Modal> */}
             <Model
               open={open}
               handleClose={handleClose}
@@ -330,6 +288,7 @@ const ProductList = () => {
               cancel="cancel"
               loading={loading}
               disabled={disableUpdate === selectedItem.productName}
+              handleSubmit={handleUpdateSubmit}
             >
               <Stack spacing={2}>
                 <Typography variant="h6" mb={2}>
@@ -361,59 +320,14 @@ const ProductList = () => {
               </Stack>
             </Model>
           </div>
-          <DataGrid
-            rows={products?.products}
-            style={{
-              cursor: "pointer",
-              textAlign: selectedDirection === "rtl" ? "left" : "right",
-            }}
+          <Datagrid
+            rows={products.products}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: products?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={products?.totalRows}
-            paginationMode="server"
-            pagination
-            page={products?.currentPage}
-            pageSize={products?.limitPerPage}
+            totalRows={products.totalRows}
+            currentPage={products.currentPage}
+            limitPerPage={products?.limitPerPage}
             loading={products?.loading}
-            density="compact"
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            stateChanged={stateChanged}
           />
         </>
       )}

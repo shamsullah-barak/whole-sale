@@ -2,27 +2,23 @@ import React, { useState } from "react";
 import MainDashboard from "../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPartners } from "../../store/selectors/investment.selector";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
+import { Typography } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { fetchPartnersAsync } from "../../store/slices/investment.slice";
 import { selectExpenses } from "../../store/selectors/expenses.selector";
+import Model from "../../components/Model";
+import Datagrid from "../../components/DataGrid";
 
 const ExpensesList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-
-  const selectedDirection = useSelector(selectDirection);
 
   const expenses = useSelector(selectExpenses);
 
@@ -75,7 +71,6 @@ const ExpensesList = () => {
       toast.success("data updated");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setUpdateOpen(false);
       setLoading(false);
       toast.error(
@@ -95,7 +90,6 @@ const ExpensesList = () => {
       toast.success("data deleted");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(
@@ -104,13 +98,11 @@ const ExpensesList = () => {
     }
   };
 
-  console.log({ e: expenses.expenses });
   const handleUpdateOpen = (item) => {
     setSelectedItem({ ...item });
     setUpdateOpen(true);
   };
 
-  const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
@@ -195,121 +187,44 @@ const ExpensesList = () => {
       ) : (
         <>
           <div>
-            <Modal open={open} onClose={handleClose}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" component="h2">
-                  آیا ډاډه یې؟
-                </Typography>
-                <Typography sx={{ mt: 2 }}>
-                  که ته دا عمل ترسره کوې، نو بیا نه شي بېرته اخیستل کېدای!
-                </Typography>
-
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    لغوه
-                  </Button>
-                  <Button
-                    onClick={handleConfirm}
-                    color="error"
-                    variant="contained"
-                    disabled={loading}
-                    loading={loading}
-                    loadingPosition="start"
-                  >
-                    تائید
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-            <Modal open={updateOpen} onClose={handleCloseUpdate}>
-              {/* update data model here */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" mb={2}>
-                  معلومات اپډیټ کړي
-                </Typography>
-              </Box>
-            </Modal>
+            <Model
+              open={open}
+              handleClose={handleClose}
+              submit="delete"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleConfirm}
+            >
+              <Typography variant="h6" component="h2">
+                are you sure?
+              </Typography>
+              <Typography sx={{ mt: 2 }}>
+                you cannot undo this action
+              </Typography>
+            </Model>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleUpdateSubmit}
+            >
+              <Typography variant="h6" mb={2}>
+                update info here
+              </Typography>
+            </Model>
           </div>
-          <DataGrid
-            rows={expenses.expenses}
+          <Datagrid
+            rows={expenses?.expenses}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: expenses?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={expenses?.totalRows}
-            paginationMode="server"
-            pagination
-            page={expenses?.currentPage}
-            pageSize={expenses?.limitPerPage}
+            limitPerPage={expenses?.limitPerPage}
             loading={expenses?.loading}
-            density="compact"
-            slots={{
-              footer: () => null,
-            }}
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={expenses?.totalRows}
+            currentPage={expenses?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}

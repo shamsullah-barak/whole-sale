@@ -1,9 +1,8 @@
+import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../theme/main/MainDashboard";
 import { Button } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import React, { useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,6 +13,7 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { useTranslation } from "react-i18next";
 import COLORS from "../../constant/colors";
 import { selectDirection } from "../../store/selectors/app.selector";
+import Datagrid from "../../components/DataGrid";
 
 export const columns = [
   {
@@ -48,7 +48,7 @@ export const columns = [
   },
 ];
 
-const CustomizedDataGrid = () => {
+const LedgerList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const ledgers = useSelector(selectLedgers);
@@ -72,57 +72,14 @@ const CustomizedDataGrid = () => {
   };
 
   return (
-    <DataGrid
+    <Datagrid
       rows={ledgers?.ledgers}
-      style={{
-        cursor: "pointer",
-        textAlign: selectedDirection === "rtl" ? "left" : "right",
-      }}
       columns={columns}
-      getRowId={(row) => row.id}
-      onRowClick={handleRowClick}
-      getRowClassName={(params) =>
-        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-      }
-      initialState={{
-        pagination: { paginationModel: { pageSize: ledgers?.limitPerPage } },
-      }}
-      pageSizeOptions={[10, 20, 50]}
-      onPaginationModelChange={(data) => stateChanged(data)}
-      disableColumnResize
-      rowCount={ledgers?.totalRows}
-      paginationMode="server"
-      pagination
-      page={ledgers?.currentPage}
-      pageSize={ledgers?.limitPerPage}
+      limitPerPage={ledgers?.limitPerPage}
       loading={ledgers?.loading}
-      density="compact"
-      slotProps={{
-        filterPanel: {
-          filterFormProps: {
-            logicOperatorInputProps: {
-              variant: "outlined",
-              size: "small",
-            },
-            columnInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            operatorInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            valueInputProps: {
-              InputComponentProps: {
-                variant: "outlined",
-                size: "small",
-              },
-            },
-          },
-        },
-      }}
+      totalRows={ledgers?.totalRows}
+      currentPage={ledgers?.currentPage}
+      stateChanged={stateChanged}
     />
   );
 };
@@ -159,7 +116,7 @@ const Ledgers = () => {
       </Grid>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%" }}>
-          <CustomizedDataGrid />
+          <LedgerList />
         </Grid>
       </Grid>
     </MainDashboard>

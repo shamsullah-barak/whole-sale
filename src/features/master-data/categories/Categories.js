@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import MainDashboard from "../../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
+import { Typography, TextField, Stack } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../../store/selectors/app.selector";
 import COLORS from "../../../constant/colors";
 import { selectCategories } from "../../../store/selectors/category.selector";
 import { fetchCategoriesAsync } from "../../../store/slices/category.slice";
+import Datagrid from "../../../components/DataGrid";
+import Model from "../../../components/Model";
 
 const CreateCategory = ({ open, setOpen }) => {
   const dispatch = useDispatch();
@@ -58,63 +58,30 @@ const CreateCategory = ({ open, setOpen }) => {
 
   return (
     <>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Add new Category
-          </Typography>
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          Add new Category
+        </Typography>
 
-          <Stack spacing={2}>
-            <TextField
-              label="categoryName"
-              name="categoryName"
-              value={categoryName}
-              onChange={(event) => setCategoryName(event.target.value)}
-              fullWidth
-              size="small"
-            />
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={handleClose}
-                variant="outlined"
-                color="secondary"
-              >
-                cancel
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-                color="inherit"
-                sx={(theme) => ({
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? COLORS.WHITE
-                      : COLORS.PURPLE,
-                  color:
-                    theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-                })}
-              >
-                submit
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
+        <Stack spacing={2}>
+          <TextField
+            label="categoryName"
+            name="categoryName"
+            value={categoryName}
+            onChange={(event) => setCategoryName(event.target.value)}
+            fullWidth
+            size="small"
+          />
+        </Stack>
+      </Model>
     </>
   );
 };
@@ -122,7 +89,6 @@ const CreateCategory = ({ open, setOpen }) => {
 const CategoryList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const selectedDirection = useSelector(selectDirection);
   const categories = useSelector(selectCategories);
   const [open, setOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
@@ -200,7 +166,6 @@ const CategoryList = () => {
     }
   };
 
-  const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
@@ -261,169 +226,50 @@ const CategoryList = () => {
       ) : (
         <>
           <div>
-            <Modal open={open} onClose={handleClose}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" component="h2">
-                  Are you sure
-                </Typography>
-                <Typography sx={{ mt: 2 }}>
-                  this action cannot be undo
-                </Typography>
-
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    cancel
-                  </Button>
-                  <Button
-                    onClick={handleConfirm}
-                    color="error"
-                    variant="contained"
-                    disabled={loading}
-                    loading={loading}
-                    loadingPosition="start"
-                    sx={(theme) => ({
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? COLORS.WHITE
-                          : COLORS.PURPLE,
-                      color:
-                        theme.palette.mode === "dark"
-                          ? COLORS.BLACK
-                          : COLORS.WHITE,
-                    })}
-                  >
-                    delete
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-            <Modal open={updateOpen} onClose={handleCloseUpdate}>
-              {/* update data model here */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" mb={2}>
-                  update category
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label="categoryName"
-                  name="categoryName"
-                  value={selectedItem.categoryName}
-                  onChange={handleUpdateChanges}
-                />
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleCloseUpdate}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    cancel
-                  </Button>
-                  <Button
-                    onClick={handleUpdateSubmit}
-                    color="error"
-                    variant="contained"
-                    disabled={disableUpdate === selectedItem.categoryName}
-                    loading={loading}
-                    loadingPosition="start"
-                    sx={(theme) => ({
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? COLORS.WHITE
-                          : COLORS.PURPLE,
-                      color:
-                        theme.palette.mode === "dark"
-                          ? COLORS.BLACK
-                          : COLORS.WHITE,
-                    })}
-                  >
-                    update
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
+            <Model
+              open={open}
+              handleClose={handleClose}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleConfirm}
+            >
+              <Typography variant="h6" component="h2">
+                Are you sure
+              </Typography>
+              <Typography sx={{ mt: 2 }}>this action cannot be undo</Typography>
+            </Model>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={disableUpdate === selectedItem.categoryName}
+              handleSubmit={handleUpdateSubmit}
+            >
+              <Typography variant="h6" mb={2}>
+                update category
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                label="categoryName"
+                name="categoryName"
+                value={selectedItem.categoryName}
+                onChange={handleUpdateChanges}
+              />
+            </Model>
           </div>
-          <DataGrid
+          <Datagrid
             rows={categories?.categories}
-            style={{
-              cursor: "pointer",
-              textAlign: selectedDirection === "rtl" ? "left" : "right",
-            }}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: categories?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={categories?.totalRows}
-            paginationMode="server"
-            pagination
-            page={categories?.currentPage}
-            pageSize={categories?.limitPerPage}
+            limitPerPage={categories?.limitPerPage}
             loading={categories?.loading}
-            density="compact"
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={categories?.totalRows}
+            currentPage={categories?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}

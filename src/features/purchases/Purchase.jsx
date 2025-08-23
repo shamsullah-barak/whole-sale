@@ -9,7 +9,6 @@ import {
   LinearProgress,
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
 import { selectPurchases } from "../../store/selectors/purchase.selector";
@@ -17,9 +16,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import Chip from "@mui/material/Chip";
+import Datagrid from "../../components/DataGrid";
 
-const CustomizedDataGrid = () => {
+const PurchaseList = () => {
   const dispatch = useDispatch();
   const purchases = useSelector(selectPurchases);
   useEffect(() => {
@@ -35,51 +34,14 @@ const CustomizedDataGrid = () => {
   };
 
   return (
-    <DataGrid
+    <Datagrid
       rows={purchases?.purchases}
       columns={columns}
-      getRowClassName={(params) =>
-        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-      }
-      initialState={{
-        pagination: { paginationModel: { pageSize: purchases?.limitPerPage } },
-      }}
-      pageSizeOptions={[10, 20, 50]}
-      onPaginationModelChange={(data) => stateChanged(data)}
-      disableColumnResize
-      rowCount={purchases.totalRows}
-      paginationMode="server"
-      pagination
-      page={purchases.currentPage}
-      pageSize={purchases.limitPerPage}
-      loading={purchases.loading}
-      density="compact"
-      slotProps={{
-        filterPanel: {
-          filterFormProps: {
-            logicOperatorInputProps: {
-              variant: "outlined",
-              size: "small",
-            },
-            columnInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            operatorInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            valueInputProps: {
-              InputComponentProps: {
-                variant: "outlined",
-                size: "small",
-              },
-            },
-          },
-        },
-      }}
+      limitPerPage={purchases?.limitPerPage}
+      loading={purchases?.loading}
+      totalRows={purchases?.totalRows}
+      currentPage={purchases?.currentPage}
+      stateChanged={stateChanged}
     />
   );
 };
@@ -102,17 +64,6 @@ const columns = [
   {
     field: "unitPerPackage",
     headerName: "unit per package",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-    valueFormatter: (params) => {
-      return params ? params.toFixed(2) : 0.0;
-    },
-  },
-  {
-    field: "unitPrice",
-    headerName: "unit price",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -278,7 +229,7 @@ export default function DashboardCards() {
     <MainDashboard title="Purchases">
       <Cards />
       <Grid container spacing={2}>
-        <CustomizedDataGrid />
+        <PurchaseList />
       </Grid>
     </MainDashboard>
   );

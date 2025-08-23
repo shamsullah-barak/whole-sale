@@ -2,12 +2,11 @@ import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../theme/main/MainDashboard";
 import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { useDispatch, useSelector } from "react-redux";
-import { DataGrid } from "@mui/x-data-grid";
 import { fetchStockItemsAsync } from "../../store/slices/stock.items.slice";
 import { selectStockItems } from "../../store/selectors/stock.items.selector";
+import Datagrid from "../../components/DataGrid";
 
 const columns = [
   {
@@ -94,7 +93,6 @@ const StockItemsList = () => {
   const dispatch = useDispatch();
   const stockName = useParams().stockName;
   const stockItems = useSelector(selectStockItems);
-  const selectedDirection = useSelector(selectDirection);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
@@ -104,56 +102,14 @@ const StockItemsList = () => {
   };
 
   return (
-    <DataGrid
+    <Datagrid
       rows={stockItems?.stockItems}
-      style={{
-        cursor: "pointer",
-        textAlign: selectedDirection === "rtl" ? "left" : "right",
-      }}
       columns={columns}
-      getRowId={(row) => row.id}
-      getRowClassName={(params) =>
-        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-      }
-      initialState={{
-        pagination: { paginationModel: { pageSize: stockItems?.limitPerPage } },
-      }}
-      pageSizeOptions={[10, 20, 50]}
-      onPaginationModelChange={(data) => stateChanged(data)}
-      disableColumnResize
-      rowCount={stockItems?.totalRows}
-      paginationMode="server"
-      pagination
-      page={stockItems?.currentPage}
-      pageSize={stockItems?.limitPerPage}
+      limitPerPage={stockItems?.limitPerPage}
       loading={stockItems?.loading}
-      density="compact"
-      slotProps={{
-        filterPanel: {
-          filterFormProps: {
-            logicOperatorInputProps: {
-              variant: "outlined",
-              size: "small",
-            },
-            columnInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            operatorInputProps: {
-              variant: "outlined",
-              size: "small",
-              sx: { mt: "auto" },
-            },
-            valueInputProps: {
-              InputComponentProps: {
-                variant: "outlined",
-                size: "small",
-              },
-            },
-          },
-        },
-      }}
+      totalRows={stockItems?.totalRows}
+      currentPage={stockItems?.currentPage}
+      stateChanged={stateChanged}
     />
   );
 };

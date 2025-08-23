@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import MainDashboard from "../../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPartners } from "../../../store/selectors/investment.selector";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
+import { Typography, TextField, Stack } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../../store/selectors/app.selector";
 import COLORS from "../../../constant/colors";
 import { fetchPartnersAsync } from "../../../store/slices/investment.slice";
+import Model from "../../../components/Model";
+import Datagrid from "../../../components/DataGrid";
 
 const currencyTypes = ["afn", "dollar", "rupee"];
 
@@ -75,82 +75,57 @@ const CreatePartnerModal = ({ open, setOpen }) => {
 
   return (
     <>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            نوی شریک اضافه کړئ
-          </Typography>
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          Add a new partner
+        </Typography>
 
-          <Stack spacing={2}>
-            <TextField
-              label="نوم"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              label="موقعیت"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              select
-              fullWidth
-              label={t("currencyType")}
-              name="currencyType"
-              value={formData.currencyType}
-              onChange={(event) => {
-                setFormData({
-                  ...formData,
-                  currencyType: event.target.value,
-                });
-              }}
-            >
-              {currencyTypes.map((item) => (
-                <MenuItem key={item} value={item} dir={selectedDirection}>
-                  {t(`${item}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={handleClose}
-                variant="outlined"
-                color="secondary"
-              >
-                لغوه
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-              >
-                ثبت
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
+        <Stack spacing={2}>
+          <TextField
+            label="نوم"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="موقعیت"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            select
+            fullWidth
+            label={t("currencyType")}
+            name="currencyType"
+            value={formData.currencyType}
+            onChange={(event) => {
+              setFormData({
+                ...formData,
+                currencyType: event.target.value,
+              });
+            }}
+          >
+            {currencyTypes.map((item) => (
+              <MenuItem key={item} value={item} dir={selectedDirection}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+      </Model>
     </>
   );
 };
@@ -322,177 +297,83 @@ const PartnerList = () => {
       ) : (
         <>
           <div>
-            <Modal open={open} onClose={handleClose}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" component="h2">
-                  آیا ډاډه یې؟
-                </Typography>
-                <Typography sx={{ mt: 2 }}>
-                  که ته دا عمل ترسره کوې، نو بیا نه شي بېرته اخیستل کېدای!
-                </Typography>
+            <Model
+              open={open}
+              handleClose={handleClose}
+              submit="delete"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleConfirm}
+            >
+              <Typography variant="h6" component="h2">
+                Are you sure
+              </Typography>
+              <Typography sx={{ mt: 2 }}>
+                you cannot undo this action
+              </Typography>
+            </Model>
 
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    لغوه
-                  </Button>
-                  <Button
-                    onClick={handleConfirm}
-                    color="error"
-                    variant="contained"
-                    disabled={loading}
-                    loading={loading}
-                    loadingPosition="start"
-                  >
-                    تائید
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-            <Modal open={updateOpen} onClose={handleCloseUpdate}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" mb={2}>
-                  معلومات اپډیټ کړي
-                </Typography>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleUpdateSubmit}
+            >
+              <Typography variant="h6" mb={2}>
+                update info here
+              </Typography>
 
-                <Stack spacing={2}>
-                  <TextField
-                    label="نوم"
-                    name="name"
-                    value={selectedItem.name ?? ""}
-                    onChange={handleUpdateChanges}
-                    fullWidth
-                    size="small"
-                  />
-                  <TextField
-                    label="موقعیت"
-                    name="location"
-                    value={selectedItem.location ?? ""}
-                    onChange={handleUpdateChanges}
-                    fullWidth
-                    size="small"
-                  />
-                  <TextField
-                    select
-                    fullWidth
-                    label={t("currencyType")}
-                    name="currencyType"
-                    value={selectedItem.currencyType ?? ""}
-                    onChange={(event) => {
-                      setSelectedItem({
-                        ...selectedItem,
-                        currencyType: event.target.value,
-                      });
-                    }}
-                  >
-                    {currencyTypes.map((item) => (
-                      <MenuItem key={item} value={item} dir={selectedDirection}>
-                        {t(`${item}`)}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <Stack direction="row" spacing={2} justifyContent="flex-end">
-                    <Button
-                      onClick={handleCloseUpdate}
-                      variant="outlined"
-                      color="secondary"
-                    >
-                      لغوه
-                    </Button>
-                    <Button
-                      onClick={handleUpdateSubmit}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      loading={loading}
-                      loadingPosition="start"
-                    >
-                      ثبت
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Box>
-            </Modal>
+              <Stack spacing={2}>
+                <TextField
+                  label="نوم"
+                  name="name"
+                  value={selectedItem.name ?? ""}
+                  onChange={handleUpdateChanges}
+                  fullWidth
+                  size="small"
+                />
+                <TextField
+                  label="موقعیت"
+                  name="location"
+                  value={selectedItem.location ?? ""}
+                  onChange={handleUpdateChanges}
+                  fullWidth
+                  size="small"
+                />
+                <TextField
+                  select
+                  fullWidth
+                  label={t("currencyType")}
+                  name="currencyType"
+                  value={selectedItem.currencyType ?? ""}
+                  onChange={(event) => {
+                    setSelectedItem({
+                      ...selectedItem,
+                      currencyType: event.target.value,
+                    });
+                  }}
+                >
+                  {currencyTypes.map((item) => (
+                    <MenuItem key={item} value={item} dir={selectedDirection}>
+                      {t(`${item}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Stack>
+            </Model>
           </div>
-          <DataGrid
-            rows={partners || []}
+          <Datagrid
+            rows={partners}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: partners?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={partners?.totalRows}
-            paginationMode="server"
-            pagination
-            page={partners?.currentPage}
-            pageSize={partners?.limitPerPage}
+            limitPerPage={partners?.limitPerPage}
             loading={partners?.loading}
-            density="compact"
-            slots={{
-              footer: () => null,
-            }}
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={partners?.totalRows}
+            currentPage={partners?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}

@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MainDashboard from "../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPartners } from "../../store/selectors/investment.selector";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
+import { Typography, TextField, Stack } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../store/selectors/app.selector";
@@ -18,6 +14,8 @@ import COLORS from "../../constant/colors";
 import { fetchPartnersAsync } from "../../store/slices/investment.slice";
 import { fetchSuppliersAsync } from "../../store/slices/businessEntity.slice";
 import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import Datagrid from "../../components/DataGrid";
+import Model from "../../components/Model";
 
 const CreateSupplier = ({ open, setOpen }) => {
   const { t } = useTranslation();
@@ -30,9 +28,6 @@ const CreateSupplier = ({ open, setOpen }) => {
     phone: "",
     address: "",
   });
-
-  //   selectors
-  const selectedDirection = useSelector(selectDirection);
 
   // methods
   const handleClose = () => {
@@ -78,73 +73,48 @@ const CreateSupplier = ({ open, setOpen }) => {
 
   return (
     <>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Add new Supplier
-          </Typography>
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          Add new Supplier
+        </Typography>
 
-          <Stack spacing={2}>
-            <TextField
-              label="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <TextField
-              label="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />{" "}
-            <TextField
-              label="address"
-              name="address"
-              type="text"
-              value={formData.address}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={handleClose}
-                variant="outlined"
-                color="secondary"
-              >
-                cancel
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-              >
-                submit
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
+        <Stack spacing={2}>
+          <TextField
+            label="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="phone"
+            name="phone"
+            type="tel"
+            value={formData.phone}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />{" "}
+          <TextField
+            label="address"
+            name="address"
+            type="text"
+            value={formData.address}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+        </Stack>
+      </Model>
     </>
   );
 };
@@ -152,9 +122,6 @@ const CreateSupplier = ({ open, setOpen }) => {
 const SupplierList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-
-  const selectedDirection = useSelector(selectDirection);
-
   const suppliers = useSelector(selectSuppliers);
 
   const [open, setOpen] = useState(false);
@@ -170,13 +137,6 @@ const SupplierList = () => {
   const handleOpen = (id) => {
     setSelectedId(id);
     setOpen(true);
-  };
-
-  const handleUpdateChanges = (e) => {
-    setSelectedItem((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
   };
 
   const handleClose = () => setOpen(false);
@@ -240,7 +200,6 @@ const SupplierList = () => {
     setUpdateOpen(true);
   };
 
-  const handleRowClick = () => {};
   const stateChanged = (data) => {};
 
   const columns = [
@@ -317,122 +276,42 @@ const SupplierList = () => {
       ) : (
         <>
           <div>
-            <Modal open={open} onClose={handleClose}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" component="h2">
-                  آیا ډاډه یې؟
-                </Typography>
-                <Typography sx={{ mt: 2 }}>
-                  که ته دا عمل ترسره کوې، نو بیا نه شي بېرته اخیستل کېدای!
-                </Typography>
-
-                <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                  <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    لغوه
-                  </Button>
-                  <Button
-                    onClick={handleConfirm}
-                    color="error"
-                    variant="contained"
-                    disabled={loading}
-                    loading={loading}
-                    loadingPosition="start"
-                  >
-                    تائید
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-            <Modal open={updateOpen} onClose={handleCloseUpdate}>
-              {/* update data model here */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  bgcolor: "background.paper",
-                  borderRadius: 2,
-                  boxShadow: 24,
-                  p: 4,
-                }}
-              >
-                <Typography variant="h6" mb={2}>
-                  معلومات اپډیټ کړي
-                </Typography>
-              </Box>
-            </Modal>
+            <Model
+              open={open}
+              handleClose={handleClose}
+              cancel="cancel"
+              submit="Delete"
+              handleSubmit={handleConfirm}
+              loading={loading}
+            >
+              <Typography variant="h6" component="h2">
+                Are you sure
+              </Typography>
+              <Typography sx={{ mt: 2 }}>
+                you cannot undo this action
+              </Typography>
+            </Model>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              cancel="cancel"
+              submit="update"
+              loading={loading}
+              handleSubmit={handleUpdateSubmit}
+            >
+              <Typography variant="h6" mb={2}>
+                update info
+              </Typography>
+            </Model>
           </div>
-          <DataGrid
+          <Datagrid
             rows={suppliers?.suppliers}
-            style={{
-              cursor: "pointer",
-              textAlign: selectedDirection === "rtl" ? "left" : "right",
-            }}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: suppliers?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={suppliers?.totalRows}
-            paginationMode="server"
-            pagination
-            page={suppliers?.currentPage}
-            pageSize={suppliers?.limitPerPage}
+            limitPerPage={suppliers?.limitPerPage}
             loading={suppliers?.loading}
-            density="compact"
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={suppliers?.totalRows}
+            currentPage={suppliers?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}

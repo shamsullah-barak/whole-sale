@@ -1,0 +1,11 @@
+.even-row {
+  background-color: #fbeeff;
+}
+
+.odd-row {
+  background-color: white;
+}
+
+.even-row:hover {
+  background-color: #fbeeff;
+}

@@ -8,8 +8,6 @@ import {
   setSelectedLedger,
 } from "../../store/slices/ledger.slice";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
-import { useTranslation } from "react-i18next";
-import { selectDirection } from "../../store/selectors/app.selector";
 import Datagrid from "../../components/DataGrid";
 
 export const columns = [
@@ -81,8 +79,6 @@ const LedgerList = () => {
 };
 
 const Ledgers = () => {
-  const selectedDirection = useSelector(selectDirection);
-  const { t } = useTranslation();
   return (
     <MainDashboard title="Ledger">
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>

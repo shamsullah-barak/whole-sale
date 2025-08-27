@@ -1,41 +1,56 @@
-import React from 'react';
-import MainDashboard from '../../theme/main/MainDashboard';
-import { Box, Typography, Grid, Card, CardContent, CardActions, Button, Avatar } from '@mui/material';
-import { NavLink } from 'react-router-dom';
-import CategoryIcon from '@mui/icons-material/Category';
-import BusinessIcon from '@mui/icons-material/Business';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import StraightenIcon from '@mui/icons-material/Straighten';
+import React from "react";
+import MainDashboard from "../../theme/main/MainDashboard";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Avatar,
+} from "@mui/material";
+import { NavLink } from "react-router-dom";
+import CategoryIcon from "@mui/icons-material/Category";
+import BusinessIcon from "@mui/icons-material/Business";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import StraightenIcon from "@mui/icons-material/Straighten";
+import EntryForm from "../journal/entryForm";
 
 const MasterData = () => {
   const masterDataItems = [
     {
-      title: 'Categories',
-      description: 'Manage product categories and classifications',
+      title: "Categories",
+      description: "Manage product categories and classifications",
       icon: <CategoryIcon sx={{ fontSize: 40 }} />,
-      path: '/master-data/categories',
-      color: '#1976d2',
+      path: "/master-data/categories",
+      color: "#1976d2",
     },
     {
-      title: 'Companies',
-      description: 'Manage company information and suppliers',
+      title: "Companies",
+      description: "Manage company information and suppliers",
       icon: <BusinessIcon sx={{ fontSize: 40 }} />,
-      path: '/master-data/companies',
-      color: '#388e3c',
+      path: "/master-data/companies",
+      color: "#388e3c",
     },
     {
-      title: 'Units',
-      description: 'Manage measurement units (e.g., kg, piece)',
+      title: "Units",
+      description: "Manage measurement units (e.g., kg, piece)",
       icon: <StraightenIcon sx={{ fontSize: 40 }} />,
-      path: '/master-data/units',
-      color: '#ff9800',
+      path: "/master-data/units",
+      color: "#ff9800",
     },
   ];
 
   return (
     <MainDashboard title="Master Data">
-      <Box sx={{ width: '100%' }}>
-        {/* Header */}
+      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%", height: "100%" }}>
+          <EntryForm />
+        </Grid>
+      </Grid>
+      {/* <Box sx={{ width: '100%' }}>
+      
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Master Data Management
@@ -45,7 +60,7 @@ const MasterData = () => {
           </Typography>
         </Box>
 
-        {/* Master Data Cards */}
+      
         <Grid container spacing={3}>
           {masterDataItems.map((item, index) => (
             <Grid xs={12} sm={6} md={4} key={index}>
@@ -102,7 +117,7 @@ const MasterData = () => {
           ))}
         </Grid>
 
-        {/* Quick Stats or Additional Info */}
+       
         <Box sx={{ mt: 6 }}>
           <Typography variant="h6" gutterBottom>
             Quick Actions
@@ -131,7 +146,7 @@ const MasterData = () => {
             </Grid>
           </Grid>
         </Box>
-      </Box>
+      </Box> */}
     </MainDashboard>
   );
 };

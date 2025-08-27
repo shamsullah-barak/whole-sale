@@ -29,7 +29,7 @@ const Datagrid = ({
           textAlign: selectedDirection === "rtl" ? "left" : "right",
         }}
         columns={columns}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row._id}
         // onRowClick={handleRowClick}
         getRowClassName={(params) =>
           params.indexRelativeToCurrentPage % 2 === 0 ? "odd-row" : "even-row"

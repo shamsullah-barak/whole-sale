@@ -164,7 +164,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             )}
             onChange={(event, value) => {
               if (value) {
-                setJournalEntry({ ...journalEntry, productId: value.id });
+                setJournalEntry({ ...journalEntry, productId: value._id });
               }
             }}
           />
@@ -343,7 +343,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             onChange={inputHandler}
           >
             {stocks.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
+              <MenuItem key={index} value={item._id}>
                 {t(`${item.engName}`)}
               </MenuItem>
             ))}
@@ -363,7 +363,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             onChange={inputHandler}
           >
             {suppliers.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
+              <MenuItem key={index} value={item._id}>
                 {t(`${item.name}`)}-#{t(`${item.address}`)}-#
                 {t(`${item.phone}`)}
               </MenuItem>

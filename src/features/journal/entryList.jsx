@@ -4,12 +4,29 @@ import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import Datagrid from "../../components/DataGrid";
+import formatDate from "../../constant/moment";
 
 const columns = [
   {
-    field: "status",
-    headerName: "status",
+    field: "description",
+    headerName: "description",
     flex: 0.5,
+    minWidth: 80,
+  },
+  {
+    field: "debitAccount",
+    headerName: "debitAccount",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
+    minWidth: 50,
+  },
+  {
+    field: "creditAccount",
+    headerName: "creditAccount",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
     minWidth: 80,
   },
   {
@@ -18,23 +35,18 @@ const columns = [
     headerAlign: "center",
     align: "center",
     flex: 1,
-    minWidth: 50,
-  },
-  {
-    field: "description",
-    headerName: "description",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
     minWidth: 80,
   },
   {
-    field: "date",
+    field: "createdAt",
     headerName: "date",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
 ];
 

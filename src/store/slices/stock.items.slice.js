@@ -30,11 +30,11 @@ export const stockItemsSlice = createSlice({
       })
       .addCase(fetchStockItemsAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.stockItems = action.payload.results;
-        state.currentPage = action.payload.page;
-        state.limitPerPage = action.payload.limit;
-        state.totalPages = action.payload.totalPages;
-        state.totalRows = action.payload.totalResults;
+        state.stockItems = action.payload;
+        // state.currentPage = action.payload.page;
+        // state.limitPerPage = action.payload.limit;
+        // state.totalPages = action.payload.totalPages;
+        // state.totalRows = action.payload.totalResults;
       });
   },
 });

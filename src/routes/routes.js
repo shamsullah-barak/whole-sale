@@ -28,6 +28,8 @@ import Suppliers from "../features/suppliers";
 import Customers from "../features/customers";
 import Payable from "../features/payable";
 import Receivable from "../features/receivable";
+import Category from "../features/master-data/categories/Categories";
+import CashBox from "../features/cashbox";
 
 // ----------------------------------------------------------------------
 
@@ -147,6 +149,14 @@ export default function Router() {
     {
       path: "/expenses",
       element: <Expenses />,
+    },
+    {
+      path: "/categories",
+      element: <Category />,
+    },
+    {
+      path: "/cashbox",
+      element: <CashBox />,
     },
     {
       path: "404",

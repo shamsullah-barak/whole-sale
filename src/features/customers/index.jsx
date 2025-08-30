@@ -76,7 +76,7 @@ const CreateCustomers = ({ open, setOpen }) => {
       <Model
         open={open}
         handleClose={handleClose}
-        submit="update"
+        submit="submit"
         cancel="cancel"
         loading={loading}
         disabled={loading}
@@ -156,7 +156,7 @@ const CustomerList = () => {
     try {
       setLoading(true);
       await axios.patch(
-        `http://localhost:5000/api/investments/expenses/${selectedItem.id}`,
+        `http://localhost:5000/api/${selectedItem.id}`,
         updatedData,
         {
           headers: {
@@ -181,9 +181,7 @@ const CustomerList = () => {
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:5000/api/investments/expenses/${selectedId}`
-      );
+      await axios.delete(`http://localhost:5000/api/${selectedId}`);
       setOpen(false);
       setLoading(false);
       toast.success("data deleted");

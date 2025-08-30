@@ -4,7 +4,7 @@ import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import Datagrid from "../../components/DataGrid";
-import formatDate from "../../constant/moment";
+import formatDate from "../../utils/moment";
 
 const columns = [
   {

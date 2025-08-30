@@ -97,7 +97,7 @@ const CreateProduct = ({ open, setOpen }) => {
             onChange={handleChange}
           >
             {categories.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
+              <MenuItem key={index} value={item._id}>
                 {item.name}
               </MenuItem>
             ))}
@@ -312,7 +312,7 @@ const ProductList = () => {
                   onChange={handleUpdateChanges}
                 >
                   {categories.map((item, index) => (
-                    <MenuItem key={index} value={item.id}>
+                    <MenuItem key={index} value={item._id}>
                       {item.name}
                     </MenuItem>
                   ))}

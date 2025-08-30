@@ -32,8 +32,8 @@ const ExpensesList = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const handleOpen = (id) => {
-    setSelectedId(id);
+  const handleOpen = (_id) => {
+    setSelectedId(_id);
     setOpen(true);
   };
 
@@ -163,7 +163,7 @@ const ExpensesList = () => {
                   color: "darkred",
                 },
               }}
-              onClick={() => handleOpen(params.row.id)}
+              onClick={() => handleOpen(params.row._id)}
             />
           </div>
         );

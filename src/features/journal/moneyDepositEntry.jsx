@@ -21,7 +21,7 @@ const MoneyDeposit = ({ statusId }) => {
     event.preventDefault(event);
     try {
       await axios.post(
-        `http://localhost:5000/api/journal-entries/moneyDeposit?statusId=${statusId}`,
+        `http://localhost:5000/api/journal-entries/money-deposit`,
         journalEntry,
         {
           headers: {
@@ -34,6 +34,8 @@ const MoneyDeposit = ({ statusId }) => {
         description: "",
         amount: 0,
       });
+
+      toast.success("data successfully added");
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??
@@ -52,82 +54,80 @@ const MoneyDeposit = ({ statusId }) => {
   return (
     <>
       <ToastContainer />
-      <form style={{ marginTop: "15px" }}>
-        <Grid container>
-          <Grid xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label={t("select ledger")}
-              style={{ minWidth: "200px" }}
-              dir={selectedDirection === "rtl" ? "right" : "left"}
-              value={journalEntry.ledgerId}
-              onChange={(event) => {
-                const selectedLedger = ledgers.ledgers.find(
-                  (ledger) => ledger.id === event.target.value
-                );
-                setJournalEntry({
-                  ...journalEntry,
-                  ledgerId: selectedLedger.id,
-                  ledgerInfo: selectedLedger.name,
-                });
-              }}
-            >
-              {ledgers.ledgers?.map((item, index) => (
-                <MenuItem key={index} value={item.id}>
-                  {item.ledgerType} د {item.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          <Grid xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label={t("Quantity")}
-              name="amount"
-              type="number"
-              value={journalEntry.amount}
-              onChange={(event) =>
-                setJournalEntry({
-                  ...journalEntry,
-                  amount: event.target.value,
-                })
-              }
-            />
-          </Grid>
-          <Grid xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label={t("description")}
-              name="description"
-              type="text"
-              value={journalEntry.description}
-              onChange={(event) =>
-                setJournalEntry({
-                  ...journalEntry,
-                  description: event.target.value,
-                })
-              }
-            />
-          </Grid>
+      <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+        <Grid size={4} xs={12} sm={12}>
+          <TextField
+            select
+            fullWidth
+            label={t("select ledger")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.ledgerId}
+            onChange={(event) => {
+              const selectedLedger = ledgers.ledgers.find(
+                (ledger) => ledger._id === event.target.value
+              );
+              setJournalEntry({
+                ...journalEntry,
+                ledgerId: selectedLedger._id,
+                ledgerInfo: selectedLedger.name,
+              });
+            }}
+          >
+            {ledgers.ledgers?.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          color="inherit"
-          style={{ marginTop: 20 }}
-          sx={(theme) => ({
-            backgroundColor:
-              theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-            color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-          })}
-          onClick={journalEntryHandler}
-        >
-          {t("Add")}
-        </Button>
-      </form>
+
+        <Grid size={4} xs={12} sm={12}>
+          <TextField
+            fullWidth
+            label={t("Quantity")}
+            name="amount"
+            type="number"
+            value={journalEntry.amount}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                amount: event.target.value,
+              })
+            }
+          />
+        </Grid>
+        <Grid size={4} xs={12} sm={12}>
+          <TextField
+            fullWidth
+            label={t("description")}
+            name="description"
+            type="text"
+            value={journalEntry.description}
+            onChange={(event) =>
+              setJournalEntry({
+                ...journalEntry,
+                description: event.target.value,
+              })
+            }
+          />
+        </Grid>
+      </Grid>
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        color="inherit"
+        style={{ marginTop: 20 }}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
+        onClick={journalEntryHandler}
+      >
+        {t("Add")}
+      </Button>
     </>
   );
 };

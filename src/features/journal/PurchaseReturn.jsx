@@ -37,6 +37,7 @@ const PurchaseReturnForm = () => {
     quantity: "",
     unitType: "",
     returnReason: "",
+    totalReturn: true,
   });
 
   const selectedDirection = useSelector(selectDirection);
@@ -82,6 +83,7 @@ const PurchaseReturnForm = () => {
         } else {
           setPurchase(null);
           setUnitTypes([]);
+          toast.info("No Purchase was found with this number");
         }
       } catch (error) {
         toast.error(
@@ -99,12 +101,13 @@ const PurchaseReturnForm = () => {
   const handleSubmit = async () => {
     const data = {
       returnReason: purchaseReturn.returnReason,
-      purchaseId: purchase.id,
+      purchaseId: purchase._id,
       returnQuantity: purchaseReturn.quantity,
       returnQuantityType: purchaseReturn.unitType
         ? purchaseReturn.unitType
         : purchase.unitType,
     };
+
     try {
       await axios.post("http://localhost:5000/api/purchase-return", data, {
         headers: {
@@ -115,15 +118,12 @@ const PurchaseReturnForm = () => {
 
       toast.success("data added");
     } catch (error) {
-      clearState();
       toast.error(
         error?.response?.data?.message ??
           "something went wrong! please try again"
       );
     }
   };
-
-  console.log({ purchase });
 
   return (
     <>
@@ -157,7 +157,7 @@ const PurchaseReturnForm = () => {
           </Grid>
         </FormControl>
 
-        {purchase && (
+        {/* {purchase && (
           <TableContainer component={Paper} sx={{ mt: 3 }}>
             <Table>
               <TableHead>
@@ -271,25 +271,94 @@ const PurchaseReturnForm = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        )}
-
+        )} */}
         {purchase && (
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            color="inherit"
-            style={{ marginTop: 20 }}
-            sx={(theme) => ({
-              backgroundColor:
-                theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-              color:
-                theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-            })}
-            onClick={handleSubmit}
-          >
-            {t("Add")}
-          </Button>
+          <>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>product name</Typography>
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>purchase quantity</Typography>
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>total return</Typography>
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>select return quantity</Typography>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>{purchase.productName}</Typography>
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <Typography>
+                  {purchase.quantity} {purchase.unitType}
+                </Typography>
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  type="checkbox"
+                  value={purchaseReturn.totalReturn}
+                  onChange={(event) => console.log(event.isTrusted)}
+                />
+              </Grid>
+              <Grid size={3} xs={12} sm={12}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  value={purchaseReturn.quantity}
+                  onChange={(event) =>
+                    setPurchaseReturn({
+                      ...purchaseReturn,
+                      quantity: event.target.value,
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={12} xs={12} sm={12}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="returnReason"
+                  type="text"
+                  value={purchaseReturn.returnReason}
+                  onChange={(event) =>
+                    setPurchaseReturn({
+                      ...purchaseReturn,
+                      returnReason: event.target.value,
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                color="inherit"
+                style={{ marginTop: 20 }}
+                sx={(theme) => ({
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? COLORS.WHITE
+                      : COLORS.PURPLE,
+                  color:
+                    theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+                })}
+                onClick={handleSubmit}
+              >
+                {t("Add")}
+              </Button>
+            </Grid>
+          </>
         )}
       </Box>
     </>

@@ -7,7 +7,10 @@ import { fetchProductsAsync } from "./store/slices/product.slice";
 import { fetchJournalsAsync } from "./store/slices/journal.slice";
 import { fetchLedgersAsync } from "./store/slices/ledger.slice";
 import { fetchTransactionTypesAsync } from "./store/slices/transaction.types.slice";
-import { fetchStocksAsync } from "./store/slices/stock.slice";
+import {
+  fetchStockNamesAsync,
+  fetchStocksAsync,
+} from "./store/slices/stock.slice";
 import { fetchPartnersAsync } from "./store/slices/investment.slice";
 import { fetchExpensesAsync } from "./store/slices/expenses.slice";
 import {
@@ -34,6 +37,7 @@ function App() {
     dispatch(fetchReceivablesAsync());
     dispatch(fetchNextInvoiceAsync());
     dispatch(fetchNextSaleNumberAsync());
+    dispatch(fetchStockNamesAsync());
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));

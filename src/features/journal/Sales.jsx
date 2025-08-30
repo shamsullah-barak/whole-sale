@@ -32,7 +32,7 @@ const Sales = () => {
   });
   const selectedDirection = useSelector(selectDirection);
   const customers = useSelector(selectCustomers).customers;
-  const stocks = useSelector(selectStocks).stocks;
+  const stocks = useSelector(selectStocks).stockNames;
   const [sale, setSale] = useState({
     unitType: "",
     unitPerPackage: "",
@@ -139,9 +139,10 @@ const Sales = () => {
 
   const selectStock = (event) => {
     const { value } = event.target;
-    const stock = stocks.find((s) => s.id === value);
-
-    setSelectedStock({ name: stock.engName, id: stock.id });
+    const stock = stocks.find((s) => s._id === value);
+    if (stock) {
+      setSelectedStock({ name: stock.engName, id: stock._id });
+    }
   };
 
   return (
@@ -167,7 +168,7 @@ const Sales = () => {
             }}
           >
             {stocks.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
+              <MenuItem key={item._id} value={item._id}>
                 {item.engName}
               </MenuItem>
             ))}
@@ -353,7 +354,7 @@ const Sales = () => {
                     onChange={inputHandler}
                   >
                     {customers.map((item, index) => (
-                      <MenuItem key={index} value={item.id}>
+                      <MenuItem key={index} value={item._id}>
                         {t(`${item.name}`)}-#{t(`${item.address}`)}-#
                         {t(`${item.phone}`)}
                       </MenuItem>

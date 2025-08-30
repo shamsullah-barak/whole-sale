@@ -67,12 +67,12 @@ const LedgerList = () => {
 
   return (
     <Datagrid
-      rows={ledgers?.ledgers}
+      rows={ledgers.ledgers}
       columns={columns}
-      limitPerPage={ledgers?.limitPerPage}
-      loading={ledgers?.loading}
-      totalRows={ledgers?.totalRows}
-      currentPage={ledgers?.currentPage}
+      limitPerPage={ledgers.limitPerPage}
+      loading={ledgers.loading}
+      totalRows={ledgers.totalRows}
+      currentPage={ledgers.currentPage}
       stateChanged={stateChanged}
     />
   );

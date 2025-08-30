@@ -32,7 +32,7 @@ const PurchaseOfGoods = ({ statusId }) => {
 
   const journals = useSelector(selectJournals);
   const nextInvoiceNo = useSelector(selectNextInvoiceNo);
-  const stocks = useSelector(selectStocks).stocks;
+  const stocks = useSelector(selectStocks).stockNames;
   const products = useSelector(selectProducts).products;
   const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);

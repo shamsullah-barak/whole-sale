@@ -101,12 +101,13 @@ const SaleReturn = () => {
   const handleSubmit = async () => {
     const data = {
       returnReason: saleReturn.returnReason,
-      saleId: sale.id,
+      saleId: sale._id,
       returnQuantity: saleReturn.quantity,
       returnQuantityType: saleReturn.unitType
         ? saleReturn.unitType
         : sale.unitType,
     };
+
     try {
       await axios.post("http://localhost:5000/api/sale-return", data, {
         headers: {
@@ -117,7 +118,6 @@ const SaleReturn = () => {
 
       toast.success("data added");
     } catch (error) {
-      clearState();
       toast.error(
         error?.response?.data?.message ??
           "something went wrong! please try again"

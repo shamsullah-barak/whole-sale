@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchStockItemsAsync } from "../../store/slices/stock.items.slice";
 import { selectStockItems } from "../../store/selectors/stock.items.selector";
 import Datagrid from "../../components/DataGrid";
+import formatDate from "../../utils/moment";
 
 const columns = [
   {
@@ -16,76 +17,31 @@ const columns = [
     minWidth: 80,
   },
   {
-    field: "stockName",
-    headerName: "stockName",
+    field: "quantity",
+    headerName: "available quantity",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "quantity",
-    headerName: "quantity",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
     field: "unitType",
-    headerName: "unitType",
+    headerName: "unit type",
     headerAlign: "center",
     align: "center",
     flex: 1,
-    minWidth: 80,
+    minWidth: 50,
   },
   {
-    field: "unitPerPackage",
-    headerName: "unitPerPackage",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
-    field: "unitPrice",
-    headerName: "unitPrice",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
-    field: "totalPrice",
-    headerName: "totalPrice",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
-    field: "invoiceNo",
-    headerName: "invoiceNo",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
-    field: "purchaseDate",
+    field: "createdAt",
     headerName: "purchaseDate",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
-  },
-  {
-    field: "expiryDate",
-    headerName: "expiryDate",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
 ];
 
@@ -100,6 +56,8 @@ const StockItemsList = () => {
       fetchStockItemsAsync({ stockName, page: page + 1, limit: pageSize })
     );
   };
+
+  console.log(stockItems);
 
   return (
     <Datagrid

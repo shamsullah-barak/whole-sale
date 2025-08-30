@@ -9,12 +9,15 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { selectReceivables } from "../../store/selectors/receivable.selector";
 import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
+import { fetchJournalsAsync } from "../../store/slices/journal.slice";
+import { selectJournals } from "../../store/selectors/journal.selector";
 
 const Receivable = () => {
   const { t } = useTranslation();
   const selectedDirection = useSelector(selectDirection);
 
   const dispatch = useDispatch();
+  const journals = useSelector(selectJournals);
   const receivables = useSelector(selectReceivables).receivables;
 
   const [loading, setLoading] = useState(false);
@@ -36,6 +39,7 @@ const Receivable = () => {
       setLoading(false);
       toast.success("data added");
       dispatch(fetchReceivablesAsync());
+      dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
     } catch (error) {
       setLoading(false);
       toast.error(

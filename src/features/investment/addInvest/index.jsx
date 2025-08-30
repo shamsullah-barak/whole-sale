@@ -263,7 +263,7 @@ const AddNewInvest = () => {
             }
           >
             {partners.map((item) => (
-              <MenuItem key={item.id} value={item.id} dir={selectedDirection}>
+              <MenuItem key={item.id} value={item._id} dir={selectedDirection}>
                 {t(`${item.name}`)}
               </MenuItem>
             ))}

@@ -64,6 +64,7 @@ const mainListItems = [
   { text: "Receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
   { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
+  { text: "Category", icon: <EqualizerIcon />, path: "/categories" },
 ];
 
 const secondaryListItems = [

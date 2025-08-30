@@ -4,16 +4,22 @@ import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { selectPayable } from "../../store/selectors/payable.selector";
+import { fetchJournalsAsync } from "../../store/slices/journal.slice";
+import { selectJournals } from "../../store/selectors/journal.selector";
+import { fetchPayableAsync } from "../../store/slices/payable.slice";
 
 const Payable = () => {
   const { t } = useTranslation();
-  const selectedDirection = useSelector(selectDirection);
 
+  const dispatch = useDispatch();
+
+  const journals = useSelector(selectJournals);
   const payables = useSelector(selectPayable).payable;
+  const selectedDirection = useSelector(selectDirection);
 
   const [loading, setLoading] = useState(false);
   const [payable, setPayable] = useState({
@@ -34,6 +40,8 @@ const Payable = () => {
       });
 
       setLoading(false);
+      dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
+      dispatch(fetchPayableAsync());
       toast.success("data added");
     } catch (error) {
       setLoading(false);

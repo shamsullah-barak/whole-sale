@@ -17,7 +17,10 @@ import {
   fetchCustomersAsync,
   fetchSuppliersAsync,
 } from "./store/slices/businessEntity.slice";
-import { fetchNextInvoiceAsync } from "./store/slices/purchase.slice";
+import {
+  fetchDashboardDataAsync,
+  fetchNextInvoiceAsync,
+} from "./store/slices/purchase.slice";
 import {
   fetchNextSaleNumberAsync,
   fetchSalesAsync,
@@ -38,6 +41,7 @@ function App() {
     dispatch(fetchNextInvoiceAsync());
     dispatch(fetchNextSaleNumberAsync());
     dispatch(fetchStockNamesAsync());
+    dispatch(fetchDashboardDataAsync());
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));

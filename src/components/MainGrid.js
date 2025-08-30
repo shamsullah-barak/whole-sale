@@ -9,7 +9,7 @@ import StatCard from "./StatCard";
 
 const data = [
   {
-    title: "Users",
+    title: "Purchases",
     value: "14k",
     interval: "Last 30 days",
     trend: "up",
@@ -19,7 +19,7 @@ const data = [
     ],
   },
   {
-    title: "Conversions",
+    title: "Sales",
     value: "325",
     interval: "Last 30 days",
     trend: "down",
@@ -30,7 +30,17 @@ const data = [
     ],
   },
   {
-    title: "Event count",
+    title: "income",
+    value: "200k",
+    interval: "Last 30 days",
+    trend: "neutral",
+    data: [
+      500, 400, 510, 530, 520, 600, 530, 520, 510, 730, 520, 510, 530, 620, 510,
+      530, 520, 410, 530, 520, 610, 530, 520, 610, 530, 420, 510, 430, 520, 510,
+    ],
+  },
+  {
+    title: "expenses",
     value: "200k",
     interval: "Last 30 days",
     trend: "neutral",
@@ -59,9 +69,9 @@ export default function MainGrid() {
             <StatCard {...card} />
           </Grid>
         ))}
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        {/* <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <HighlightedCard />
-        </Grid>
+        </Grid> */}
         <Grid size={{ xs: 12, md: 6 }}>
           <SessionsChart />
         </Grid>

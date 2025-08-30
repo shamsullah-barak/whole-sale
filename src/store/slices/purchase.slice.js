@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  fetchDashboardData,
   fetchNextInvoiceNo,
   fetchPurchases,
 } from "../actions/purchase.actions";
@@ -16,6 +17,7 @@ const initialState = {
   totalCashPurchases: 0,
   totalCreditPurchases: 0,
   totalCashAndCreditPurchases: 0,
+  dashboardData: {},
 };
 
 // async reducers
@@ -33,6 +35,15 @@ export const fetchNextInvoiceAsync = createAsyncThunk(
   async () => {
     const nextInvoice = await fetchNextInvoiceNo();
     return nextInvoice;
+  }
+);
+
+// async reducers
+export const fetchDashboardDataAsync = createAsyncThunk(
+  "purchases/fetchDashboardData",
+  async () => {
+    const result = await fetchDashboardData();
+    return result;
   }
 );
 
@@ -66,6 +77,15 @@ export const purchaseSlice = createSlice({
       .addCase(fetchNextInvoiceAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.nextInvoiceNo = action.payload.counter;
+      });
+
+    builder
+      .addCase(fetchDashboardDataAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDashboardDataAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.dashboardData = action.payload;
       });
   },
 });

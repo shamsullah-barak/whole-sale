@@ -28,6 +28,7 @@ import {
 import { fetchCategoriesAsync } from "./store/slices/category.slice";
 import { fetchPayableAsync } from "./store/slices/payable.slice";
 import { fetchReceivablesAsync } from "./store/slices/receivable.slice";
+import { fetchIncomeAsync } from "./store/slices/income.slice";
 
 function App() {
   const dispatch = useDispatch();
@@ -42,6 +43,7 @@ function App() {
     dispatch(fetchNextSaleNumberAsync());
     dispatch(fetchStockNamesAsync());
     dispatch(fetchDashboardDataAsync());
+    dispatch(fetchIncomeAsync());
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));

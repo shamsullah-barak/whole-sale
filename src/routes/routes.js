@@ -1,6 +1,5 @@
 import { useRoutes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
-import Incomes from "../pages/Income";
 import Invoices from "../pages/Invoices";
 import Products from "../features/products/Product";
 import MasterData from "../features/master-data/MasterData";
@@ -30,6 +29,7 @@ import Payable from "../features/payable";
 import Receivable from "../features/receivable";
 import Category from "../features/master-data/categories/Categories";
 import CashBox from "../features/cashbox";
+import Incomes from "../features/income";
 
 // ----------------------------------------------------------------------
 

@@ -17,6 +17,7 @@ import businessEntityReducer from "./reducers/businessEntity.reducer";
 import saleReducer from "./reducers/sale.reducer";
 import payable from "./reducers/payable.reducer";
 import receivable from "./reducers/receivable.reducer";
+import incomes from "./reducers/incomes.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -38,5 +39,6 @@ export const store = configureStore({
     sales: saleReducer,
     payable: payable,
     receivable: receivable,
+    incomes: incomes,
   },
 });

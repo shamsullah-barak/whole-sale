@@ -29,8 +29,6 @@ export const fetchPurchases = async (page, limit) => {
       }
     });
 
-    console.log({ d: response.data });
-
     return {
       ...response.data,
       totalCashAndCreditPurchases,

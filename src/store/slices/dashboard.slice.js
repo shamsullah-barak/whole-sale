@@ -27,10 +27,16 @@ export const dashboardSlice = createSlice({
       })
       .addCase(dashboardDataAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.cards.push(action.payload.purchases);
-        state.cards.push(action.payload.sales);
-        state.cards.push(action.payload.incomes);
-        state.cards.push(action.payload.expenses);
+        const newArray = [];
+        newArray.push(action.payload.purchases);
+        newArray.push(action.payload.sales);
+        newArray.push(action.payload.incomes);
+        newArray.push(action.payload.expenses);
+        // state.cards.push(action.payload.purchases);
+        // state.cards.push(action.payload.sales);
+        // state.cards.push(action.payload.incomes);
+        // state.cards.push(action.payload.expenses);
+        state.cards = [...newArray];
         state.salesGraph = action.payload.salesGraph;
       });
   },

@@ -1,18 +1,10 @@
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { useTheme } from "@mui/material/styles";
-/*
-  MUI + Recharts SalesCard component
-  - Ultra thin grid lines
-  - Blue and green stacked bars
-  - Legend with margin and rounded marker icons
-*/
-
-import React, { useEffect, useState } from "react";
-import { CardHeader, Box, FormControl, Select, MenuItem } from "@mui/material";
+import React, { useState } from "react";
+import { Box, FormControl, Select, MenuItem } from "@mui/material";
 import {
   ResponsiveContainer,
   BarChart,
@@ -26,42 +18,12 @@ import {
 import { useSelector } from "react-redux";
 import { selectDashboardData } from "../store/selectors/dashboard.selector";
 
-const sampleData = [
-  { day: "Mon", sales: 22, revenue: 45 },
-  { day: "Tue", sales: 28, revenue: 60 },
-  { day: "Wed", sales: 18, revenue: 38 },
-  { day: "Thu", sales: 30, revenue: 70 },
-  { day: "Fri", sales: 15, revenue: 32 },
-  { day: "Sat", sales: 26, revenue: 52 },
-  { day: "Sun", sales: 34, revenue: 78 },
-];
-
 function SalesCard({ fetchUrl = null }) {
   const theme = useTheme();
-  const ddd = useSelector(selectDashboardData).salesGraph;
-  console.log({ ddd });
-  const [data, setData] = useState(sampleData);
-
-  // useEffect(() => {
-  //   if (!fetchUrl) return;
-  //   let mounted = true;
-  //   fetch(fetchUrl)
-  //     .then((r) => r.json())
-  //     .then((json) => {
-  //       if (!mounted) return;
-  //       setData(json);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Sales fetch failed", err);
-  //     });
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, [fetchUrl]);
+  const data = useSelector(selectDashboardData).salesGraph;
 
   const BLUE = "#2d6cdf";
   const GREEN = "#2dd4bf";
-  const GRID_COLOR = "#e8f2ff";
 
   const tooltipFormatter = (value, name) => {
     if (name && name.toLowerCase().includes("revenue")) {
@@ -111,7 +73,7 @@ function SalesCard({ fetchUrl = null }) {
     <Box sx={{ width: "100%", height: 290 }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={ddd.data}
+          data={data.data}
           margin={{ top: 18, right: 18, left: 0, bottom: 8 }}
         >
           <CartesianGrid

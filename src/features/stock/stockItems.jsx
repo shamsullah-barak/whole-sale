@@ -57,8 +57,6 @@ const StockItemsList = () => {
     );
   };
 
-  console.log(stockItems);
-
   return (
     <Datagrid
       rows={stockItems?.stockItems}

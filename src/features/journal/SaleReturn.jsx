@@ -71,7 +71,6 @@ const SaleReturn = () => {
         const res = await axios.get(
           `http://localhost:5000/api/sales?saleCounter=${debouncedQuery}`
         );
-        console.log({ res });
         if (res.data.results[0]) {
           setSale({ ...res.data.results[0] });
           if (
@@ -124,8 +123,6 @@ const SaleReturn = () => {
       );
     }
   };
-
-  console.log({ sale });
 
   return (
     <>

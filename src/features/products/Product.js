@@ -167,7 +167,6 @@ const ProductList = () => {
       toast.success("data updated");
       dispatch(fetchProductsAsync({ page: 1, limit: 10 }));
     } catch (error) {
-      console.log(error);
       setUpdateOpen(false);
       setLoading(false);
       toast.error(

@@ -64,7 +64,6 @@ const CreatePartnerModal = ({ open, setOpen }) => {
       toast.success("data added");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(
@@ -186,7 +185,6 @@ const PartnerList = () => {
       toast.success("data updated");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setUpdateOpen(false);
       setLoading(false);
       toast.error(
@@ -206,7 +204,6 @@ const PartnerList = () => {
       toast.success("data deleted");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(

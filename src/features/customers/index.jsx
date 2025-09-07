@@ -62,7 +62,6 @@ const CreateCustomers = ({ open, setOpen }) => {
       toast.success("data added");
       dispatch(fetchCustomersAsync({ page: 1, limit: 10 }));
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(
@@ -169,7 +168,6 @@ const CustomerList = () => {
       toast.success("data updated");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setUpdateOpen(false);
       setLoading(false);
       toast.error(
@@ -187,7 +185,6 @@ const CustomerList = () => {
       toast.success("data deleted");
       dispatch(fetchPartnersAsync());
     } catch (error) {
-      console.log(error);
       setOpen(false);
       setLoading(false);
       toast.error(

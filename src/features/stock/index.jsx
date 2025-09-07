@@ -158,7 +158,6 @@ const StockList = () => {
     ],
   };
 
-  console.log({ stocks });
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       <Grid

@@ -3,7 +3,7 @@ import { TextField, MenuItem, Button, Grid } from "@mui/material";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import COLORS from "../../../constant/colors";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const financialTerms = [
   "Money deposit",
@@ -55,7 +55,10 @@ const LedgerTransactionForm = () => {
         quantity: 0,
       });
     } catch (error) {
-      console.log(error);
+      toast.error(
+        error?.response?.data?.message ??
+          "something went wrong! please try again"
+      );
     }
   };
 

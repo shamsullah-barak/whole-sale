@@ -29,7 +29,6 @@ const Payable = () => {
   });
 
   const handleSubmit = async () => {
-    console.log("trying......");
     setLoading(true);
 
     try {

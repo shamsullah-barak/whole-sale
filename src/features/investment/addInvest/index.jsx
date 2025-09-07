@@ -165,7 +165,6 @@ const AddNewInvest = () => {
         setLoading(false);
         toast.success("data added");
       } catch (error) {
-        console.log(error);
         setOpen(false);
         setLoading(false);
         setNewInvest({ amount: "", investorId: "", type: "" });
@@ -190,7 +189,6 @@ const AddNewInvest = () => {
         setLoading(false);
         toast.success("data added");
       } catch (error) {
-        console.log(error);
         setOpen(false);
         setLoading(false);
         setNewInvest({ amount: "", investorId: "", type: "" });

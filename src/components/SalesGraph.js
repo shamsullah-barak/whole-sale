@@ -23,6 +23,8 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import { useSelector } from "react-redux";
+import { selectDashboardData } from "../store/selectors/dashboard.selector";
 
 const sampleData = [
   { day: "Mon", sales: 22, revenue: 45 },
@@ -36,24 +38,26 @@ const sampleData = [
 
 function SalesCard({ fetchUrl = null }) {
   const theme = useTheme();
+  const ddd = useSelector(selectDashboardData).salesGraph;
+  console.log({ ddd });
   const [data, setData] = useState(sampleData);
 
-  useEffect(() => {
-    if (!fetchUrl) return;
-    let mounted = true;
-    fetch(fetchUrl)
-      .then((r) => r.json())
-      .then((json) => {
-        if (!mounted) return;
-        setData(json);
-      })
-      .catch((err) => {
-        console.error("Sales fetch failed", err);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [fetchUrl]);
+  // useEffect(() => {
+  //   if (!fetchUrl) return;
+  //   let mounted = true;
+  //   fetch(fetchUrl)
+  //     .then((r) => r.json())
+  //     .then((json) => {
+  //       if (!mounted) return;
+  //       setData(json);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Sales fetch failed", err);
+  //     });
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [fetchUrl]);
 
   const BLUE = "#2d6cdf";
   const GREEN = "#2dd4bf";
@@ -107,7 +111,7 @@ function SalesCard({ fetchUrl = null }) {
     <Box sx={{ width: "100%", height: 290 }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
+          data={ddd.data}
           margin={{ top: 18, right: 18, left: 0, bottom: 8 }}
         >
           <CartesianGrid
@@ -167,6 +171,9 @@ function SalesCard({ fetchUrl = null }) {
 }
 
 export default function PageViewsBarChart() {
+  const data = useSelector(selectDashboardData).salesGraph;
+
+  console.log({ data });
   const [range, setRange] = useState("thisWeek");
   const theme = useTheme();
   const colorPalette = [
@@ -198,9 +205,9 @@ export default function PageViewsBarChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              Sales 1.3M
+              {data.title} {data.value}
             </Typography>
-            <Chip size="small" color="error" label="-8%" />
+            {/* <Chip size="small" color="error" label="-8%" /> */}
           </Stack>
           <FormControl size="small" sx={{ minWidth: 130 }}>
             <Select value={range} onChange={(e) => setRange(e.target.value)}>

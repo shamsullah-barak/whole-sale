@@ -46,7 +46,7 @@ const PurchaseOfGoods = ({ statusId }) => {
     totalPrice: "",
     paymentMethod: "cash",
     invoiceNo: "",
-    stockName: "",
+    stockId: "",
     discount: 0,
     givingCash: 0,
     remainingCash: 0,
@@ -65,7 +65,6 @@ const PurchaseOfGoods = ({ statusId }) => {
       totalPrice: "",
       paymentMethod: "",
       invoiceNo: "",
-      stockName: "",
       stockId: "",
       discount: 0,
       givingCash: 0,
@@ -335,11 +334,11 @@ const PurchaseOfGoods = ({ statusId }) => {
             select
             fullWidth
             required
-            name="stockName"
+            name="stockId"
             label={t("stockName")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.stockName}
+            value={journalEntry.stockId}
             onChange={inputHandler}
           >
             {stocks.map((item, index) => (

@@ -32,10 +32,6 @@ export const dashboardSlice = createSlice({
         newArray.push(action.payload.sales);
         newArray.push(action.payload.incomes);
         newArray.push(action.payload.expenses);
-        // state.cards.push(action.payload.purchases);
-        // state.cards.push(action.payload.sales);
-        // state.cards.push(action.payload.incomes);
-        // state.cards.push(action.payload.expenses);
         state.cards = [...newArray];
         state.salesGraph = action.payload.salesGraph;
       });

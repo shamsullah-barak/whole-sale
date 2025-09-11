@@ -2,20 +2,13 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Select,
   MenuItem,
-  InputLabel,
   FormControl,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   TextField,
   Button,
+  Divider,
 } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -25,6 +18,8 @@ import { useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 
+const TOTAL_RETURN = "TOTAL_RETURN";
+
 const PurchaseReturnForm = () => {
   const { t } = useTranslation();
   const [unitTypes, setUnitTypes] = useState([]);
@@ -33,14 +28,14 @@ const PurchaseReturnForm = () => {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const selectedDirection = useSelector(selectDirection);
+
   const [purchaseReturn, setPurchaseReturn] = useState({
     quantity: "",
     unitType: "",
     returnReason: "",
-    totalReturn: true,
+    totalReturn: false,
   });
-
-  const selectedDirection = useSelector(selectDirection);
 
   const clearState = () => {
     setUnitTypes([]);
@@ -51,6 +46,7 @@ const PurchaseReturnForm = () => {
       quantity: "",
       unitType: "",
       returnReason: "",
+      totalReturn: false,
     });
   };
   // Debounce input
@@ -74,12 +70,7 @@ const PurchaseReturnForm = () => {
         );
         if (res.data.results[0]) {
           setPurchase({ ...res.data.results[0] });
-          if (
-            res?.data?.results[0]?.unitType === "carton" ||
-            res?.data?.results[0]?.unitType === "dozen"
-          ) {
-            setUnitTypes(["piece", res?.data?.results[0]?.unitType]);
-          }
+          setUnitTypes(["piece", res?.data?.results[0]?.unitType]);
         } else {
           setPurchase(null);
           setUnitTypes([]);
@@ -98,11 +89,31 @@ const PurchaseReturnForm = () => {
     fetchData();
   }, [debouncedQuery]);
 
+  const handleChange = (event) => {
+    const { name, value, checked } = event.target;
+
+    if (name === TOTAL_RETURN) {
+      setPurchaseReturn({
+        ...purchaseReturn,
+        totalReturn: checked,
+        unitType: purchase.unitType,
+        quantity: purchase.quantity,
+      });
+    } else {
+      setPurchaseReturn({
+        ...purchaseReturn,
+        [name]: value,
+      });
+    }
+  };
+
   const handleSubmit = async () => {
     const data = {
       returnReason: purchaseReturn.returnReason,
       purchaseId: purchase._id,
-      returnQuantity: purchaseReturn.quantity,
+      returnQuantity: purchaseReturn.totalReturn
+        ? purchase.quantity
+        : purchaseReturn.quantity,
       returnQuantityType: purchaseReturn.unitType
         ? purchaseReturn.unitType
         : purchase.unitType,
@@ -133,8 +144,6 @@ const PurchaseReturnForm = () => {
           mx: "auto",
           mt: 3,
           p: 3,
-          border: "1px solid #ccc",
-          borderRadius: 2,
         }}
       >
         <FormControl fullWidth margin="normal">
@@ -157,123 +166,9 @@ const PurchaseReturnForm = () => {
           </Grid>
         </FormControl>
 
-        {/* {purchase && (
-          <TableContainer component={Paper} sx={{ mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t(`productName`)}</TableCell>
-                  <TableCell>{t(`quantity`)}</TableCell>
-                  {purchase.unitType !== "kg" &&
-                    purchase.unitType !== "piece" &&
-                    purchase.unitType !== "liter" && (
-                      <>
-                        <TableCell>{t(`unitPerPackage`)}</TableCell>
-                        <TableCell>{t(`totalQuantity`)}</TableCell>
-                      </>
-                    )}
-                  <TableCell>{t(`returnQty`)}</TableCell>
-                  {purchase.unitType !== "kg" &&
-                    purchase.unitType !== "piece" &&
-                    purchase.unitType !== "liter" && (
-                      <>
-                        <TableCell>{t(`unitType`)}</TableCell>
-                      </>
-                    )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {purchase && (
-                  <>
-                    <TableRow key={purchase.id}>
-                      <TableCell>{purchase.productName}</TableCell>
-                      <TableCell>
-                        {purchase.quantity} {purchase.unitType}
-                      </TableCell>
-
-                      {purchase.unitType !== "kg" &&
-                        purchase.unitType !== "piece" &&
-                        purchase.unitType !== "liter" && (
-                          <>
-                            <TableCell>{purchase.unitPerPackage}</TableCell>
-                            <TableCell>
-                              {purchase.quantity * purchase.unitPerPackage}
-                            </TableCell>
-                          </>
-                        )}
-
-                      <TableCell>
-                        <TextField
-                          type="number"
-                          size="small"
-                          style={{ minWidth: "100px" }}
-                          value={purchaseReturn.quantity}
-                          onChange={(event) =>
-                            setPurchaseReturn({
-                              ...purchaseReturn,
-                              quantity: event.target.value,
-                            })
-                          }
-                          inputProps={{ min: 0, max: purchase.quantity }}
-                        />
-                      </TableCell>
-
-                      {purchase.unitType !== "kg" &&
-                        purchase.unitType !== "piece" &&
-                        purchase.unitType !== "liter" && (
-                          <TableCell>
-                            <TextField
-                              select
-                              size="small"
-                              name="unitType"
-                              style={{ minWidth: "100px" }}
-                              dir={
-                                selectedDirection === "rtl" ? "right" : "left"
-                              }
-                              value={purchaseReturn.unitType}
-                              onChange={(event) =>
-                                setPurchaseReturn({
-                                  ...purchaseReturn,
-                                  unitType: event.target.value,
-                                })
-                              }
-                            >
-                              {unitTypes.map((item, index) => (
-                                <MenuItem key={index} value={item}>
-                                  {t(`${item}`)}
-                                </MenuItem>
-                              ))}
-                            </TextField>
-                          </TableCell>
-                        )}
-                    </TableRow>
-                  </>
-                )}
-                <TableRow>
-                  {purchase && (
-                    <TableCell colSpan={100}>
-                      <TextField
-                        fullWidth
-                        label={t("returnReason")}
-                        name="returnReason"
-                        type="text"
-                        value={purchaseReturn.returnReason}
-                        onChange={(event) =>
-                          setPurchaseReturn({
-                            ...purchaseReturn,
-                            returnReason: event.target.value,
-                          })
-                        }
-                      />
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )} */}
         {purchase && (
           <>
+            <Divider style={{ marginTop: "12px", marginBottom: "12px" }} />
             <Grid container spacing={2} sx={{ marginTop: "15px" }}>
               <Grid size={3} xs={12} sm={12}>
                 <Typography>product name</Typography>
@@ -282,15 +177,15 @@ const PurchaseReturnForm = () => {
                 <Typography>purchase quantity</Typography>
               </Grid>
               <Grid size={3} xs={12} sm={12}>
-                <Typography>total return</Typography>
+                <Typography>sold quantity</Typography>
               </Grid>
               <Grid size={3} xs={12} sm={12}>
-                <Typography>select return quantity</Typography>
+                <Typography>available quantity</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ marginTop: "15px" }}>
               <Grid size={3} xs={12} sm={12}>
-                <Typography>{purchase.productName}</Typography>
+                <Typography>{purchase.quantity}</Typography>
               </Grid>
               <Grid size={3} xs={12} sm={12}>
                 <Typography>
@@ -298,26 +193,63 @@ const PurchaseReturnForm = () => {
                 </Typography>
               </Grid>
               <Grid size={3} xs={12} sm={12}>
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  type="checkbox"
-                  value={purchaseReturn.totalReturn}
-                  onChange={(event) => console.log(event.isTrusted)}
-                />
+                <Typography>
+                  {purchase.quantity} {purchase.unitType}
+                </Typography>
               </Grid>
               <Grid size={3} xs={12} sm={12}>
+                <Typography>
+                  {purchase.quantity} {purchase.unitType}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider style={{ marginTop: "20px", marginBottom: "30px" }} />
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={4} xs={12} sm={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name={TOTAL_RETURN}
+                      checked={purchaseReturn.totalReturn}
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Total Return"
+                />
+              </Grid>
+              <Grid size={4} xs={12} sm={12}>
+                <TextField
+                  select
+                  fullWidth
+                  required
+                  name="unitType"
+                  label={t("unitType")}
+                  style={{ minWidth: "200px" }}
+                  type="text"
+                  disabled={purchaseReturn.totalReturn}
+                  dir={selectedDirection === "rtl" ? "right" : "left"}
+                  value={purchaseReturn.unitType}
+                  onChange={handleChange}
+                >
+                  {unitTypes.map((item, index) => (
+                    <MenuItem key={index} value={item}>
+                      {t(`${item}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid size={4} xs={12} sm={12}>
                 <TextField
                   variant="outlined"
                   fullWidth
+                  label="Select Return Quantity"
                   type="number"
+                  name="quantity"
+                  disabled={purchaseReturn.totalReturn}
                   value={purchaseReturn.quantity}
-                  onChange={(event) =>
-                    setPurchaseReturn({
-                      ...purchaseReturn,
-                      quantity: event.target.value,
-                    })
-                  }
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>
@@ -327,14 +259,10 @@ const PurchaseReturnForm = () => {
                   variant="outlined"
                   fullWidth
                   label="returnReason"
+                  name="returnReason"
                   type="text"
                   value={purchaseReturn.returnReason}
-                  onChange={(event) =>
-                    setPurchaseReturn({
-                      ...purchaseReturn,
-                      returnReason: event.target.value,
-                    })
-                  }
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>

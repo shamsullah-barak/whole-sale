@@ -8,45 +8,45 @@ import formatDate from "../../utils/moment";
 
 const columns = [
   {
-    field: "description",
-    headerName: "description",
+    field: "createdAt",
+    headerName: "Date",
     flex: 0.5,
     minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
   {
-    field: "debitAccount",
-    headerName: "debitAccount",
+    field: "account",
+    headerName: "Account",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "creditAccount",
-    headerName: "creditAccount",
+    field: "debit",
+    headerName: "Debit",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
-    field: "amount",
-    headerName: "amount",
+    field: "credit",
+    headerName: "Credit",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
-    field: "createdAt",
-    headerName: "date",
+    field: "description",
+    headerName: "Description",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
-    valueFormatter: (params) => {
-      return formatDate(params);
-    },
   },
 ];
 

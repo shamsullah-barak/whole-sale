@@ -200,15 +200,6 @@ const Sales = () => {
 
             {sale.stockItemId && (
               <>
-                {/* <Grid item xs={12} sm={12} md={12}>
-                  <Typography item xs={12} sm={6} md={6}>
-                    You have purchased {selectedProduct.quantity}{" "}
-                    {selectedProduct.unitType.toLowerCase()} of this product at
-                    a unit price of {selectedProduct.unitPrice}, totaling{" "}
-                    {selectedProduct.totalPrice}.
-                  </Typography>
-                </Grid> */}
-
                 <Grid item xs={12} sm={4}>
                   <TextField
                     fullWidth

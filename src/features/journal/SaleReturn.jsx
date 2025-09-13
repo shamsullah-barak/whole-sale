@@ -15,6 +15,9 @@ import {
   Paper,
   TextField,
   Button,
+  Divider,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -24,6 +27,8 @@ import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
+
+const TOTAL_RETURN = "TOTAL_RETURN";
 
 const SaleReturn = () => {
   const { t } = useTranslation();
@@ -37,6 +42,7 @@ const SaleReturn = () => {
     quantity: "",
     unitType: "",
     returnReason: "",
+    totalReturn: false,
   });
 
   const selectedDirection = useSelector(selectDirection);
@@ -50,6 +56,7 @@ const SaleReturn = () => {
       quantity: "",
       unitType: "",
       returnReason: "",
+      totalReturn: false,
     });
   };
   // Debounce input
@@ -73,12 +80,7 @@ const SaleReturn = () => {
         );
         if (res.data.results[0]) {
           setSale({ ...res.data.results[0] });
-          if (
-            res?.data?.results[0]?.unitType === "carton" ||
-            res?.data?.results[0]?.unitType === "dozen"
-          ) {
-            setUnitTypes(["piece", res?.data?.results[0]?.unitType]);
-          }
+          setUnitTypes(["piece", res?.data?.results[0]?.unitType]);
         } else {
           toast.info("sale not found");
           setSale(null);
@@ -97,11 +99,31 @@ const SaleReturn = () => {
     fetchData();
   }, [debouncedQuery]);
 
+  const handleChange = (event) => {
+    const { name, value, checked } = event.target;
+
+    if (name === TOTAL_RETURN) {
+      setSaleReturn({
+        ...saleReturn,
+        totalReturn: checked,
+        unitType: sale.unitType,
+        quantity: sale.quantity,
+      });
+    } else {
+      setSaleReturn({
+        ...saleReturn,
+        [name]: value,
+      });
+    }
+  };
+
   const handleSubmit = async () => {
     const data = {
       returnReason: saleReturn.returnReason,
       saleId: sale._id,
-      returnQuantity: saleReturn.quantity,
+      returnQuantity: saleReturn.totalReturn
+        ? sale.quantity
+        : saleReturn.quantity,
       returnQuantityType: saleReturn.unitType
         ? saleReturn.unitType
         : sale.unitType,
@@ -132,8 +154,6 @@ const SaleReturn = () => {
           mx: "auto",
           mt: 3,
           p: 3,
-          border: "1px solid #ccc",
-          borderRadius: 2,
         }}
       >
         <FormControl fullWidth margin="normal">
@@ -157,138 +177,117 @@ const SaleReturn = () => {
         </FormControl>
 
         {sale && (
-          <TableContainer component={Paper} sx={{ mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t(`productName`)}</TableCell>
-                  <TableCell>{t(`quantity`)}</TableCell>
-                  {sale.unitType !== "kg" &&
-                    sale.unitType !== "piece" &&
-                    sale.unitType !== "liter" && (
-                      <>
-                        <TableCell>{t(`unitPerPackage`)}</TableCell>
-                        <TableCell>{t(`totalQuantity`)}</TableCell>
-                      </>
-                    )}
-                  <TableCell>{t(`returnQty`)}</TableCell>
-                  {sale.unitType !== "kg" &&
-                    sale.unitType !== "piece" &&
-                    sale.unitType !== "liter" && (
-                      <>
-                        <TableCell>{t(`unitType`)}</TableCell>
-                      </>
-                    )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sale && (
-                  <>
-                    <TableRow key={sale.id}>
-                      <TableCell>{sale.productName}</TableCell>
-                      <TableCell>
-                        {sale.quantity} {sale.unitType}
-                      </TableCell>
+          <>
+            <Divider style={{ marginTop: "12px", marginBottom: "12px" }} />
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>{t(`productName`)}</Typography>
+              </Grid>
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>{t(`sold quantity`)}</Typography>
+              </Grid>{" "}
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>{t(`returnQty`)}</Typography>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>{sale.productName}</Typography>
+              </Grid>
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>
+                  {sale.quantity} {sale.unitType}
+                </Typography>
+              </Grid>{" "}
+              <Grid size={4} xs={12} sm={12}>
+                <Typography>0</Typography>
+              </Grid>
+            </Grid>
+            <Divider style={{ marginTop: "20px", marginBottom: "30px" }} />
 
-                      {sale.unitType !== "kg" &&
-                        sale.unitType !== "piece" &&
-                        sale.unitType !== "liter" && (
-                          <>
-                            <TableCell>{sale.unitPerPackage}</TableCell>
-                            <TableCell>
-                              {sale.quantity * sale.unitPerPackage}
-                            </TableCell>
-                          </>
-                        )}
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={4} xs={12} sm={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name={TOTAL_RETURN}
+                      checked={saleReturn.totalReturn}
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Total Return"
+                />
+              </Grid>
+              <Grid size={4} xs={12} sm={12}>
+                <TextField
+                  select
+                  fullWidth
+                  required
+                  name="unitType"
+                  label={t("unitType")}
+                  style={{ minWidth: "200px" }}
+                  type="text"
+                  disabled={saleReturn.totalReturn}
+                  dir={selectedDirection === "rtl" ? "right" : "left"}
+                  value={saleReturn.unitType}
+                  onChange={handleChange}
+                >
+                  {unitTypes.map((item, index) => (
+                    <MenuItem key={index} value={item}>
+                      {t(`${item}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
 
-                      <TableCell>
-                        <TextField
-                          type="number"
-                          size="small"
-                          style={{ minWidth: "100px" }}
-                          value={saleReturn.quantity}
-                          onChange={(event) =>
-                            setSaleReturn({
-                              ...saleReturn,
-                              quantity: event.target.value,
-                            })
-                          }
-                          inputProps={{ min: 0, max: sale.quantity }}
-                        />
-                      </TableCell>
+              <Grid size={4} xs={12} sm={12}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="Select Return Quantity"
+                  type="number"
+                  name="quantity"
+                  disabled={saleReturn.totalReturn}
+                  value={saleReturn.quantity}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
 
-                      {sale.unitType !== "kg" &&
-                        sale.unitType !== "piece" &&
-                        sale.unitType !== "liter" && (
-                          <TableCell>
-                            <TextField
-                              select
-                              size="small"
-                              name="unitType"
-                              style={{ minWidth: "100px" }}
-                              dir={
-                                selectedDirection === "rtl" ? "right" : "left"
-                              }
-                              value={saleReturn.unitType}
-                              onChange={(event) =>
-                                setSaleReturn({
-                                  ...saleReturn,
-                                  unitType: event.target.value,
-                                })
-                              }
-                            >
-                              {unitTypes.map((item, index) => (
-                                <MenuItem key={index} value={item}>
-                                  {t(`${item}`)}
-                                </MenuItem>
-                              ))}
-                            </TextField>
-                          </TableCell>
-                        )}
-                    </TableRow>
-                  </>
-                )}
-                <TableRow>
-                  {sale && (
-                    <TableCell colSpan={100}>
-                      <TextField
-                        fullWidth
-                        label={t("returnReason")}
-                        name="returnReason"
-                        type="text"
-                        value={saleReturn.returnReason}
-                        onChange={(event) =>
-                          setSaleReturn({
-                            ...saleReturn,
-                            returnReason: event.target.value,
-                          })
-                        }
-                      />
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-
-        {sale && (
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            color="inherit"
-            style={{ marginTop: 20 }}
-            sx={(theme) => ({
-              backgroundColor:
-                theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-              color:
-                theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-            })}
-            onClick={handleSubmit}
-          >
-            {t("Add")}
-          </Button>
+            <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+              <Grid size={12} xs={12} sm={12}>
+                <TextField
+                  fullWidth
+                  label={t("returnReason")}
+                  name="returnReason"
+                  type="text"
+                  value={saleReturn.returnReason}
+                  onChange={(event) =>
+                    setSaleReturn({
+                      ...saleReturn,
+                      returnReason: event.target.value,
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              color="inherit"
+              style={{ marginTop: 20 }}
+              sx={(theme) => ({
+                backgroundColor:
+                  theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+                color:
+                  theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+              })}
+              onClick={handleSubmit}
+            >
+              {t("Add")}
+            </Button>
+          </>
         )}
       </Box>
     </>

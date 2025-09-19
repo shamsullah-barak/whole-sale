@@ -118,5 +118,7 @@
   "rowsPerPage": "په یوه صفحه کي قطارونه",
   "currencyType": "د کرنسي ډول",
   "addNewPartner": "نوی شریک اضافه کړي",
-  "addNewInvest": "سرمایه اضافه کړي "
+  "addNewInvest": "سرمایه اضافه کړي ",
+  "newCategory": "نوې کټګوري",
+  "categoryName": "د کټګوری نوم"
 }

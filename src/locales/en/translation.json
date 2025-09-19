@@ -118,5 +118,7 @@
   "rowsPerPage": "Rows Per Page",
   "currencyType": "Currency Type",
   "addNewPartner": "Add New Partner",
-  "addNewInvest": "Add new Invest"
+  "addNewInvest": "Add new Invest",
+  "newCategory": "New Category",
+  "categoryName": "Category Name"
 }

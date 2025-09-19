@@ -7,64 +7,43 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { ToastContainer, toast } from "react-toastify";
 import { fetchExpensesAsync } from "../../store/slices/expenses.slice";
-
-const reasons = ["shopExpense"];
-const shopExpenses = [
-  "rent",
-  "electricityBill",
-  "waterBill",
-  "internetBill",
-  "salariesOfEmployees",
-  "cleaningSupplies",
-  "packagingMaterials",
-  "transportationCost",
-  "maintenanceAndRepairs",
-  "securityServices",
-  "shopInsurance",
-  "marketingAndAdvertising",
-  "licensingAndPermits",
-  "POSSystemSubscription",
-  "inventoryPurchase",
-  "uniformsForStaff",
-  "furnitureAndFixtures",
-  "stationery",
-  "softwareSubscriptions",
-  "wasteDisposal",
-  "mobileRechargeForBusiness",
-  "refreshmentsForStaff",
-  "bankCharges",
-  "loanInstallments",
-  "emergencyFundExpenses",
-  "others",
-];
+import { selectLedgers } from "../../store/selectors/ledgers.selector";
 
 const MoneyWithdrawal = ({ transactionTypeId }) => {
   const { t } = useTranslation();
-  const [description, setDescription] = useState("");
-  const [reason, setReason] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [type, setShopExpense] = useState("");
-  const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const selectedDirection = useSelector(selectDirection);
+  const ledgers = useSelector(selectLedgers).ledgers;
+
+  const [data, setData] = useState({
+    ledgerId: "",
+    amount: 0,
+    description: "",
+  });
+
+  const handleInput = (event) => {
+    const [name, value] = event.target;
+
+    setData({
+      ...data,
+      [name]: value,
+    });
+  };
 
   const journalEntryHandler = async (event) => {
     event.preventDefault(event);
 
     setLoading(true);
-    const data = { reason, type, description, amount };
+
     try {
-      await axios.post(
-        `http://localhost:5000/api/expenses?transactionTypeId=${transactionTypeId}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.post(`http://localhost:5000/api/money-withdrawal`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       setLoading(false);
       dispatch(fetchExpensesAsync());
       toast.success("data added");
@@ -85,42 +64,20 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
           <TextField
             select
             fullWidth
-            label={t("reason")}
+            label={t("ledger")}
+            name="ledgerId"
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={reason}
-            onChange={(event) => {
-              setReason(event.target.value);
-            }}
+            value={data.ledgerId}
+            onChange={handleInput}
           >
-            {reasons.map((item, index) => (
-              <MenuItem key={index} value={item}>
-                {t(`${item}`)}
+            {ledgers.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.name}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        {reason === "shopExpense" && (
-          <Grid size={3} xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label={t("type")}
-              style={{ minWidth: "200px" }}
-              dir={selectedDirection === "rtl" ? "right" : "left"}
-              value={type}
-              onChange={(event) => {
-                setShopExpense(event.target.value);
-              }}
-            >
-              {shopExpenses.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {t(`${item}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-        )}
 
         <Grid size={3} xs={12} sm={6}>
           <TextField
@@ -128,8 +85,8 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
             label={t(`amount`)}
             name="amount"
             type="number"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
+            value={data.amount}
+            onChange={handleInput}
           />
         </Grid>
 
@@ -139,8 +96,8 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
             label={t("description")}
             name="description"
             type="text"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
+            value={data.description}
+            onChange={handleInput}
           />
         </Grid>
       </Grid>

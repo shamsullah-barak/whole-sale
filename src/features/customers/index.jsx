@@ -348,7 +348,7 @@ const Customers = () => {
             })}
             onClick={() => setOpen(true)}
           >
-            {t("newCustomers")}
+            {t("newCustomer")}
           </Button>
         </Grid>
       </Grid>

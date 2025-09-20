@@ -16,30 +16,7 @@ export const columns = [
     headerName: "name",
     flex: 0.5,
     minWidth: 80,
-  },
-  {
-    field: "phone",
-    headerName: "Phone",
-    headerAlign: "center",
     align: "center",
-    flex: 1,
-    minWidth: 50,
-  },
-  {
-    field: "address",
-    headerName: "Address",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-  },
-  {
-    field: "type",
-    headerName: "person type",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
   },
 ];
 

@@ -7,35 +7,46 @@ import { fetchLedgerTransactionsAsync } from "../../../store/slices/ledger.trans
 import { useTranslation } from "react-i18next";
 import { selectLedgerTransactions } from "../../../store/selectors/ledger.transactions.selectors";
 import Datagrid from "../../../components/DataGrid";
+import { useParams } from "react-router-dom";
+import formatDate from "../../../utils/moment";
 
 const columns = [
   {
-    field: "amount",
-    headerName: "amount",
-    headerAlign: "center",
-    align: "center",
+    field: "createdAt",
+    headerName: "Date",
     flex: 0.5,
     minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
   {
-    field: "type",
-    headerName: "type",
+    field: "description",
+    headerName: "Account",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "description",
-    headerName: "description",
+    field: "debit",
+    headerName: "Debit",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
-    field: "date",
-    headerName: "date",
+    field: "credit",
+    headerName: "Credit",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
+    minWidth: 80,
+  },
+  {
+    field: "balance",
+    headerName: "Balance",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -51,11 +62,13 @@ const LedgerTransactionsList = () => {
 
   const ledgerTransactions = useSelector(selectLedgerTransactions);
 
+  const { ledgerId } = useParams();
+
   useEffect(() => {
     const loadLedgerTransactions = () => {
       dispatch(
         fetchLedgerTransactionsAsync({
-          ledgerId: selectedLedger.id,
+          ledgerId: ledgerId,
           page: 1,
           limit: ledgerTransactions?.limitPerPage,
         })
@@ -69,10 +82,7 @@ const LedgerTransactionsList = () => {
     // dispatch(fetchJournalsAsync({ page: page + 1, limit: pageSize }));
   };
 
-  const handleRowClick = (params) => {
-    // dispatch(setSelectedAccount({ account: params.row }));
-    // navigate(`/ledgers/${params.row.id}`);
-  };
+  console.log({ ledgerTransactions });
 
   return (
     <>

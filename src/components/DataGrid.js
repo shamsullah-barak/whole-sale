@@ -18,6 +18,7 @@ const Datagrid = ({
   limitPerPage,
   loading,
   stateChanged,
+  onRowClick,
 }) => {
   const selectedDirection = useSelector(selectDirection);
   return (
@@ -43,6 +44,7 @@ const Datagrid = ({
         onPaginationModelChange={(data) => stateChanged(data)}
         disableColumnResize
         rowCount={totalRows}
+        onRowClick={onRowClick}
         paginationMode="server"
         pagination
         page={currentPage}

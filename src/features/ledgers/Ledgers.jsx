@@ -62,7 +62,7 @@ const LedgerList = () => {
 
   const handleRowClick = (params) => {
     dispatch(setSelectedLedger({ ledger: params.row }));
-    navigate(`/ledgers/${params.row.id}`);
+    navigate(`/ledgers/${params.row._id}`);
   };
 
   return (
@@ -74,6 +74,7 @@ const LedgerList = () => {
       totalRows={ledgers.totalRows}
       currentPage={ledgers.currentPage}
       stateChanged={stateChanged}
+      onRowClick={(params, event) => handleRowClick(params)}
     />
   );
 };

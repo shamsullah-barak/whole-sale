@@ -371,6 +371,11 @@ const PartnerList = () => {
             totalRows={partners?.totalRows}
             currentPage={partners?.currentPage}
             stateChanged={stateChanged}
+            onRowClick={(params, event) => {
+              // params.row contains the row data
+              console.log("Clicked row:", params.row);
+              // Do your navigation or modal open here
+            }}
           />
         </>
       )}

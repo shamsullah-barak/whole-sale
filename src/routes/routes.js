@@ -159,6 +159,18 @@ export default function Router() {
       element: <CashBox />,
     },
     {
+      path: "/investments",
+      element: <Investments />,
+    },
+    {
+      path: "/partners",
+      element: <Partners />,
+    },
+    {
+      path: "/addInvest",
+      element: <AddInvest />,
+    },
+    {
       path: "404",
       element: <Page404 />,
     },

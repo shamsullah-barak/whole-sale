@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchLedgerTransactions = async (ledgerId, page, limit) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/ledgerTransactions/${ledgerId}?page=${page}&limit=${limit}`
+      `http://localhost:5000/api/ledger-transactions/${ledgerId}?page=${page}&limit=${limit}`
     );
     return response.data;
   } catch (error) {

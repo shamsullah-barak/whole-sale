@@ -1,43 +1,58 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import MainDashboard from "../../../theme/main/MainDashboard";
-import LedgerTransactionForm from "./ledgerTransactionForm";
 import { useDispatch, useSelector } from "react-redux";
 import { getSelectedLedger } from "../../../store/selectors/ledgers.selector";
-import { useNavigate } from "react-router-dom";
 import { fetchLedgerTransactionsAsync } from "../../../store/slices/ledger.transactions.slice";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
 import { selectLedgerTransactions } from "../../../store/selectors/ledger.transactions.selectors";
+import Datagrid from "../../../components/DataGrid";
+import { useParams } from "react-router-dom";
+import formatDate from "../../../utils/moment";
+import COLORS from "../../../constant/colors";
+import { Button, Stack, TextField, Typography } from "@mui/material";
+import { selectDirection } from "../../../store/selectors/app.selector";
+import Model from "../../../components/Model";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
 
 const columns = [
   {
-    field: "amount",
-    headerName: "amount",
-    headerAlign: "center",
-    align: "center",
+    field: "createdAt",
+    headerName: "Date",
     flex: 0.5,
     minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
   {
-    field: "type",
-    headerName: "type",
+    field: "description",
+    headerName: "Account",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "description",
-    headerName: "description",
+    field: "debit",
+    headerName: "Debit",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
-    field: "date",
-    headerName: "date",
+    field: "credit",
+    headerName: "Credit",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
+    minWidth: 80,
+  },
+  {
+    field: "balance",
+    headerName: "Balance",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -48,17 +63,18 @@ const columns = [
 const LedgerTransactionsList = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const selectedLedger = useSelector(getSelectedLedger);
 
   const ledgerTransactions = useSelector(selectLedgerTransactions);
 
+  const { ledgerId } = useParams();
+
   useEffect(() => {
     const loadLedgerTransactions = () => {
       dispatch(
         fetchLedgerTransactionsAsync({
-          ledgerId: selectedLedger.id,
+          ledgerId: ledgerId,
           page: 1,
           limit: ledgerTransactions?.limitPerPage,
         })
@@ -72,10 +88,7 @@ const LedgerTransactionsList = () => {
     // dispatch(fetchJournalsAsync({ page: page + 1, limit: pageSize }));
   };
 
-  const handleRowClick = (params) => {
-    // dispatch(setSelectedAccount({ account: params.row }));
-    // navigate(`/ledgers/${params.row.id}`);
-  };
+  console.log({ ledgerTransactions });
 
   return (
     <>
@@ -93,55 +106,14 @@ const LedgerTransactionsList = () => {
         </>
       ) : (
         <>
-          <DataGrid
-            rows={ledgerTransactions.ledgerTransactions || []}
+          <Datagrid
+            rows={ledgerTransactions?.ledgerTransactions}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: ledgerTransactions?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={ledgerTransactions?.totalRows}
-            paginationMode="server"
-            pagination
-            page={ledgerTransactions?.currentPage}
-            pageSize={ledgerTransactions?.limitPerPage}
+            limitPerPage={ledgerTransactions?.limitPerPage}
             loading={ledgerTransactions?.loading}
-            density="compact"
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={ledgerTransactions?.totalRows}
+            currentPage={ledgerTransactions?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}
@@ -149,9 +121,118 @@ const LedgerTransactionsList = () => {
   );
 };
 
+const CreateSubLedger = ({ open, setOpen }) => {
+  // const { t } = useTranslation();
+  // const dispatch = useDispatch();
+
+  const { ledgerId } = useParams();
+
+  //   states
+  const [loading, setLoading] = useState(false);
+  const [subLedgerName, setSubLedgerName] = useState("");
+
+  // methods
+  const handleClose = () => {
+    setOpen(false);
+    setSubLedgerName("");
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault(event);
+
+    try {
+      setLoading(true);
+      await axios.post(
+        `http://localhost:5000/api/sub-ledgers`,
+        { name: subLedgerName, ledgerId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setOpen(false);
+      setLoading(false);
+      toast.success("data added");
+      // dispatch(fetchSuppliersAsync({ page: 1, limit: 10 }));
+    } catch (error) {
+      setOpen(false);
+      setLoading(false);
+      toast.error(
+        error?.response?.data?.message ??
+          "something went wrong! please try again"
+      );
+    }
+  };
+
+  return (
+    <>
+      <ToastContainer />
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          Add Sub Ledger
+        </Typography>
+
+        <Stack spacing={2}>
+          <TextField
+            label="subLedgerName"
+            name="subLedgerName"
+            value={subLedgerName}
+            onChange={(event) => setSubLedgerName(event.target.value)}
+            fullWidth
+            size="small"
+          />
+        </Stack>
+      </Model>
+    </>
+  );
+};
+
+const SubLedger = () => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const selectedDirection = useSelector(selectDirection);
+
+  return (
+    <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+      <Grid
+        xs={12}
+        lg={9}
+        sx={{
+          width: "100%",
+          textAlign: selectedDirection === "rtl" ? "left" : "right",
+        }}
+      >
+        <CreateSubLedger open={open} setOpen={setOpen} />
+        <Button
+          variant="contained"
+          color="inherit"
+          sx={(theme) => ({
+            backgroundColor:
+              theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+            color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+          })}
+          onClick={() => setOpen(true)}
+        >
+          {t("New Sub Ledger")}
+        </Button>
+      </Grid>
+    </Grid>
+  );
+};
+
 const LedgerTransactions = () => {
   return (
     <MainDashboard title="Ledger Transactions">
+      <SubLedger />
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -159,7 +240,6 @@ const LedgerTransactions = () => {
           sx={{ width: "100%", textAlign: "right", height: "100%" }}
         >
           <LedgerTransactionsList />
-          <LedgerTransactionForm />
         </Grid>
       </Grid>
     </MainDashboard>

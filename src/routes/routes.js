@@ -1,36 +1,35 @@
-import { useRoutes } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
-import Loans from '../pages/Loan';
-import Customers from '../pages/Customers';
-import Incomes from '../pages/Income';
-import Invoices from '../pages/Invoices';
-import Suppliers from '../pages/Suppliers';
-import Bank from '../pages/Bank';
-import Products from '../features/products/Product';
-import CreateProduct from '../features/products/CreateProduct';
-import EditProduct from '../features/products/EditProduct';
-// Master Data imports
-import MasterData from '../features/master-data/MasterData';
-import Categories from '../features/master-data/categories/Categories';
-import CreateCategory from '../features/master-data/categories/CreateCategory';
-import EditCategory from '../features/master-data/categories/EditCategory';
-import Companies from '../features/master-data/companies/Companies';
-import CreateCompany from '../features/master-data/companies/CreateCompany';
-import EditCompany from '../features/master-data/companies/EditCompany';
-import Purchases from '../features/purchases/Purchase';
-import CreatePurchases from '../features/purchases/CreatePurchase';
-import Ledgers from '../features/ledgers/Ledgers';
-import CreateLedger from '../features/ledgers/CreateLedger';
-import SubLedger from '../features/ledgers/ledgerTransactions';
-import Journal from '../features/journal';
-import Settings from '../features/settings';
-import Stock from '../features/stock';
-import CreateStock from '../features/stock/createStock';
-import StockItems from '../features/stock/stockItems';
-import Units from '../features/master-data/units/Units';
-import CreateUnit from '../features/master-data/units/CreateUnit';
-import EditUnit from '../features/master-data/units/EditUnit';
-import ViewProduct from '../features/products/ViewProduct';
+import { useRoutes } from "react-router-dom";
+import Dashboard from "../pages/Dashboard";
+import Invoices from "../pages/Invoices";
+import Products from "../features/products/Product";
+import MasterData from "../features/master-data/MasterData";
+import Categories from "../features/master-data/categories/Categories";
+import Companies from "../features/master-data/companies/Companies";
+import CreateCompany from "../features/master-data/companies/CreateCompany";
+import EditCompany from "../features/master-data/companies/EditCompany";
+import Purchases from "../features/purchases/Purchase";
+import CreatePurchases from "../features/purchases/CreatePurchase";
+import Ledgers from "../features/ledgers/Ledgers";
+import SubLedger from "../features/ledgers/ledgerTransactions";
+import Journal from "../features/journal";
+import Settings from "../features/settings";
+import Stock from "../features/stock";
+import CreateStock from "../features/stock/createStock";
+import StockItems from "../features/stock/stockItems";
+import Units from "../features/master-data/units/Units";
+import CreateUnit from "../features/master-data/units/CreateUnit";
+import EditUnit from "../features/master-data/units/EditUnit";
+import Partners from "../features/investment/partners";
+import AddInvest from "../features/investment/addInvest";
+import Investments from "../features/investment";
+import Expenses from "../features/expenses";
+import Suppliers from "../features/suppliers";
+import Customers from "../features/customers";
+import Payable from "../features/payable";
+import Receivable from "../features/receivable";
+import Category from "../features/master-data/categories/Categories";
+import CashBox from "../features/cashbox";
+import Incomes from "../features/income";
 
 // ----------------------------------------------------------------------
 
@@ -41,138 +40,138 @@ const Page404 = () => {
 export default function Router() {
   const routes = useRoutes([
     {
-      path: '/',
+      path: "/",
       element: <Dashboard />,
     },
     {
-      path: '/dashboard',
+      path: "/dashboard",
       element: <Dashboard />,
     },
     {
-      path: '/customers',
+      path: "/customers",
       element: <Customers />,
     },
     {
-      path: '/loan',
-      element: <Loans />,
-    },
-    {
-      path: '/incomes',
+      path: "/incomes",
       element: <Incomes />,
     },
     {
-      path: '/invoices',
+      path: "/invoices",
       element: <Invoices />,
     },
     {
-      path: '/products',
+      path: "/products",
       element: <Products />,
-    },
-    {
-      path: '/products/add',
-      element: <CreateProduct />,
-    },
-    {
-      path: '/products/view/:productId',
-      element: <ViewProduct />,
-    },
-    {
-      path: '/products/edit/:productId',
-      element: <EditProduct />,
     },
     // Master Data routes
     {
-      path: '/master-data',
+      path: "/master-data",
       element: <MasterData />,
     },
     // Category routes
     {
-      path: '/master-data/categories',
+      path: "/master-data/categories",
       element: <Categories />,
-    },
-    {
-      path: '/master-data/categories/add',
-      element: <CreateCategory />,
-    },
-    {
-      path: '/master-data/categories/edit/:categoryId',
-      element: <EditCategory />,
     },
     // Company routes
     {
-      path: '/master-data/companies',
+      path: "/master-data/companies",
       element: <Companies />,
     },
     {
-      path: '/master-data/companies/add',
+      path: "/master-data/companies/add",
       element: <CreateCompany />,
     },
     {
-      path: '/master-data/companies/edit/:companyId',
+      path: "/master-data/companies/edit/:companyId",
       element: <EditCompany />,
     },
     {
-      path: '/purchases',
+      path: "/purchases",
       element: <Purchases />,
     },
     {
-      path: '/purchases/add',
+      path: "/purchases/add",
       element: <CreatePurchases />,
     },
     {
-      path: '/stocks',
+      path: "/stocks",
       element: <Stock />,
     },
     {
-      path: '/stocks/create',
+      path: "/stocks/create",
       element: <CreateStock />,
     },
     {
-      path: '/stocks/:stockId',
+      path: "/payable",
+      element: <Payable />,
+    },
+    {
+      path: "/receivable",
+      element: <Receivable />,
+    },
+    {
+      path: "/stocks/:stockName",
       element: <StockItems />,
     },
     {
-      path: '/suppliers',
+      path: "/suppliers",
       element: <Suppliers />,
     },
     {
-      path: '/bank',
-      element: <Bank />,
-    },
-    {
-      path: '/ledgers',
+      path: "/ledgers",
       element: <Ledgers />,
     },
     {
-      path: '/ledgers/create',
-      element: <CreateLedger />,
-    },
-    {
-      path: '/ledgers/:ledgerId',
+      path: "/ledgers/:ledgerId",
       element: <SubLedger />,
     },
     {
-      path: '/journal',
+      path: "/journal",
       element: <Journal />,
     },
     {
-      path: '/settings',
+      path: "/settings",
       element: <Settings />,
     },
     {
-      path: '/master-data/units',
+      path: "/master-data/units",
       element: <Units />,
     },
     {
-      path: '/master-data/units/add',
+      path: "/master-data/units/add",
       element: <CreateUnit />,
     },
     {
-      path: '/master-data/units/edit/:unitId',
+      path: "/master-data/units/edit/:unitId",
       element: <EditUnit />,
     },
     {
-      path: '404',
+      path: "/expenses",
+      element: <Expenses />,
+    },
+    {
+      path: "/categories",
+      element: <Category />,
+    },
+    {
+      path: "/cashbox",
+      element: <CashBox />,
+    },
+    {
+      path: "/investments",
+      element: <Investments />,
+    },
+    {
+      path: "/partners",
+      element: <Partners />,
+    },
+    {
+      path: "/addInvest",
+      element: <AddInvest />,
+    },
+    {
+      path: "404",
       element: <Page404 />,
     },
   ]);

@@ -1,36 +1,48 @@
 import React, { useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
+import Datagrid from "../../components/DataGrid";
+import formatDate from "../../utils/moment";
 
 const columns = [
   {
-    field: "status",
-    headerName: "status",
+    field: "createdAt",
+    headerName: "Date",
     flex: 0.5,
     minWidth: 80,
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
   {
-    field: "amount",
-    headerName: "amount",
+    field: "ledger.name",
+    headerName: "Account",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 50,
   },
   {
-    field: "description",
-    headerName: "description",
+    field: "debit",
+    headerName: "Debit",
     headerAlign: "center",
     align: "center",
     flex: 1,
     minWidth: 80,
   },
   {
-    field: "date",
-    headerName: "date",
+    field: "credit",
+    headerName: "Credit",
+    headerAlign: "center",
+    align: "center",
+    flex: 1,
+    minWidth: 80,
+  },
+  {
+    field: "description",
+    headerName: "Description",
     headerAlign: "center",
     align: "center",
     flex: 1,
@@ -56,11 +68,6 @@ const EntryList = () => {
     dispatch(fetchJournalsAsync({ page: page + 1, limit: pageSize }));
   };
 
-  const handleRowClick = (params) => {
-    // dispatch(setSelectedAccount({ account: params.row }));
-    // navigate(`/ledgers/${params.row.id}`);
-  };
-
   return (
     <>
       {journals.journals.length === 0 ? (
@@ -77,55 +84,14 @@ const EntryList = () => {
         </>
       ) : (
         <>
-          <DataGrid
-            rows={journals.journals || []}
+          <Datagrid
+            rows={journals?.journals}
             columns={columns}
-            getRowId={(row) => row.id}
-            onRowClick={handleRowClick}
-            getRowClassName={(params) =>
-              params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-            }
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: journals?.limitPerPage },
-              },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={(data) => stateChanged(data)}
-            disableColumnResize
-            rowCount={journals?.totalRows}
-            paginationMode="server"
-            pagination
-            page={journals?.currentPage}
-            pageSize={journals?.limitPerPage}
+            limitPerPage={journals?.limitPerPage}
             loading={journals?.loading}
-            density="compact"
-            slotProps={{
-              filterPanel: {
-                filterFormProps: {
-                  logicOperatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                  },
-                  columnInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  operatorInputProps: {
-                    variant: "outlined",
-                    size: "small",
-                    sx: { mt: "auto" },
-                  },
-                  valueInputProps: {
-                    InputComponentProps: {
-                      variant: "outlined",
-                      size: "small",
-                    },
-                  },
-                },
-              },
-            }}
+            totalRows={journals?.totalRows}
+            currentPage={journals?.currentPage}
+            stateChanged={stateChanged}
           />
         </>
       )}

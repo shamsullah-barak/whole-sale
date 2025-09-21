@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchTransactionTypes = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/transactionTypes`
+      `http://localhost:5000/api/transaction-types`
     );
     return response.data;
   } catch (error) {

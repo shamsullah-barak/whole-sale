@@ -6,6 +6,59 @@ export const fetchPurchases = async (page, limit) => {
     const response = await axios.get(
       `http://localhost:5000/api/purchases?page=${page}&limit=${limit}`
     );
+
+    let totalCashPurchases = 0;
+    let totalCreditPurchases = 0;
+    let totalCashAndCreditPurchases = 0;
+    let totalPurchases = 0;
+
+    response.data.results.forEach((item) => {
+      const price = Number(item.totalPrice);
+      totalPurchases += price;
+
+      switch (item.paymentMethod) {
+        case "cash":
+          totalCashPurchases += price;
+          break;
+        case "credit":
+          totalCreditPurchases += price;
+          break;
+        case "cashAndCredit":
+          totalCashAndCreditPurchases += price;
+          break;
+      }
+    });
+
+    return {
+      ...response.data,
+      totalCashAndCreditPurchases,
+      totalCreditPurchases,
+      totalPurchases,
+      totalCashPurchases,
+    };
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// A mock function to mimic making an async request for data
+export const fetchNextInvoiceNo = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/api/purchases/next-invoice`
+    );
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+  }
+};
+
+// A mock function to mimic making an async request for data
+export const fetchDashboardData = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/api/purchases/dashboard`
+    );
     return response.data;
   } catch (error) {
     console.log({ error });

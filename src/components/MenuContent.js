@@ -1,11 +1,9 @@
 import clsx from "clsx";
-import * as React from "react";
-import Box from "@mui/material/Box";
+import React from "react";
 import List from "@mui/material/List";
 import Stack from "@mui/material/Stack";
 import Collapse from "@mui/material/Collapse";
 import ListItem from "@mui/material/ListItem";
-import Typography from "@mui/material/Typography";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import ListItemText from "@mui/material/ListItemText";
@@ -13,14 +11,11 @@ import { animated, useSpring } from "@react-spring/web";
 import ListItemButton from "@mui/material/ListItemButton";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
-import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CommentBankIcon from "@mui/icons-material/CommentBank";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
@@ -31,16 +26,16 @@ import COLORS from "../constant/colors";
 import { useSelector } from "react-redux";
 import { selectDirection } from "../store/selectors/app.selector";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
-import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { unstable_useTreeItem2 as useTreeItem2 } from "@mui/x-tree-view/useTreeItem2";
 import StorageIcon from "@mui/icons-material/Storage";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 import {
   TreeItem2Content,
   TreeItem2IconContainer,
   TreeItem2Label,
-  TreeItem2Root,
 } from "@mui/x-tree-view/TreeItem2";
 
 const mainListItems = [
@@ -63,17 +58,19 @@ const mainListItems = [
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
   { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
-  { text: "Bank", icon: <CommentBankIcon />, path: "/bank" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
-  { text: "Loan", icon: <CreditScoreIcon />, path: "/loan" },
-  { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
+  { text: "Payable", icon: <PaymentsIcon />, path: "/payable" },
+  { text: "Receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
+  { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
+  { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
+  { text: "Category", icon: <EqualizerIcon />, path: "/categories" },
 ];
 
 const secondaryListItems = [
   { text: "Settings", icon: <SettingsRoundedIcon />, path: "/settings" },
-  { text: "About", icon: <InfoRoundedIcon />, path: "/about" },
-  { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
+  // { text: "About", icon: <InfoRoundedIcon />, path: "/about" },
+  // { text: "Feedback", icon: <HelpRoundedIcon />, path: "/feedback" },
 ];
 
 const ITEMS = [

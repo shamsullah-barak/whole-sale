@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchCashBox, fetchLedgers } from "../actions/ledger.actions";
+import { fetchLedgers } from "../actions/ledger.actions";
 
 const initialState = {
   ledgers: [],
@@ -20,13 +20,13 @@ export const fetchLedgersAsync = createAsyncThunk(
   }
 );
 
-export const fetchCashBoxAsync = createAsyncThunk(
-  "ledgers/fetchCashBox",
-  async () => {
-    const cashBox = await fetchCashBox();
-    return cashBox;
-  }
-);
+// export const fetchCashBoxAsync = createAsyncThunk(
+//   "ledgers/fetchCashBox",
+//   async () => {
+//     const cashBox = await fetchCashBox();
+//     return cashBox;
+//   }
+// );
 
 export const ledgersSlice = createSlice({
   name: "ledgers",
@@ -48,16 +48,16 @@ export const ledgersSlice = createSlice({
       })
       .addCase(fetchLedgersAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.ledgers = action.payload.results;
-        state.currentPage = action.payload.page;
-        state.limitPerPage = action.payload.limit;
-        state.totalPages = action.payload.totalPages;
-        state.totalRows = action.payload.totalResults;
+        state.ledgers = action.payload;
+        // state.currentPage = action.payload.page;
+        // state.limitPerPage = action.payload.limit;
+        // state.totalPages = action.payload.totalPages;
+        // state.totalRows = action.payload.totalResults;
       });
 
-    builder.addCase(fetchCashBoxAsync.fulfilled, (state, action) => {
-      state.cashBox = action.payload.balance;
-    });
+    // builder.addCase(fetchCashBoxAsync.fulfilled, (state, action) => {
+    //   state.cashBox = action.payload.balance;
+    // });
   },
 });
 

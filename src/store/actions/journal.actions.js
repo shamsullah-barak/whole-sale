@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchJournals = async (page, limit) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/journalEntries?page=${page}&limit=${limit}`
+      `http://localhost:5000/api/journal-entries?page=${page}&limit=${limit}`
     );
     return response.data;
   } catch (error) {

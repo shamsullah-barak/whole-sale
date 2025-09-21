@@ -11,3 +11,15 @@ export const fetchStocks = async (page, limit) => {
     console.log({ error });
   }
 };
+
+// A mock function to mimic making an async request for data
+export const fetchStockNames = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/api/stocks/stock-names`
+    );
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+  }
+};

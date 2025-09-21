@@ -6,18 +6,7 @@ export const fetchLedgers = async (page, limit) => {
     const response = await axios.get(
       `http://localhost:5000/api/ledgers?page=${page}&limit=${limit}`
     );
-    return response.data;
-  } catch (error) {
-    console.log({ error });
-  }
-};
-
-// A mock function to mimic making an async request for data
-export const fetchCashBox = async () => {
-  try {
-    const response = await axios.get(
-      `http://localhost:5000/api/ledgers/cashBox`
-    );
+    console.log(response);
     return response.data;
   } catch (error) {
     console.log({ error });

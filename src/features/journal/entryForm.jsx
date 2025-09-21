@@ -6,6 +6,12 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import { selectTransactionTypes } from "../../store/selectors/transaction.types.selector";
 import MoneyDeposit from "./moneyDepositEntry";
 import PurchaseOfGoods from "./purchaseEntry";
+import MoneyWithdrawal from "./moneyWithdrawal";
+import PurchaseReturnForm from "./PurchaseReturn";
+import Sales from "./Sales";
+import SaleReturn from "./SaleReturn";
+import Receivable from "./Receivable";
+import Payable from "./Payable";
 
 const EntryForm = () => {
   const [status, setStatus] = useState({ statusId: "", statusName: "" });
@@ -43,13 +49,43 @@ const EntryForm = () => {
       </Grid>
 
       {/* money deposit */}
-      {status.statusName === "money deposit" && (
+      {status.statusName === "Money Deposit" && (
         <MoneyDeposit statusId={status.statusId} />
       )}
 
       {/* purchasing something */}
-      {status.statusName === "purchase of goods" && (
+      {status.statusName === "Purchase of Goods" && (
         <PurchaseOfGoods statusId={status.statusId} />
+      )}
+
+      {/* purchasing something */}
+      {status.statusName === "Money Withdrawal" && (
+        <MoneyWithdrawal transactionTypeId={status.statusId} />
+      )}
+
+      {/* purchase return */}
+      {status.statusName === "Purchase Return" && (
+        <PurchaseReturnForm transactionTypeId={status.statusId} />
+      )}
+
+      {/* sale */}
+      {status.statusName === "Sale of Goods" && (
+        <Sales transactionTypeId={status.statusId} />
+      )}
+
+      {/* sale return */}
+      {status.statusName === "Sales Return" && (
+        <SaleReturn transactionTypeId={status.statusId} />
+      )}
+
+      {/* Settlement of Receivable */}
+      {status.statusName === "Settlement of Receivables" && (
+        <Receivable transactionTypeId={status.statusId} />
+      )}
+
+      {/* Settlement of Balance */}
+      {status.statusName === "Settlement of Balance" && (
+        <Payable transactionTypeId={status.statusId} />
       )}
     </>
   );

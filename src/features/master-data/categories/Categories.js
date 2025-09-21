@@ -1,200 +1,321 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import MainDashboard from '../../../theme/main/MainDashboard';
-import {
-  Box,
-  Typography,
-  Button,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { NavLink } from 'react-router-dom';
-import { fetchCategoriesAsync, deleteCategoryAsync, clearError } from '../../../store/slices/category.slice';
-import {
-  selectCategories,
-  selectCategoriesLoading,
-  selectCategoriesError,
-} from '../../../store/selectors/category.selector';
+import React, { useState } from "react";
+import MainDashboard from "../../../theme/main/MainDashboard";
+import { Grid2 as Grid } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
+import { Typography, TextField, Stack } from "@mui/material";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
+import { selectDirection } from "../../../store/selectors/app.selector";
+import COLORS from "../../../constant/colors";
+import { selectCategories } from "../../../store/selectors/category.selector";
+import { fetchCategoriesAsync } from "../../../store/slices/category.slice";
+import Datagrid from "../../../components/DataGrid";
+import Model from "../../../components/Model";
 
-const Categories = () => {
+const CreateCategory = ({ open, setOpen }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const categories = useSelector(selectCategories);
-  const loading = useSelector(selectCategoriesLoading);
-  const error = useSelector(selectCategoriesError);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [categoryToDelete, setCategoryToDelete] = React.useState(null);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  //   states
+  const [loading, setLoading] = useState(false);
+  const [categoryName, setCategoryName] = useState("");
 
-  useEffect(() => {
-    dispatch(fetchCategoriesAsync({ page: 1, limit: categories.limitPerPage }));
-    dispatch(clearError());
-  }, [dispatch, categories.limitPerPage]);
-
-  const handleEdit = (category) => {
-    navigate(`/master-data/categories/edit/${category.id}`);
+  // methods
+  const handleClose = () => {
+    setOpen(false);
+    setCategoryName("");
   };
 
-  const handleDelete = (category) => {
-    setCategoryToDelete(category);
-    setDeleteDialogOpen(true);
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault(event);
 
-  const confirmDelete = async () => {
-    if (categoryToDelete) {
-      try {
-        await dispatch(deleteCategoryAsync(categoryToDelete.id)).unwrap();
-        setSnackbarMessage('Category deleted successfully');
-        setSnackbarOpen(true);
-        // Refresh the categories list
-        dispatch(fetchCategoriesAsync({ page: categories.currentPage, limit: categories.limitPerPage }));
-      } catch (error) {
-        setSnackbarMessage('Failed to delete category');
-        setSnackbarOpen(true);
-      }
+    try {
+      setLoading(true);
+      await axios.post(
+        `http://localhost:5000/api/categories`,
+        { name: categoryName },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setOpen(false);
+      setLoading(false);
+      toast.success("data added");
+      dispatch(fetchCategoriesAsync({ page: 1, limit: 10 }));
+    } catch (error) {
+      setOpen(false);
+      setLoading(false);
+      toast.error(
+        error?.response.data.message ?? "something went wrong! please try again"
+      );
     }
-    setDeleteDialogOpen(false);
-    setCategoryToDelete(null);
   };
 
-  const handlePaginationChange = (data) => {
-    const { page, pageSize } = data;
-    dispatch(fetchCategoriesAsync({ page: page + 1, limit: pageSize }));
-  };
+  return (
+    <>
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          Add new Category
+        </Typography>
 
-  const renderActions = (params) => (
-    <Box sx={{ display: 'flex', gap: 1 }}>
-      <Tooltip title="Edit">
-        <IconButton size="small" onClick={() => handleEdit(params.row)} color="primary">
-          <EditIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete">
-        <IconButton size="small" onClick={() => handleDelete(params.row)} color="error">
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-    </Box>
+        <Stack spacing={2}>
+          <TextField
+            label="categoryName"
+            name="categoryName"
+            value={categoryName}
+            onChange={(event) => setCategoryName(event.target.value)}
+            fullWidth
+            size="small"
+          />
+        </Stack>
+      </Model>
+    </>
   );
+};
+
+const CategoryList = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const categories = useSelector(selectCategories);
+  const [open, setOpen] = useState(false);
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState({ categoryName: "" });
+  const [loading, setLoading] = useState(false);
+
+  const [disableUpdate, setDisableUpdate] = useState("");
+
+  const handleOpen = (id) => {
+    setSelectedId(id);
+    setOpen(true);
+  };
+
+  const handleUpdateChanges = (event) => {
+    setSelectedItem((pre) => {
+      return {
+        ...pre,
+        categoryName: event.target.value,
+      };
+    });
+  };
+
+  const handleClose = () => setOpen(false);
+  const handleCloseUpdate = () => setUpdateOpen(false);
+
+  const handleUpdateOpen = (item) => {
+    setSelectedItem({ id: item.id, categoryName: item.name });
+    setDisableUpdate(item.name);
+    setUpdateOpen(true);
+  };
+
+  const handleUpdateSubmit = async (event) => {
+    event.preventDefault(event);
+
+    const data = { name: selectedItem.categoryName };
+    try {
+      setLoading(true);
+      await axios.patch(
+        `http://localhost:5000/api/categories/${selectedItem.id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setUpdateOpen(false);
+      setLoading(false);
+      toast.success("data updated");
+      dispatch(fetchCategoriesAsync({ page: 1, limit: 10 }));
+    } catch (error) {
+      setUpdateOpen(false);
+      setLoading(false);
+      toast.error(
+        error?.response.data.message ?? "something went wrong! please try again"
+      );
+    }
+  };
+
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      await axios.delete(`http://localhost:5000/api/categories/${selectedId}`);
+      setOpen(false);
+      setLoading(false);
+      toast.success("data deleted");
+      dispatch(fetchCategoriesAsync({ page: 1, limit: 10 }));
+    } catch (error) {
+      setOpen(false);
+      setLoading(false);
+      toast.error(
+        error?.response.data.message ?? "something went wrong! please try again"
+      );
+    }
+  };
+
+  const stateChanged = (data) => {};
 
   const columns = [
     {
-      field: 'name',
-      headerName: 'Category Name',
-      flex: 1,
-      minWidth: 200,
-      sortable: true,
+      field: "name",
+      headerName: "Category Name",
+      flex: 0.5,
+      minWidth: 80,
     },
     {
-      field: 'createdAt',
-      headerName: 'Created Date',
-      flex: 1,
-      minWidth: 150,
-      sortable: true,
-      renderCell: (params) => {
-        return params.value ? new Date(params.value).toLocaleDateString() : '';
-      },
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 0.8,
-      minWidth: 120,
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
       sortable: false,
       filterable: false,
-      renderCell: renderActions,
+      renderCell: (params) => {
+        return (
+          <div style={{ display: "flex", gap: "8px" }}>
+            <ModeEditIcon
+              sx={{
+                color: "blue",
+                cursor: "pointer",
+                "&:hover": {
+                  color: "lightblue",
+                },
+              }}
+              onClick={() => handleUpdateOpen(params.row)}
+            />
+            <DeleteIcon
+              sx={{
+                color: "red",
+                cursor: "pointer",
+                "&:hover": {
+                  color: "darkred",
+                },
+              }}
+              onClick={() => handleOpen(params.row.id)}
+            />
+          </div>
+        );
+      },
     },
   ];
 
   return (
-    <MainDashboard title="Categories">
-      <Box sx={{ width: '100%' }}>
-        {/* Header with title and add button */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 3,
+    <>
+      <ToastContainer />
+      {categories.categories.length === 0 ? (
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "50px",
+            marginBottom: "50px",
           }}
         >
-          <Typography variant="h4" component="h1">
-            Category Management
-          </Typography>
-          <NavLink to="/master-data/categories/add" style={{ textDecoration: 'none' }}>
-            <Button variant="contained" startIcon={<AddIcon />} size="large">
-              New Category
-            </Button>
-          </NavLink>
-        </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* Data Grid */}
-        <Box sx={{ width: '100%', height: 600 }}>
-          <DataGrid
-            rows={categories?.categories || []}
+          {t("No Data found")}
+        </div>
+      ) : (
+        <>
+          <div>
+            <Model
+              open={open}
+              handleClose={handleClose}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={loading}
+              handleSubmit={handleConfirm}
+            >
+              <Typography variant="h6" component="h2">
+                Are you sure
+              </Typography>
+              <Typography sx={{ mt: 2 }}>this action cannot be undo</Typography>
+            </Model>
+            <Model
+              open={updateOpen}
+              handleClose={handleCloseUpdate}
+              submit="update"
+              cancel="cancel"
+              loading={loading}
+              disabled={disableUpdate === selectedItem.categoryName}
+              handleSubmit={handleUpdateSubmit}
+            >
+              <Typography variant="h6" mb={2}>
+                update category
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                label="categoryName"
+                name="categoryName"
+                value={selectedItem.categoryName}
+                onChange={handleUpdateChanges}
+              />
+            </Model>
+          </div>
+          <Datagrid
+            rows={categories?.categories}
             columns={columns}
-            getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
-            initialState={{
-              pagination: { paginationModel: { pageSize: categories?.limitPerPage || 10 } },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            onPaginationModelChange={handlePaginationChange}
-            disableColumnResize
-            rowCount={categories.totalRows || 0}
-            paginationMode="server"
-            pagination
-            page={categories.currentPage - 1 || 0}
-            pageSize={categories.limitPerPage || 10}
-            loading={loading}
-            density="compact"
+            limitPerPage={categories?.limitPerPage}
+            loading={categories?.loading}
+            totalRows={categories?.totalRows}
+            currentPage={categories?.currentPage}
+            stateChanged={stateChanged}
           />
-        </Box>
+        </>
+      )}
+    </>
+  );
+};
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Are you sure you want to delete the category "{categoryToDelete?.name}"? This action cannot be undone.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+const Category = () => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const selectedDirection = useSelector(selectDirection);
 
-        {/* Success/Error Snackbar */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-        />
-      </Box>
+  return (
+    <MainDashboard title={t("Category")}>
+      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+        <Grid
+          xs={12}
+          lg={9}
+          sx={{
+            width: "100%",
+            textAlign: selectedDirection === "rtl" ? "left" : "right",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="inherit"
+            sx={(theme) => ({
+              backgroundColor:
+                theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+              color:
+                theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+            })}
+            onClick={() => setOpen(true)}
+          >
+            {t("newCategory")}
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
+        <Grid xs={12} lg={9} sx={{ width: "100%" }}>
+          <CategoryList />
+          <CreateCategory open={open} setOpen={setOpen} />
+        </Grid>
+      </Grid>
     </MainDashboard>
   );
 };
 
-export default Categories;
+export default Category;

@@ -16,34 +16,42 @@ import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
 import { ToastContainer, toast } from "react-toastify";
 import { selectStocks } from "../../store/selectors/stock.selector";
+import moment from "moment/moment";
+import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import { fetchNextInvoiceAsync } from "../../store/slices/purchase.slice";
+import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
+import { fetchPayableAsync } from "../../store/slices/payable.slice";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
-const paymentMethods = ["cash", "bankTransfer", "credit", "cashAndCredit"];
+const paymentMethods = ["cash", "credit", "cashAndCredit"];
 
 const PurchaseOfGoods = ({ statusId }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const journals = useSelector(selectJournals);
-  const stocks = useSelector(selectStocks).stocks;
+  const nextInvoiceNo = useSelector(selectNextInvoiceNo);
+  const stocks = useSelector(selectStocks).stockNames;
   const products = useSelector(selectProducts).products;
+  const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);
-
   const [journalEntry, setJournalEntry] = useState({
     productId: "",
     expiryDate: "",
     quantity: "",
-    unitType: "",
+    unitType: "kg",
     unitPerPackage: "",
     unitPrice: "",
     totalPrice: "",
-    paymentMethod: "",
+    paymentMethod: "cash",
     invoiceNo: "",
-    stockName: "",
     stockId: "",
     discount: 0,
-    purchaseDate: "",
+    givingCash: 0,
+    remainingCash: 0,
+    supplierId: "",
+    purchaseDate: moment().format("YYYY-MM-DD"),
   });
 
   const clearState = () => {
@@ -57,28 +65,76 @@ const PurchaseOfGoods = ({ statusId }) => {
       totalPrice: "",
       paymentMethod: "",
       invoiceNo: "",
-      stockName: "",
       stockId: "",
       discount: 0,
-      purchaseDate: "",
+      givingCash: 0,
+      remainingCash: 0,
+      purchaseDate: moment().format("YYYY-MM-DD"),
+    });
+  };
+
+  // handle input changes
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
+
+    setJournalEntry((prevState) => {
+      let updatedEntry = { ...prevState, [name]: value };
+      const {
+        discount,
+        givingCash,
+        quantity,
+        unitPerPackage,
+        unitPrice,
+        unitType,
+        paymentMethod,
+      } = updatedEntry;
+
+      // Set unitPerPackage = 1 for specific unit types
+      if (["kg", "piece", "liter"].includes(unitType)) {
+        updatedEntry.unitPerPackage = 1;
+      }
+
+      const totalPrice = quantity * unitPerPackage * unitPrice - discount;
+      updatedEntry.totalPrice = totalPrice;
+
+      if (paymentMethod === "credit") {
+        updatedEntry.remainingCash = totalPrice;
+        updatedEntry.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedEntry.remainingCash = 0;
+        updatedEntry.givingCash = totalPrice;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedEntry.remainingCash = totalPrice - givingCash;
+      }
+
+      return updatedEntry;
     });
   };
 
   const journalEntryHandler = async (event) => {
     event.preventDefault(event);
 
+    const cleanedEntry = { ...journalEntry };
+
+    if (!cleanedEntry.expiryDate) delete cleanedEntry.expiryDate;
+    if (!cleanedEntry.purchaseDate) delete cleanedEntry.purchaseDate;
+    if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+
     try {
       await axios.post(
-        `http://localhost:5000/api/journalEntries/purchase?statusId=${statusId}`,
-        journalEntry,
+        `http://localhost:5000/api/purchases?transactionTypeId=${statusId}`,
+        cleanedEntry,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
+      dispatch(fetchNextInvoiceAsync());
+      dispatch(fetchPayableAsync());
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
-      clearState();
+      toast.success("data added");
+      // clearState();
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??
@@ -91,24 +147,28 @@ const PurchaseOfGoods = ({ statusId }) => {
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid xs={12} sm={12}>
+        <Grid size={6} xs={12} sm={12}>
           <Autocomplete
             disablePortal
             disableClearable
             options={products}
             getOptionLabel={(option) => option.name}
-            sx={{ width: 300 }}
             renderInput={(params) => (
-              <TextField {...params} label={t("Products")} variant="outlined" />
+              <TextField
+                {...params}
+                label={t("Products")}
+                variant="outlined"
+                required
+              />
             )}
             onChange={(event, value) => {
               if (value) {
-                setJournalEntry({ ...journalEntry, productId: value.id });
+                setJournalEntry({ ...journalEntry, productId: value._id });
               }
             }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("expiryDate")}
@@ -118,16 +178,11 @@ const PurchaseOfGoods = ({ statusId }) => {
               shrink: true,
             }}
             value={journalEntry.expiryDate}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                expiryDate: event.target.value,
-              })
-            }
+            onChange={inputHandler}
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("purchaseDate")}
@@ -137,95 +192,68 @@ const PurchaseOfGoods = ({ statusId }) => {
               shrink: true,
             }}
             value={journalEntry.purchaseDate}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                purchaseDate: event.target.value,
-              })
-            }
+            onChange={inputHandler}
             sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
+            required
             label={t("Quantity")}
             name="quantity"
             type="number"
             value={journalEntry.quantity}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                quantity: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
+            name="unitType"
             label={t("unitType")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.unitType}
-            onChange={(event) => {
-              setJournalEntry({
-                ...journalEntry,
-                unitType: event.target.value,
-              });
-            }}
+            onChange={inputHandler}
           >
             {unitTypes.map((item, index) => (
               <MenuItem key={index} value={item}>
-                {item}
+                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
+            required
+            disabled={
+              journalEntry.unitType === "kg" ||
+              journalEntry.unitType === "piece" ||
+              journalEntry.unitType === "liter"
+            }
             label={t("unitPerPackage")}
             name="unitPerPackage"
             type="number"
             value={journalEntry.unitPerPackage}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                unitPerPackage: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
+            required
             label={t("unitPrice")}
             name="unitPrice"
             type="number"
             value={journalEntry.unitPrice}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                unitPrice: event.target.value,
-                totalPrice:
-                  journalEntry.unitPerPackage *
-                  event.target.value *
-                  journalEntry.quantity,
-              })
-            }
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             disabled
@@ -235,68 +263,108 @@ const PurchaseOfGoods = ({ statusId }) => {
             value={journalEntry.totalPrice}
           />
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
+            name="paymentMethod"
             label={t("paymentMethod")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.paymentMethod}
-            onChange={(event) => {
-              setJournalEntry({
-                ...journalEntry,
-                paymentMethod: event.target.value,
-              });
-            }}
+            onChange={inputHandler}
           >
             {paymentMethods.map((item, index) => (
               <MenuItem key={index} value={item}>
-                {item}
+                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            disabled={
+              journalEntry.paymentMethod === "cash" ||
+              journalEntry.paymentMethod === "credit"
+            }
+            label={t("givingCash")}
+            name="givingCash"
+            type="number"
+            value={journalEntry.givingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("remainingCash")}
+            name="remainingCash"
+            type="number"
+            value={journalEntry.remainingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("discount")}
+            name="discount"
+            type="number"
+            value={journalEntry.discount}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
             label={t("invoiceNo")}
             name="invoiceNo"
             type="number"
-            value={journalEntry.invoiceNo}
-            onChange={(event) =>
-              setJournalEntry({
-                ...journalEntry,
-                invoiceNo: event.target.value,
-              })
-            }
+            value={nextInvoiceNo}
+            disabled
           />
         </Grid>
 
-        <Grid xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             select
             fullWidth
+            required
+            name="stockId"
             label={t("stockName")}
             style={{ minWidth: "200px" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.stockId} // بدل شو
-            onChange={(event) => {
-              const selectedId = event.target.value;
-              const selectedType = stocks.find(
-                (item) => item.id === selectedId
-              );
-
-              setJournalEntry({
-                ...journalEntry,
-                stockName: selectedType?.name || "",
-                stockId: selectedId,
-              });
-            }}
+            value={journalEntry.stockId}
+            onChange={inputHandler}
           >
             {stocks.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.name}
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.engName}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={12} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="supplierId"
+            label={t("supplier")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.supplierId}
+            onChange={inputHandler}
+          >
+            {suppliers.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
+                {t(`${item.phone}`)}
               </MenuItem>
             ))}
           </TextField>

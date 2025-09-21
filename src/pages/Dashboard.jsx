@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import MainGrid from "../components/MainGrid";
 import MainDashboard from "../theme/main/MainDashboard";
 

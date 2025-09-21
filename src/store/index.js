@@ -12,6 +12,13 @@ import categorySlice from "./reducers/category.reducer";
 import companySlice from "./reducers/company.reducer";
 import unitReducer from "./reducers/unit.slice";
 import investmentReducer from "./reducers/investment.reducer";
+import expensesReducer from "./reducers/expenses.reducer";
+import businessEntityReducer from "./reducers/businessEntity.reducer";
+import saleReducer from "./reducers/sale.reducer";
+import payable from "./reducers/payable.reducer";
+import receivable from "./reducers/receivable.reducer";
+import incomes from "./reducers/incomes.reducer";
+import dashboardData from "./reducers/dashboard.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -28,5 +35,12 @@ export const store = configureStore({
     companies: companySlice,
     units: unitReducer,
     investments: investmentReducer,
+    expenses: expensesReducer,
+    businessEntity: businessEntityReducer,
+    sales: saleReducer,
+    payable: payable,
+    receivable: receivable,
+    incomes: incomes,
+    dashboardData: dashboardData,
   },
 });

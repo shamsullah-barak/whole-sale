@@ -2,21 +2,19 @@ import React, { useState } from "react";
 import MainDashboard from "../../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectPartners } from "../../../store/selectors/investment.selector";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { Modal, Typography, TextField, Stack } from "@mui/material";
+import { Typography, TextField, Stack } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../../store/selectors/app.selector";
 import COLORS from "../../../constant/colors";
-import { fetchPartnersAsync } from "../../../store/slices/investment.slice";
-import { BarChart, BarSeries, ChartContainer, Axis } from "@mui/x-charts";
+import { BarChart } from "@mui/x-charts";
+import Model from "../../../components/Model";
+
+const types = ["deposit", "withdraw"];
 
 const dataset = [
   {
@@ -135,14 +133,10 @@ function BasicLineChart() {
   );
 }
 
-const types = ["deposit", "withdraw"];
-
 const AddNewInvest = () => {
   const { t } = useTranslation();
   const selectedDirection = useSelector(selectDirection);
   const partners = useSelector(selectPartners);
-
-  const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
   const [newInvest, setNewInvest] = useState({
@@ -155,118 +149,126 @@ const AddNewInvest = () => {
   const handleNewInvest = async (event) => {
     event.preventDefault(event);
 
-    try {
-      setLoading(true);
-      await axios.post(
-        `http://localhost:5000/api/investments/invests`,
-        newInvest,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setOpen(false);
-      setLoading(false);
-      toast.success("data added");
-    } catch (error) {
-      console.log(error);
-      setOpen(false);
-      setLoading(false);
-      setNewInvest({ amount: "", investorId: "", type: "" });
-      toast.error(
-        error?.response.data.message ?? "something went wrong! please try again"
-      );
+    if (newInvest.type === "deposit") {
+      try {
+        setLoading(true);
+        await axios.post(
+          `http://localhost:5000/api/investments/deposit`,
+          newInvest,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setOpen(false);
+        setLoading(false);
+        toast.success("data added");
+      } catch (error) {
+        setOpen(false);
+        setLoading(false);
+        setNewInvest({ amount: "", investorId: "", type: "" });
+        toast.error(
+          error?.response.data.message ??
+            "something went wrong! please try again"
+        );
+      }
+    } else if (newInvest.type === "withdraw") {
+      try {
+        setLoading(true);
+        await axios.post(
+          `http://localhost:5000/api/investments/withdraw`,
+          newInvest,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setOpen(false);
+        setLoading(false);
+        toast.success("data added");
+      } catch (error) {
+        setOpen(false);
+        setLoading(false);
+        setNewInvest({ amount: "", investorId: "", type: "" });
+        toast.error(
+          error?.response.data.message ??
+            "something went wrong! please try again"
+        );
+      }
     }
+  };
+
+  const handleCLose = () => {
+    setOpen(false);
   };
 
   return (
     <>
       <ToastContainer />
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Add new invest
-          </Typography>
 
-          <Stack spacing={2}>
-            <TextField
-              label="amount"
-              name="amount"
-              value={newInvest.amount}
-              onChange={(event) =>
-                setNewInvest({ ...newInvest, amount: event.target.value })
-              }
-              fullWidth
-              size="small"
-              type="number"
-            />
-            <TextField
-              select
-              fullWidth
-              label={t("type")}
-              name="type"
-              value={newInvest.type}
-              onChange={(event) =>
-                setNewInvest({ ...newInvest, type: event.target.value })
-              }
-            >
-              {types.map((item) => (
-                <MenuItem key={item} value={item} dir={selectedDirection}>
-                  {t(`${item}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              select
-              fullWidth
-              label={t("investorId")}
-              name="investorId"
-              value={newInvest.investorId}
-              onChange={(event) =>
-                setNewInvest({ ...newInvest, investorId: event.target.value })
-              }
-            >
-              {partners.map((item) => (
-                <MenuItem key={item.id} value={item.id} dir={selectedDirection}>
-                  {t(`${item.name}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                onClick={() => setOpen(false)}
-                variant="outlined"
-                color="secondary"
-              >
-                لغوه
-              </Button>
-              <Button
-                onClick={handleNewInvest}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                loading={loading}
-                loadingPosition="start"
-              >
-                ثبت
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Modal>
+      <Model
+        open={open}
+        handleClose={handleCLose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleNewInvest}
+      >
+        <Typography variant="h6" mb={2}>
+          Add new invest
+        </Typography>
+
+        <Stack spacing={2}>
+          <TextField
+            select
+            fullWidth
+            label={t("type")}
+            name="type"
+            value={newInvest.type}
+            onChange={(event) =>
+              setNewInvest({ ...newInvest, type: event.target.value })
+            }
+          >
+            {types.map((item) => (
+              <MenuItem key={item} value={item} dir={selectedDirection}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="amount"
+            name="amount"
+            value={newInvest.amount}
+            onChange={(event) =>
+              setNewInvest({ ...newInvest, amount: event.target.value })
+            }
+            fullWidth
+            size="small"
+            type="number"
+          />
+
+          <TextField
+            select
+            fullWidth
+            label={t("investorId")}
+            name="investorId"
+            value={newInvest.investorId}
+            onChange={(event) =>
+              setNewInvest({ ...newInvest, investorId: event.target.value })
+            }
+          >
+            {partners.map((item) => (
+              <MenuItem key={item.id} value={item._id} dir={selectedDirection}>
+                {t(`${item.name}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+      </Model>
+
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -304,9 +306,6 @@ const AddNewInvest = () => {
 
 const AddInvest = () => {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const selectedDirection = useSelector(selectDirection);
-
   return (
     <MainDashboard title={t("AddInvest")}>
       <AddNewInvest />

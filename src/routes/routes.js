@@ -135,16 +135,16 @@ export default function Router() {
       element: <Settings />,
     },
     {
-      path: "/investments",
-      element: <Investments />,
+      path: "/master-data/units",
+      element: <Units />,
     },
     {
-      path: "/partners",
-      element: <Partners />,
+      path: "/master-data/units/add",
+      element: <CreateUnit />,
     },
     {
-      path: "/addInvest",
-      element: <AddInvest />,
+      path: "/master-data/units/edit/:unitId",
+      element: <EditUnit />,
     },
     {
       path: "/expenses",

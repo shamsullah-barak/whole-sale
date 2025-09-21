@@ -17,7 +17,7 @@ const columns = [
     },
   },
   {
-    field: "account",
+    field: "ledger.name",
     headerName: "Account",
     headerAlign: "center",
     align: "center",

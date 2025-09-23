@@ -171,6 +171,10 @@ export default function Router() {
       element: <AddInvest />,
     },
     {
+      path: "/companies",
+      element: <Companies />,
+    },
+    {
       path: "404",
       element: <Page404 />,
     },

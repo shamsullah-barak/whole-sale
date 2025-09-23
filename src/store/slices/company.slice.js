@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   fetchCompanies,
   createCompany,
@@ -6,10 +6,47 @@ import {
   deleteCompany,
   getCompanyById,
   getAllCompanies,
-} from '../actions/company.actions';
+} from "../actions/company.actions";
 
 const initialState = {
-  companies: [],
+  companies: [
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+    {
+      _id: "68ce3969f014952a405f338d",
+      name: "Company 1",
+    },
+  ],
   allCompanies: [], // For dropdowns
   currentPage: 1,
   totalPages: 1,
@@ -23,67 +60,91 @@ const initialState = {
 
 // Async thunks
 export const fetchCompaniesAsync = createAsyncThunk(
-  'companies/fetchCompanies',
+  "companies/fetchCompanies",
   async ({ page, limit, filters = {} }, { rejectWithValue }) => {
     try {
       const companies = await fetchCompanies(page, limit, filters);
       return companies;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch companies');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch companies"
+      );
     }
   }
 );
 
-export const createCompanyAsync = createAsyncThunk('companies/createCompany', async (companyData, { rejectWithValue }) => {
-  try {
-    const company = await createCompany(companyData);
-    return company;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Failed to create company');
+export const createCompanyAsync = createAsyncThunk(
+  "companies/createCompany",
+  async (companyData, { rejectWithValue }) => {
+    try {
+      const company = await createCompany(companyData);
+      return company;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create company"
+      );
+    }
   }
-});
+);
 
 export const updateCompanyAsync = createAsyncThunk(
-  'companies/updateCompany',
+  "companies/updateCompany",
   async ({ companyId, companyData }, { rejectWithValue }) => {
     try {
       const company = await updateCompany(companyId, companyData);
       return company;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update company');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update company"
+      );
     }
   }
 );
 
-export const deleteCompanyAsync = createAsyncThunk('companies/deleteCompany', async (companyId, { rejectWithValue }) => {
-  try {
-    await deleteCompany(companyId);
-    return companyId;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Failed to delete company');
+export const deleteCompanyAsync = createAsyncThunk(
+  "companies/deleteCompany",
+  async (companyId, { rejectWithValue }) => {
+    try {
+      await deleteCompany(companyId);
+      return companyId;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete company"
+      );
+    }
   }
-});
+);
 
-export const getCompanyByIdAsync = createAsyncThunk('companies/getCompanyById', async (companyId, { rejectWithValue }) => {
-  try {
-    const company = await getCompanyById(companyId);
-    return company;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Failed to fetch company');
+export const getCompanyByIdAsync = createAsyncThunk(
+  "companies/getCompanyById",
+  async (companyId, { rejectWithValue }) => {
+    try {
+      const company = await getCompanyById(companyId);
+      return company;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch company"
+      );
+    }
   }
-});
+);
 
-export const getAllCompaniesAsync = createAsyncThunk('companies/getAllCompanies', async (_, { rejectWithValue }) => {
-  try {
-    const companies = await getAllCompanies();
-    return companies;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Failed to fetch all companies');
+export const getAllCompaniesAsync = createAsyncThunk(
+  "companies/getAllCompanies",
+  async (_, { rejectWithValue }) => {
+    try {
+      const companies = await getAllCompanies();
+      return companies;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch all companies"
+      );
+    }
   }
-});
+);
 
 export const companySlice = createSlice({
-  name: 'companies',
+  name: "companies",
   initialState,
   reducers: {
     setFilters: (state, action) => {
@@ -143,7 +204,9 @@ export const companySlice = createSlice({
       .addCase(updateCompanyAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        const index = state.companies.findIndex((c) => c.id === action.payload.id);
+        const index = state.companies.findIndex(
+          (c) => c.id === action.payload.id
+        );
         if (index !== -1) {
           state.companies[index] = action.payload;
         }
@@ -161,7 +224,9 @@ export const companySlice = createSlice({
       .addCase(deleteCompanyAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.companies = state.companies.filter((c) => c.id !== action.payload);
+        state.companies = state.companies.filter(
+          (c) => c.id !== action.payload
+        );
         state.totalRows -= 1;
       })
       // Get company by ID
@@ -180,11 +245,13 @@ export const companySlice = createSlice({
       })
       // Get all companies
       .addCase(getAllCompaniesAsync.fulfilled, (state, action) => {
-        state.allCompanies = action.payload.results || action.payload.data || [];
+        state.allCompanies =
+          action.payload.results || action.payload.data || [];
       });
   },
 });
 
-export const { setFilters, clearError, clearSelectedCompany } = companySlice.actions;
+export const { setFilters, clearError, clearSelectedCompany } =
+  companySlice.actions;
 
 export default companySlice.reducer;

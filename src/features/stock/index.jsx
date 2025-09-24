@@ -15,7 +15,10 @@ import { selectStocks } from "../../store/selectors/stock.selector";
 import Model from "../../components/Model";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { fetchStocksAsync } from "../../store/slices/stock.slice";
+import {
+  addStockToList,
+  fetchStocksAsync,
+} from "../../store/slices/stock.slice";
 // import StatCard from "../../components/StatCard";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -185,7 +188,12 @@ const CreateStock = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [stock, setStock] = useState({ stockName: "", location: "" });
+  const [stock, setStock] = useState({
+    engName: "",
+    psName: "",
+    drName: "",
+    location: "",
+  });
 
   const selectedDirection = useSelector(selectDirection);
   const dispatch = useDispatch();
@@ -200,19 +208,18 @@ const CreateStock = () => {
 
     setLoading(true);
 
-    const data = { name: stock.stockName, location: stock.location };
-
     try {
       const response = await axios.post(
         "http://localhost:5000/api/stocks",
-        data,
+        stock,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      dispatch(fetchStocksAsync());
+      // dispatch(fetchStocksAsync());
+      dispatch(addStockToList({ stock: response.data }));
       toast.success("stock create");
       setLoading(false);
     } catch (error) {
@@ -268,14 +275,42 @@ const CreateStock = () => {
         <Stack spacing={2}>
           <TextField
             fullWidth
-            label={t("stockName")}
-            name="stockName"
+            label={t("engName")}
+            name="engName"
             type="text"
-            value={stock.stockName}
+            value={stock.engName}
             onChange={(event) =>
               setStock({
                 ...stock,
-                stockName: event.target.value,
+                engName: event.target.value,
+              })
+            }
+          />
+
+          <TextField
+            fullWidth
+            label={t("psName")}
+            name="psName"
+            type="text"
+            value={stock.psName}
+            onChange={(event) =>
+              setStock({
+                ...stock,
+                psName: event.target.value,
+              })
+            }
+          />
+
+          <TextField
+            fullWidth
+            label={t("drName")}
+            name="drName"
+            type="text"
+            value={stock.drName}
+            onChange={(event) =>
+              setStock({
+                ...stock,
+                drName: event.target.value,
               })
             }
           />

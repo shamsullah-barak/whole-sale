@@ -47,4 +47,4 @@ export const journalSlice = createSlice({
   },
 });
 
-export const { addItemToJournals, unSetSelectedAccount } = journalSlice.actions;
+export const { addItemToJournals } = journalSlice.actions;

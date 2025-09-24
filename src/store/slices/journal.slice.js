@@ -23,14 +23,13 @@ export const journalSlice = createSlice({
   name: "journals",
   initialState,
 
-  // reducers: {
-  //   setSelectedAccount: (state, action) => {
-  //     state.selectedAccount = action.payload.journal;
-  //   },
-  //   unSetSelectedAccount: (state, action) => {
-  //     state.selectedAccount = null;
-  //   },
-  // },
+  reducers: {
+    addItemToJournals: (state, action) => {
+      const arr = [...state.journals];
+      arr.push(action.payload.item);
+      state.journals = [...arr];
+    },
+  },
 
   extraReducers: (builder) => {
     builder
@@ -48,5 +47,4 @@ export const journalSlice = createSlice({
   },
 });
 
-export const { setSelectedAccount, unSetSelectedAccount } =
-  journalSlice.actions;
+export const { addItemToJournals, unSetSelectedAccount } = journalSlice.actions;

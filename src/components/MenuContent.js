@@ -46,7 +46,7 @@ const mainListItems = [
   { text: "Ledgers", icon: <ReceiptIcon />, path: "/ledgers" },
   { text: "Invoices", icon: <RequestQuoteIcon />, path: "/invoices" },
   {
-    text: "Products",
+    text: "products",
     icon: <ProductionQuantityLimitsIcon />,
     path: "/products",
   },
@@ -62,12 +62,12 @@ const mainListItems = [
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
-  { text: "Payable", icon: <PaymentsIcon />, path: "/payable" },
-  { text: "Receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
+  { text: "payable", icon: <PaymentsIcon />, path: "/payable" },
+  { text: "receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
   { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
-  { text: "Category", icon: <EqualizerIcon />, path: "/categories" },
-  { text: "Company", icon: <EqualizerIcon />, path: "/companies" },
+  { text: "category", icon: <EqualizerIcon />, path: "/categories" },
+  { text: "company", icon: <EqualizerIcon />, path: "/companies" },
 ];
 
 const secondaryListItems = [

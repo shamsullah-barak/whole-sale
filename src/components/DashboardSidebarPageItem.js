@@ -18,6 +18,7 @@ import { Link } from "react-router";
 import { MINI_DRAWER_WIDTH } from "../constant/pageSize";
 import DashboardSidebarContext from "../context/DashboardSidebarContext";
 import COLORS from "../constant/colors";
+import { t } from "i18next";
 // import { MINI_DRAWER_WIDTH } from '../constants';
 
 function DashboardSidebarPageItem({
@@ -205,7 +206,7 @@ function DashboardSidebarPageItem({
           ) : null}
           {!mini ? (
             <ListItemText
-              primary={title}
+              primary={t(`${title}`)}
               sx={{
                 whiteSpace: "nowrap",
                 zIndex: 1,

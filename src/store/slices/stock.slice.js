@@ -33,6 +33,13 @@ export const stockSlice = createSlice({
   name: "stocks",
   initialState,
 
+  reducers: {
+    addStockToList: (state, action) => {
+      const arr = [...state.stocks, action.payload.stock];
+      state.stocks = [...arr];
+    },
+  },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchStocksAsync.pending, (state) => {
@@ -41,10 +48,6 @@ export const stockSlice = createSlice({
       .addCase(fetchStocksAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.stocks = action.payload;
-        // state.currentPage = action.payload.page;
-        // state.limitPerPage = action.payload.limit;
-        // state.totalPages = action.payload.totalPages;
-        // state.totalRows = action.payload.totalResults;
       });
 
     builder
@@ -54,10 +57,8 @@ export const stockSlice = createSlice({
       .addCase(fetchStockNamesAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.stockNames = action.payload;
-        // state.currentPage = action.payload.page;
-        // state.limitPerPage = action.payload.limit;
-        // state.totalPages = action.payload.totalPages;
-        // state.totalRows = action.payload.totalResults;
       });
   },
 });
+
+export const { addStockToList } = stockSlice.actions;

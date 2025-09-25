@@ -20,7 +20,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import { NavLink, useLocation } from "react-router-dom";
+import { matchPath, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import COLORS from "../constant/colors";
 import { useSelector } from "react-redux";
@@ -31,12 +31,14 @@ import { unstable_useTreeItem2 as useTreeItem2 } from "@mui/x-tree-view/useTreeI
 import StorageIcon from "@mui/icons-material/Storage";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import PersonIcon from "@mui/icons-material/Person";
 
 import {
   TreeItem2Content,
   TreeItem2IconContainer,
   TreeItem2Label,
 } from "@mui/x-tree-view/TreeItem2";
+import DashboardSidebarPageItem from "./DashboardSidebarPageItem";
 
 const mainListItems = [
   { text: "Dashboard", icon: <EqualizerIcon />, path: "/dashboard" },
@@ -222,38 +224,16 @@ export default function MenuContent() {
                 </>
               ) : (
                 <>
-                  <ListItem
-                    key={index}
-                    disablePadding
-                    component={NavLink}
-                    to={item.path}
-                    style={{ textDecoration: "none" }}
-                    sx={(theme) => ({
-                      display: "block",
-                      borderRadius: "5px",
-                      color: theme.palette.mode === "dark" ? "#fff" : "#000",
-                      textAlign: "right",
-                      "&.active": {
-                        color: COLORS.WHITE,
-                        bgcolor:
-                          theme.palette.mode === "dark"
-                            ? theme.palette.action.selected
-                            : COLORS.PURPLE,
-                        fontWeight: theme.typography.fontWeightBold,
-                      },
-                    })}
-                  >
-                    <ListItemButton selected={pathname === item.path}>
-                      <ListItemIcon>{item.icon}</ListItemIcon>
-                      <ListItemText
-                        style={{
-                          textAlign:
-                            selectedDirection === "rtl" ? "right" : "left",
-                        }}
-                        primary={t(`${item.text}`)}
-                      />
-                    </ListItemButton>
-                  </ListItem>
+                  <DashboardSidebarPageItem
+                    id={item.path}
+                    title={item.text}
+                    icon={item.icon}
+                    href={item.path}
+                    selected={
+                      !!matchPath(`${item.path}/*`, pathname) ||
+                      pathname === "/"
+                    }
+                  />
                 </>
               )}
             </React.Fragment>

@@ -12,6 +12,7 @@ import {
   Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  Refresh,
 } from "@mui/icons-material";
 import formatDate from "../../utils/moment";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,6 +31,8 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 
 function CustomToolbar() {
   const [showQuick, setShowQuick] = useState(false);
+  const dispatch = useDispatch();
+  const journals = useSelector(selectJournals);
 
   return (
     <GridToolbarContainer
@@ -51,6 +54,14 @@ function CustomToolbar() {
           </Box>
         )}
 
+        <IconButton
+          size="small"
+          onClick={() => {
+            dispatch(fetchJournalsAsync({ page: 1, limit: 10 }));
+          }}
+        >
+          <Refresh />
+        </IconButton>
         <IconButton
           size="small"
           onClick={() => setShowQuick((s) => !s)}
@@ -231,7 +242,7 @@ export default function LedgerGrid() {
       },
     },
     {
-      field: "ledger.name",
+      field: "accountName",
       headerName: "Account",
       headerAlign: "center",
       align: "center",
@@ -302,7 +313,6 @@ export default function LedgerGrid() {
         }}
         columns={columns}
         getRowId={(row) => row._id}
-        // onRowClick={handleRowClick}
         getRowClassName={(params) =>
           params.indexRelativeToCurrentPage % 2 === 0 ? "odd-row" : "even-row"
         }
@@ -321,33 +331,33 @@ export default function LedgerGrid() {
         page={journals?.currentPage}
         pageSize={journals?.limitPerPage}
         loading={journals?.loading}
-        density="compact"
-        slotProps={{
-          filterPanel: {
-            filterFormProps: {
-              logicOperatorInputProps: {
-                variant: "outlined",
-                size: "small",
-              },
-              columnInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              operatorInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              valueInputProps: {
-                InputComponentProps: {
-                  variant: "outlined",
-                  size: "small",
-                },
-              },
-            },
-          },
-        }}
+        density="standard"
+        // slotProps={{
+        //   filterPanel: {
+        //     filterFormProps: {
+        //       logicOperatorInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //       },
+        //       columnInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //         sx: { mt: "auto" },
+        //       },
+        //       operatorInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //         sx: { mt: "auto" },
+        //       },
+        //       valueInputProps: {
+        //         InputComponentProps: {
+        //           variant: "outlined",
+        //           size: "small",
+        //         },
+        //       },
+        //     },
+        //   },
+        // }}
       />
     </>
   );

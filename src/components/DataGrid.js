@@ -50,33 +50,33 @@ const Datagrid = ({
         page={currentPage}
         pageSize={limitPerPage}
         loading={loading}
-        density="compact"
-        slotProps={{
-          filterPanel: {
-            filterFormProps: {
-              logicOperatorInputProps: {
-                variant: "outlined",
-                size: "small",
-              },
-              columnInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              operatorInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              valueInputProps: {
-                InputComponentProps: {
-                  variant: "outlined",
-                  size: "small",
-                },
-              },
-            },
-          },
-        }}
+        density="standard"
+        // slotProps={{
+        //   filterPanel: {
+        //     filterFormProps: {
+        //       logicOperatorInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //       },
+        //       columnInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //         sx: { mt: "auto" },
+        //       },
+        //       operatorInputProps: {
+        //         variant: "outlined",
+        //         size: "small",
+        //         sx: { mt: "auto" },
+        //       },
+        //       valueInputProps: {
+        //         InputComponentProps: {
+        //           variant: "outlined",
+        //           size: "small",
+        //         },
+        //       },
+        //     },
+        //   },
+        // }}
       />
     </>
   );

@@ -20,21 +20,21 @@ function AppTheme(props) {
       ? {}
       : createTheme({
           // For more details about CSS variables configuration, see https://mui.com/material-ui/customization/css-theme-variables/configuration/
-          cssVariables: {
-            colorSchemeSelector: "data-mui-color-scheme",
-            cssVarPrefix: "template",
-          },
+          // cssVariables: {
+          //   colorSchemeSelector: "data-mui-color-scheme",
+          //   cssVarPrefix: "template",
+          // },
           colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
-          shadows,
-          shape,
-          components: {
-            ...inputsCustomizations,
-            ...dataDisplayCustomizations,
-            ...feedbackCustomizations,
-            ...navigationCustomizations,
-            ...surfacesCustomizations,
-            ...themeComponents,
-          },
+          // shadows,
+          // shape,
+          // components: {
+          //   ...inputsCustomizations,
+          //   ...dataDisplayCustomizations,
+          //   ...feedbackCustomizations,
+          //   ...navigationCustomizations,
+          //   ...surfacesCustomizations,
+          //   ...themeComponents,
+          // },
 
           // fonts
           typography: {

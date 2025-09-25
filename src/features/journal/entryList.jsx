@@ -32,7 +32,6 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 function CustomToolbar() {
   const [showQuick, setShowQuick] = useState(false);
   const dispatch = useDispatch();
-  const journals = useSelector(selectJournals);
 
   return (
     <GridToolbarContainer
@@ -81,6 +80,7 @@ function CustomToolbar() {
 
 function CustomFooter() {
   const [loading, setLoading] = useState(false);
+  const [accountName, setAccountName] = useState("");
 
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -118,10 +118,9 @@ function CustomFooter() {
       );
       setLoading(false);
       toast.success("data updated");
-      console.log({ result });
+      result.data[0].accountName = accountName;
       dispatch(addItemToJournals({ item: result.data[0] }));
     } catch (error) {
-      console.log(error);
       setLoading(false);
       toast.error(
         error?.response?.data?.message ??
@@ -139,14 +138,16 @@ function CustomFooter() {
           gridTemplateColumns: "repeat(6, 1fr)",
           gap: 1,
           p: 1,
+          alignItems: "baseline",
         }}
       >
         <TextField
-          variant="outlined"
+          variant="standard"
           size="small"
           placeholder="Date"
           type="date"
           name="date"
+          label="Date"
           value={formData.date}
           onChange={handleChange}
         />
@@ -154,42 +155,47 @@ function CustomFooter() {
           select
           fullWidth
           required
+          variant="standard"
           name="relatedTo"
           label={t("ledger")}
           value={formData.relatedTo}
           onChange={(event) => {
-            setFormData({ ...formData, relatedTo: event.target.value });
+            setFormData({ ...formData, relatedTo: event.target.value._id });
+            setAccountName(event.target.value.name);
           }}
         >
           {ledgers.map((item, index) => (
-            <MenuItem key={index} value={item._id}>
+            <MenuItem key={index} value={item}>
               {t(`${item.name}`)}
             </MenuItem>
           ))}
         </TextField>
         <TextField
-          variant="outlined"
+          variant="standard"
           size="small"
           placeholder="Debit"
           name="debit"
           type="number"
+          label="Debit"
           value={formData.debit}
           onChange={handleChange}
         />
         <TextField
-          variant="outlined"
+          variant="standard"
           size="small"
           placeholder="Credit"
           name="credit"
           type="number"
+          label="Credit"
           value={formData.credit}
           onChange={handleChange}
         />
         <TextField
-          variant="outlined"
+          variant="standard"
           size="small"
           placeholder="Description"
           name="description"
+          label="Description"
           value={formData.description}
           onChange={handleChange}
         />
@@ -332,32 +338,6 @@ export default function LedgerGrid() {
         pageSize={journals?.limitPerPage}
         loading={journals?.loading}
         density="standard"
-        // slotProps={{
-        //   filterPanel: {
-        //     filterFormProps: {
-        //       logicOperatorInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //       },
-        //       columnInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //         sx: { mt: "auto" },
-        //       },
-        //       operatorInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //         sx: { mt: "auto" },
-        //       },
-        //       valueInputProps: {
-        //         InputComponentProps: {
-        //           variant: "outlined",
-        //           size: "small",
-        //         },
-        //       },
-        //     },
-        //   },
-        // }}
       />
     </>
   );

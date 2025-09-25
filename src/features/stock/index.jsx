@@ -272,63 +272,71 @@ const CreateStock = () => {
           Add new Stock
         </Typography>
 
-        <Stack spacing={2}>
-          <TextField
-            fullWidth
-            label={t("engName")}
-            name="engName"
-            type="text"
-            value={stock.engName}
-            onChange={(event) =>
-              setStock({
-                ...stock,
-                engName: event.target.value,
-              })
-            }
-          />
-
-          <TextField
-            fullWidth
-            label={t("psName")}
-            name="psName"
-            type="text"
-            value={stock.psName}
-            onChange={(event) =>
-              setStock({
-                ...stock,
-                psName: event.target.value,
-              })
-            }
-          />
-
-          <TextField
-            fullWidth
-            label={t("drName")}
-            name="drName"
-            type="text"
-            value={stock.drName}
-            onChange={(event) =>
-              setStock({
-                ...stock,
-                drName: event.target.value,
-              })
-            }
-          />
-
-          <TextField
-            fullWidth
-            label={t("location")}
-            name="location"
-            type="text"
-            value={stock.location}
-            onChange={(event) =>
-              setStock({
-                ...stock,
-                location: event.target.value,
-              })
-            }
-          />
-        </Stack>
+        <Grid xs={12} spacing={2}>
+          <Grid>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <TextField
+                fullWidth
+                label={t("engName")}
+                name="engName"
+                type="text"
+                value={stock.engName}
+                onChange={(event) =>
+                  setStock({
+                    ...stock,
+                    engName: event.target.value,
+                  })
+                }
+                size="small"
+              />
+              <TextField
+                fullWidth
+                label={t("psName")}
+                name="psName"
+                type="text"
+                required
+                size="small"
+                value={stock.psName}
+                onChange={(event) =>
+                  setStock({
+                    ...stock,
+                    psName: event.target.value,
+                  })
+                }
+              />
+              <TextField
+                fullWidth
+                required
+                size="small"
+                label={t("drName")}
+                name="drName"
+                type="text"
+                value={stock.drName}
+                onChange={(event) =>
+                  setStock({
+                    ...stock,
+                    drName: event.target.value,
+                  })
+                }
+              />
+            </Box>
+          </Grid>
+          <Grid container xs={12} spacing={2} mt={2}>
+            <TextField
+              fullWidth
+              label={t("location")}
+              name="location"
+              type="text"
+              value={stock.location}
+              onChange={(event) =>
+                setStock({
+                  ...stock,
+                  location: event.target.value,
+                })
+              }
+            />
+          </Grid>
+        </Grid>
       </Model>
     </>
   );

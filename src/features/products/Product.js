@@ -93,10 +93,10 @@ const CreateProduct = ({ open, setOpen }) => {
           Add new Product
         </Typography>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} mt={2}>
           {/* ================= General Info ================= */}
           <Grid item xs={12}>
-            <Paper sx={{ p: 2, borderRadius: 2 }}>
+            <Grid>
               <Typography variant="subtitle1" gutterBottom>
                 General Information
               </Typography>
@@ -151,17 +151,15 @@ const CreateProduct = ({ open, setOpen }) => {
                   value={product.description}
                   onChange={handleChange}
                   fullWidth
-                  multiline
-                  rows={2}
                   size="small"
                 />
               </Box>
-            </Paper>
+            </Grid>
           </Grid>
 
           {/* ================= Stock Info ================= */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2, borderRadius: 2 }}>
+          <Grid item xs={12} sx={{ width: "100%" }} mt={2}>
+            <Grid>
               <Typography variant="subtitle1" gutterBottom>
                 Stock Information
               </Typography>
@@ -185,12 +183,12 @@ const CreateProduct = ({ open, setOpen }) => {
                   size="small"
                 />
               </Box>
-            </Paper>
+            </Grid>
           </Grid>
 
           {/* ================= Pricing ================= */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2, borderRadius: 2 }}>
+          <Grid xs={12} sx={{ width: "100%" }} mt={2}>
+            <Grid>
               <Typography variant="subtitle1" gutterBottom>
                 Pricing
               </Typography>
@@ -214,12 +212,12 @@ const CreateProduct = ({ open, setOpen }) => {
                   size="small"
                 />
               </Box>
-            </Paper>
+            </Grid>
           </Grid>
         </Grid>
         {/* ================= Relations ================= */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, borderRadius: 2 }}>
+        <Grid xs={12} mt={2}>
+          <Grid>
             <Typography variant="subtitle1" gutterBottom>
               Relations
             </Typography>
@@ -270,7 +268,7 @@ const CreateProduct = ({ open, setOpen }) => {
                 ))}
               </TextField>
             </Box>
-          </Paper>
+          </Grid>
         </Grid>
       </Model>
     </>

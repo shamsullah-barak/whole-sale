@@ -338,6 +338,17 @@ export default function LedgerGrid() {
         pageSize={journals?.limitPerPage}
         loading={journals?.loading}
         density="standard"
+        sx={{
+          borderColor: "divider",
+          "& .MuiDataGrid-columnHeaders": {
+            borderBottom: "1px solid ",
+            borderColor: "divider",
+          },
+          "& .MuiDataGrid-row": {
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          },
+        }}
       />
     </>
   );

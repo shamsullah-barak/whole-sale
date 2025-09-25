@@ -51,6 +51,17 @@ const Datagrid = ({
         pageSize={limitPerPage}
         loading={loading}
         density="standard"
+        sx={{
+          borderColor: "divider",
+          "& .MuiDataGrid-columnHeaders": {
+            borderBottom: "1px solid ",
+            borderColor: "divider",
+          },
+          "& .MuiDataGrid-row": {
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          },
+        }}
         // slotProps={{
         //   filterPanel: {
         //     filterFormProps: {

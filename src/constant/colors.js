@@ -6,6 +6,7 @@ const COLORS = {
   //   PURPLE: "#8F00FF",
   //   PURPLE: "#A020F0",
   PURPLE: "#870AE0",
+  LIGHT_PURPLE: "#BC73EE",
 };
 
 export default COLORS;

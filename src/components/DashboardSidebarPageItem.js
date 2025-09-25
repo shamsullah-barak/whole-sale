@@ -17,6 +17,7 @@ import { Link } from "react-router";
 // import DashboardSidebarContext from "../context/DashboardSidebarContext";
 import { MINI_DRAWER_WIDTH } from "../constant/pageSize";
 import DashboardSidebarContext from "../context/DashboardSidebarContext";
+import COLORS from "../constant/colors";
 // import { MINI_DRAWER_WIDTH } from '../constants';
 
 function DashboardSidebarPageItem({
@@ -114,6 +115,16 @@ function DashboardSidebarPageItem({
           disabled={disabled}
           sx={{
             height: mini ? 50 : "auto",
+            "&.Mui-selected": {
+              backgroundColor: COLORS.LIGHT_PURPLE,
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: COLORS.PURPLE,
+              },
+            },
+            "&.Mui-selected .MuiListItemIcon-root": {
+              color: "#fff",
+            },
           }}
           {...(nestedNavigation && !mini
             ? {

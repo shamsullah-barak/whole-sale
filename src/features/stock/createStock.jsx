@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { NavLink } from "react-router-dom";
 import { Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -100,7 +99,7 @@ const CreateStock = () => {
   const { t } = useTranslation();
   const selectedDirection = useSelector(selectDirection);
   return (
-    <MainDashboard title="Stock > Create">
+    <>
       {/* <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", textAlign: "left" }}>
           <NavLink to="/stocks">
@@ -151,7 +150,7 @@ const CreateStock = () => {
           <CreateStockForm />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

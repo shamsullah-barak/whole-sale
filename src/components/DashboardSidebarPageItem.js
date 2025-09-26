@@ -14,12 +14,11 @@ import Typography from "@mui/material/Typography";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link } from "react-router";
-// import DashboardSidebarContext from "../context/DashboardSidebarContext";
-import { MINI_DRAWER_WIDTH } from "../constant/pageSize";
 import DashboardSidebarContext from "../context/DashboardSidebarContext";
-import COLORS from "../constant/colors";
+import { MINI_DRAWER_WIDTH } from "../constants";
 import { t } from "i18next";
-// import { MINI_DRAWER_WIDTH } from '../constants';
+import { useTheme } from "@mui/material/styles";
+import COLORS from "../constant/colors";
 
 function DashboardSidebarPageItem({
   id,
@@ -33,6 +32,7 @@ function DashboardSidebarPageItem({
   disabled = false,
   nestedNavigation,
 }) {
+  const theme = useTheme();
   const sidebarContext = React.useContext(DashboardSidebarContext);
   if (!sidebarContext) {
     throw new Error("Sidebar context was used without a provider.");
@@ -116,16 +116,20 @@ function DashboardSidebarPageItem({
           disabled={disabled}
           sx={{
             height: mini ? 50 : "auto",
-            "&.Mui-selected": {
-              backgroundColor: COLORS.LIGHT_PURPLE,
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: COLORS.PURPLE,
-              },
-            },
-            "&.Mui-selected .MuiListItemIcon-root": {
-              color: "#fff",
-            },
+            ...(theme.palette.mode === "light"
+              ? {
+                  "&.Mui-selected": {
+                    backgroundColor: COLORS.LIGHT_PURPLE,
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: COLORS.PURPLE,
+                    },
+                  },
+                  "&.Mui-selected .MuiListItemIcon-root": {
+                    color: "#fff",
+                  },
+                }
+              : {}),
           }}
           {...(nestedNavigation && !mini
             ? {

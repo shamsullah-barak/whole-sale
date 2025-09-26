@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -58,13 +57,13 @@ const LedgerList = () => {
 
 const Ledgers = () => {
   return (
-    <MainDashboard title="Ledger">
+    <>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%" }}>
           <LedgerList />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -327,7 +326,7 @@ const Customers = () => {
   const selectedDirection = useSelector(selectDirection);
 
   return (
-    <MainDashboard title={t("customers")}>
+    <>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -358,7 +357,7 @@ const Customers = () => {
           <CreateCustomers open={open} setOpen={setOpen} />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { Typography, MenuItem, Select } from "@mui/material";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectFontFamily,
@@ -33,9 +32,9 @@ const FontChanger = () => {
 
 const Settings = () => {
   return (
-    <MainDashboard>
+    <>
       <FontChanger />
-    </MainDashboard>
+    </>
   );
 };
 

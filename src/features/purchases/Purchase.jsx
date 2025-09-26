@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
 import {
   Grid,
   Card,
@@ -226,11 +225,11 @@ const Cards = () => {
 
 export default function DashboardCards() {
   return (
-    <MainDashboard title="Purchases">
+    <>
       <Cards />
       <Grid container spacing={2}>
         <PurchaseList />
       </Grid>
-    </MainDashboard>
+    </>
   );
 }

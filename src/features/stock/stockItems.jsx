@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useParams } from "react-router-dom";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { useDispatch, useSelector } from "react-redux";
@@ -92,7 +91,7 @@ const StockItems = () => {
   }, []);
   return (
     <>
-      <MainDashboard title="StockItems">
+      <>
         <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
           <Grid
             xs={12}
@@ -105,7 +104,7 @@ const StockItems = () => {
             <StockItemsList />
           </Grid>
         </Grid>
-      </MainDashboard>
+      </>
     </>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { Box, Container, Grid2 as Grid, Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
@@ -575,7 +574,7 @@ const Products = () => {
   const selectedDirection = useSelector(selectDirection);
 
   return (
-    <MainDashboard title={t("products")}>
+    <>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -606,7 +605,7 @@ const Products = () => {
           <CreateProduct open={open} setOpen={setOpen} />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

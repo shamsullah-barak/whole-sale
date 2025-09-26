@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useTranslation } from "react-i18next";
 import { selectReceivables } from "../../store/selectors/receivable.selector";
 import Datagrid from "../../components/DataGrid";
@@ -65,9 +64,9 @@ const ReceivableList = () => {
 const Receivable = () => {
   return (
     <>
-      <MainDashboard title="Receivable">
+      <>
         <ReceivableList />
-      </MainDashboard>
+      </>
     </>
   );
 };

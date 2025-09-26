@@ -1,12 +1,12 @@
 import React from "react";
 import MainGrid from "../components/MainGrid";
-import MainDashboard from "../theme/main/MainDashboard";
+import PageContainer from "../components/PageContainer";
 
 const Dashboard = () => {
   return (
-    <MainDashboard>
-      <MainGrid />
-    </MainDashboard>
+    <PageContainer>
+      <MainGrid />;
+    </PageContainer>
   );
 };
 

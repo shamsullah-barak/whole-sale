@@ -3,7 +3,6 @@ import Grid from "@mui/material/Grid2";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { Box, Button } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -345,10 +344,10 @@ const CreateStock = () => {
 const Stock = () => {
   return (
     <>
-      <MainDashboard title="Stock">
+      <>
         <CreateStock />
         <StockList />
-      </MainDashboard>
+      </>
     </>
   );
 };

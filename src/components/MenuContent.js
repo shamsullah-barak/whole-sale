@@ -206,36 +206,17 @@ export default function MenuContent() {
         {mainListItems.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              {item.text === "Investment" ? (
-                <>
-                  <RichTreeView
-                    items={ITEMS}
-                    defaultExpandedItems={isCollapsed ? ["1"] : []}
-                    aria-label="pages"
-                    sx={{
-                      m: "0 -8px",
-                      pb: "8px",
-                      height: "fit-content",
-                      flexGrow: 1,
-                      overflowY: "auto",
-                    }}
-                    slots={{ item: CustomTreeItem }}
-                  />
-                </>
-              ) : (
-                <>
-                  <DashboardSidebarPageItem
-                    id={item.path}
-                    title={item.text}
-                    icon={item.icon}
-                    href={item.path}
-                    selected={
-                      !!matchPath(`${item.path}/*`, pathname) ||
-                      pathname === "/"
-                    }
-                  />
-                </>
-              )}
+              <>
+                <DashboardSidebarPageItem
+                  id={item.path}
+                  title={item.text}
+                  icon={item.icon}
+                  href={item.path}
+                  selected={
+                    !!matchPath(`${item.path}/*`, pathname) || pathname === "/"
+                  }
+                />
+              </>
             </React.Fragment>
           );
         })}

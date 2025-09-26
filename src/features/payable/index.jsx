@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectDirection } from "../../store/selectors/app.selector";
@@ -114,9 +113,9 @@ const PayableList = () => {
 const Payable = () => {
   return (
     <>
-      <MainDashboard title="Payable">
+      <>
         <PayableList />
-      </MainDashboard>
+      </>
     </>
   );
 };

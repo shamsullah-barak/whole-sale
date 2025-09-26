@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
-import MainDashboard from "../../../theme/main/MainDashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { getSelectedLedger } from "../../../store/selectors/ledgers.selector";
 import { fetchLedgerTransactionsAsync } from "../../../store/slices/ledger.transactions.slice";
@@ -231,7 +230,7 @@ const SubLedger = () => {
 
 const LedgerTransactions = () => {
   return (
-    <MainDashboard title="Ledger Transactions">
+    <>
       <SubLedger />
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
@@ -242,7 +241,7 @@ const LedgerTransactions = () => {
           <LedgerTransactionsList />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

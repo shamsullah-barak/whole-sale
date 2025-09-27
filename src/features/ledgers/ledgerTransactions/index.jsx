@@ -27,6 +27,7 @@ import { selectSelectedSubLedger } from "../../../store/selectors/subLedger.sele
 import Datagrid from "../../../components/DataGrid";
 import formatDate from "../../../utils/moment";
 import COLORS from "../../../constant/colors";
+import LedgerTransactionList from "./LedgerTransactionsList";
 
 const columns = [
   {
@@ -78,130 +79,82 @@ const LedgerTransactionsList = () => {
   const navigate = useNavigate();
   const { ledgerId, subLedgerId } = useParams();
 
-  const ledgerTransactions = useSelector(selectLedgerTransactions);
   const selectedLedger = useSelector(getSelectedLedger);
   const selectedSubLedger = useSelector(selectSelectedSubLedger);
-
-  useEffect(() => {
-    if (subLedgerId) {
-      dispatch(
-        fetchLedgerTransactionsAsync({
-          subLedgerId: subLedgerId,
-          page: 1,
-          limit: ledgerTransactions?.limitPerPage || 20,
-        })
-      );
-    }
-  }, [dispatch, subLedgerId]);
-
-  const stateChanged = (data) => {
-    const { page, pageSize } = data;
-    dispatch(
-      fetchLedgerTransactionsAsync({
-        subLedgerId: subLedgerId,
-        page: page + 1,
-        limit: pageSize,
-      })
-    );
-  };
 
   const handleBackToSubLedgers = () => {
     navigate(`/ledgers/${ledgerId}`);
   };
 
-  const breadcrumbs = [
-    <Link
-      key="1"
-      color="inherit"
-      href="/ledgers"
-      onClick={(e) => {
-        e.preventDefault();
-        navigate("/ledgers");
-      }}
-      sx={{ display: "flex", alignItems: "center" }}
-    >
-      <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-      Ledgers
-    </Link>,
-    <Link
-      key="2"
-      color="inherit"
-      href={`/ledgers/${ledgerId}`}
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(`/ledgers/${ledgerId}`);
-      }}
-    >
-      {selectedLedger?.name || "SubLedgers"}
-    </Link>,
-    <Typography key="3" color="text.primary">
-      {selectedSubLedger?.name || "Transactions"}
-    </Typography>,
-  ];
-
-  if (ledgerTransactions.loading && ledgerTransactions.ledgerTransactions.length === 0) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // const breadcrumbs = [
+  //   <Link
+  //     key="1"
+  //     color="inherit"
+  //     href="/ledgers"
+  //     onClick={(e) => {
+  //       e.preventDefault();
+  //       navigate("/ledgers");
+  //     }}
+  //     sx={{ display: "flex", alignItems: "center" }}
+  //   >
+  //     <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+  //     Ledgers
+  //   </Link>,
+  //   <Link
+  //     key="2"
+  //     color="inherit"
+  //     href={`/ledgers/${ledgerId}`}
+  //     onClick={(e) => {
+  //       e.preventDefault();
+  //       navigate(`/ledgers/${ledgerId}`);
+  //     }}
+  //   >
+  //     {selectedLedger?.name || "SubLedgers"}
+  //   </Link>,
+  //   <Typography key="3" color="text.primary">
+  //     {selectedSubLedger?.name || "Transactions"}
+  //   </Typography>,
+  // ];
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {/* Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-        {breadcrumbs}
-      </Breadcrumbs>
+    // <Box sx={{ width: "100%" }}>
+    //   <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
+    //     {breadcrumbs}
+    //   </Breadcrumbs>
+    //   <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+    //     <Stack
+    //       direction="row"
+    //       justifyContent="space-between"
+    //       alignItems="center"
+    //     >
+    //       <Stack direction="row" alignItems="center" spacing={2}>
+    //         <Button
+    //           startIcon={<ArrowBackIcon />}
+    //           onClick={handleBackToSubLedgers}
+    //           variant="outlined"
+    //           size="small"
+    //         >
+    //           Back to SubLedgers
+    //         </Button>
+    //         <Box>
+    //           <Typography variant="h4" component="h1" gutterBottom>
+    //             <ReceiptIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+    //             {selectedSubLedger?.name || "Transactions"}
+    //           </Typography>
+    //           <Typography variant="body1" color="text.secondary">
+    //             Transaction history for{" "}
+    //             {selectedSubLedger?.name || "this sub-ledger"}
+    //           </Typography>
+    //         </Box>
+    //       </Stack>
+    //     </Stack>
+    //   </Paper>
 
-      {/* Header */}
-      <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={handleBackToSubLedgers}
-              variant="outlined"
-              size="small"
-            >
-              Back to SubLedgers
-            </Button>
-            <Box>
-              <Typography variant="h4" component="h1" gutterBottom>
-                <ReceiptIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                {selectedSubLedger?.name || "Transactions"}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Transaction history for {selectedSubLedger?.name || "this sub-ledger"}
-              </Typography>
-            </Box>
-          </Stack>
-        </Stack>
-      </Paper>
+    // </Box>
 
-      {/* Transactions Grid */}
-      {ledgerTransactions.ledgerTransactions.length === 0 ? (
-        <Paper elevation={1} sx={{ p: 6, textAlign: "center" }}>
-          <ReceiptIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            No Transactions Found
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            No transactions have been recorded for this sub-ledger yet.
-          </Typography>
-        </Paper>
-      ) : (
-        <Datagrid
-          rows={ledgerTransactions?.ledgerTransactions}
-          columns={columns}
-          limitPerPage={ledgerTransactions?.limitPerPage}
-          loading={ledgerTransactions?.loading}
-          totalRows={ledgerTransactions?.totalRows}
-          currentPage={ledgerTransactions?.currentPage}
-          stateChanged={stateChanged}
-        />
-      )}
-    </Box>
+    <>
+      <LedgerTransactionList />
+    </>
   );
 };
 

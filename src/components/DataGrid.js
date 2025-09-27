@@ -3,6 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
 import { selectDirection } from "../store/selectors/app.selector";
 import "./DataGrid.css";
+import { Grid2 as Grid } from "@mui/material";
 
 // sx={{
 //   "& .MuiDataGrid-row:hover": {
@@ -23,72 +24,74 @@ const Datagrid = ({
   const selectedDirection = useSelector(selectDirection);
   return (
     <>
-      <DataGrid
-        rows={rows}
-        style={{
-          cursor: "pointer",
-          textAlign: selectedDirection === "rtl" ? "left" : "right",
-        }}
-        columns={columns}
-        getRowId={(row) => row._id}
-        // onRowClick={handleRowClick}
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? "odd-row" : "even-row"
-        }
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: limitPerPage },
-          },
-        }}
-        pageSizeOptions={[10, 20, 50]}
-        onPaginationModelChange={(data) => stateChanged(data)}
-        disableColumnResize
-        rowCount={totalRows}
-        onRowClick={onRowClick}
-        paginationMode="server"
-        pagination
-        page={currentPage}
-        pageSize={limitPerPage}
-        loading={loading}
-        density="standard"
-        sx={{
-          borderColor: "divider",
-          "& .MuiDataGrid-columnHeaders": {
-            borderBottom: "1px solid ",
+      <Grid mt={3}>
+        <DataGrid
+          rows={rows}
+          style={{
+            cursor: "pointer",
+            textAlign: selectedDirection === "rtl" ? "left" : "right",
+          }}
+          columns={columns}
+          getRowId={(row) => row._id}
+          // onRowClick={handleRowClick}
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0 ? "odd-row" : "even-row"
+          }
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: limitPerPage },
+            },
+          }}
+          pageSizeOptions={[10, 20, 50]}
+          onPaginationModelChange={(data) => stateChanged(data)}
+          disableColumnResize
+          rowCount={totalRows}
+          onRowClick={onRowClick}
+          paginationMode="server"
+          pagination
+          page={currentPage}
+          pageSize={limitPerPage}
+          loading={loading}
+          density="standard"
+          sx={{
             borderColor: "divider",
-          },
-          "& .MuiDataGrid-row": {
-            borderBottom: "1px solid",
-            borderColor: "divider",
-          },
-        }}
-        // slotProps={{
-        //   filterPanel: {
-        //     filterFormProps: {
-        //       logicOperatorInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //       },
-        //       columnInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //         sx: { mt: "auto" },
-        //       },
-        //       operatorInputProps: {
-        //         variant: "outlined",
-        //         size: "small",
-        //         sx: { mt: "auto" },
-        //       },
-        //       valueInputProps: {
-        //         InputComponentProps: {
-        //           variant: "outlined",
-        //           size: "small",
-        //         },
-        //       },
-        //     },
-        //   },
-        // }}
-      />
+            "& .MuiDataGrid-columnHeaders": {
+              borderBottom: "1px solid ",
+              borderColor: "divider",
+            },
+            "& .MuiDataGrid-row": {
+              borderBottom: "1px solid",
+              borderColor: "divider",
+            },
+          }}
+          // slotProps={{
+          //   filterPanel: {
+          //     filterFormProps: {
+          //       logicOperatorInputProps: {
+          //         variant: "outlined",
+          //         size: "small",
+          //       },
+          //       columnInputProps: {
+          //         variant: "outlined",
+          //         size: "small",
+          //         sx: { mt: "auto" },
+          //       },
+          //       operatorInputProps: {
+          //         variant: "outlined",
+          //         size: "small",
+          //         sx: { mt: "auto" },
+          //       },
+          //       valueInputProps: {
+          //         InputComponentProps: {
+          //           variant: "outlined",
+          //           size: "small",
+          //         },
+          //       },
+          //     },
+          //   },
+          // }}
+        />
+      </Grid>
     </>
   );
 };

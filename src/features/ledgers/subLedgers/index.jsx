@@ -30,6 +30,7 @@ import { getSelectedLedger } from "../../../store/selectors/ledgers.selector";
 import SubLedgerItem from "./SubLedgerItem";
 import SubLedgerForm from "./SubLedgerForm";
 import COLORS from "../../../constant/colors";
+import LedgerTransactions from "../ledgerTransactions";
 
 const SubLedgerList = () => {
   const dispatch = useDispatch();
@@ -168,7 +169,7 @@ const SubLedgerList = () => {
       )}
 
       {/* SubLedgers Grid */}
-      {subLedgers.subLedgers.length === 0 ? (
+      {/* {subLedgers.subLedgers.length === 0 ? (
         <Paper
           elevation={0}
           sx={{
@@ -202,18 +203,17 @@ const SubLedgerList = () => {
             Create SubLedger
           </Button>
         </Paper>
-      ) : (
-        <Grid container spacing={3}>
-          {subLedgers.subLedgers.map((subLedger) => (
-            <Grid item xs={12} sm={6} md={4} key={subLedger._id}>
-              <SubLedgerItem
-                subLedger={subLedger}
-                onEdit={handleEditSubLedger}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      ) : ( */}
+      <Grid container spacing={3}>
+        {subLedgers.subLedgers.map((subLedger) => (
+          <Grid item xs={12} sm={6} md={4} key={subLedger._id}>
+            <SubLedgerItem subLedger={subLedger} onEdit={handleEditSubLedger} />
+          </Grid>
+        ))}
+      </Grid>
+      {/* )} */}
+
+      <LedgerTransactions />
 
       {/* SubLedger Form Modal */}
       <SubLedgerForm

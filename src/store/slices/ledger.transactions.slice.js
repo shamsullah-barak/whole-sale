@@ -14,9 +14,10 @@ const initialState = {
 // async reducers
 export const fetchLedgerTransactionsAsync = createAsyncThunk(
   "ledgerTransactions/fetchLedgerTransactions",
-  async ({ ledgerId, page, limit }) => {
+  async ({ ledgerId, subLedgerId, page, limit }) => {
     const ledgerTransactions = await fetchLedgerTransactions(
       ledgerId,
+      subLedgerId,
       page,
       limit
     );

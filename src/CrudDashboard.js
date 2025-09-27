@@ -14,7 +14,8 @@ import EditCompany from "./features/master-data/companies/EditCompany";
 import Purchases from "./features/purchases/Purchase";
 import CreatePurchases from "./features/purchases/CreatePurchase";
 import Ledgers from "./features/ledgers/Ledgers";
-import SubLedger from "./features/ledgers/ledgerTransactions";
+import SubLedgerList from "./features/ledgers/subLedgers";
+import LedgerTransactions from "./features/ledgers/ledgerTransactions";
 import Journal from "./features/journal";
 import Settings from "./features/settings";
 import Stock from "./features/stock";
@@ -164,7 +165,11 @@ const router = createHashRouter([
       },
       {
         path: "/ledgers/:ledgerId",
-        Component: SubLedger,
+        Component: SubLedgerList,
+      },
+      {
+        path: "/ledgers/:ledgerId/:subLedgerId",
+        Component: LedgerTransactions,
       },
       {
         path: "/journal",

@@ -6,6 +6,7 @@ import journalSlice from "./reducers/journal.reducer";
 import appSlice from "./reducers/app.reducer";
 import transactionTypesSlice from "./reducers/transaction.types.reducer";
 import ledgerTransactionsSlice from "./reducers/ledger.transactions.reducer";
+import subLedgerSlice from "./slices/subLedger.slice";
 import stockSlice from "./reducers/stock.reducer";
 import stockItemsSlice from "./reducers/stock.items.reducer";
 import categorySlice from "./reducers/category.reducer";
@@ -31,6 +32,7 @@ export const store = configureStore({
     journals: journalSlice,
     transactionTypes: transactionTypesSlice,
     ledgerTransactions: ledgerTransactionsSlice,
+    subLedgers: subLedgerSlice,
     categories: categorySlice,
     companies: companySlice,
     units: unitReducer,

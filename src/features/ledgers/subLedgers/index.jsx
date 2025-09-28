@@ -103,6 +103,7 @@ const SubLedgerList = () => {
     );
   }
 
+  console.log({ subLedgers });
   return (
     <Box sx={{ width: "100%" }}>
       {/* Breadcrumbs */}
@@ -168,42 +169,6 @@ const SubLedgerList = () => {
         </Alert>
       )}
 
-      {/* SubLedgers Grid */}
-      {/* {subLedgers.subLedgers.length === 0 ? (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 6,
-            textAlign: "center",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-          }}
-        >
-          <AccountBalanceIcon
-            sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
-          />
-          <Typography variant="h6" gutterBottom>
-            No SubLedgers Found
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Create your first sub-ledger to start organizing transactions
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateSubLedger}
-            sx={{
-              backgroundColor: COLORS.PURPLE,
-              "&:hover": {
-                backgroundColor: COLORS.PURPLE_DARK,
-              },
-            }}
-          >
-            Create SubLedger
-          </Button>
-        </Paper>
-      ) : ( */}
       <Grid container spacing={3}>
         {subLedgers.subLedgers.map((subLedger) => (
           <Grid item xs={12} sm={6} md={4} key={subLedger._id}>

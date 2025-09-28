@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Typography,
@@ -20,9 +20,11 @@ import {
   fetchLedgersAsync,
   setSelectedLedger,
 } from "../../store/slices/ledger.slice";
+import CreateLedgerForm from "./CreateLedgerForm";
 import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import Datagrid from "../../components/DataGrid";
 import COLORS from "../../constant/colors";
+import formatDate from "../../utils/moment";
 
 export const columns = [
   {
@@ -45,6 +47,9 @@ export const columns = [
     flex: 0.5,
     minWidth: 150,
     align: "center",
+    valueFormatter: (params) => {
+      return formatDate(params);
+    },
   },
 ];
 
@@ -53,15 +58,19 @@ const LedgerList = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const ledgers = useSelector(selectLedgers);
+  const [formOpen, setFormOpen] = useState(false);
+  const handleFormClose = () => {
+    setFormOpen(false);
+  };
 
-  useEffect(() => {
-    const loadLedgers = () => {
-      dispatch(
-        fetchLedgersAsync({ page: 1, limit: ledgers?.limitPerPage || 20 })
-      );
-    };
-    loadLedgers();
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const loadLedgers = () => {
+  //     dispatch(
+  //       fetchLedgersAsync({ page: 1, limit: ledgers?.limitPerPage || 20 })
+  //     );
+  //   };
+  //   loadLedgers();
+  // }, [dispatch]);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
@@ -74,8 +83,7 @@ const LedgerList = () => {
   };
 
   const handleCreateLedger = () => {
-    // TODO: Implement create ledger functionality
-    console.log("Create new ledger");
+    setFormOpen(true);
   };
 
   if (ledgers.loading && ledgers.ledgers.length === 0) {
@@ -136,7 +144,15 @@ const LedgerList = () => {
 
       {/* Ledgers Grid */}
       {ledgers.ledgers.length === 0 ? (
-        <Paper elevation={1} sx={{ p: 6, textAlign: "center" }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 6,
+            textAlign: "center",
+            border: "1px solid",
+            borderColor: "divider",
+          }}
+        >
           <AccountBalanceIcon
             sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
           />
@@ -172,6 +188,9 @@ const LedgerList = () => {
           onRowClick={(params, event) => handleRowClick(params)}
         />
       )}
+
+      {/* Create Ledger Form Modal */}
+      <CreateLedgerForm open={formOpen} onClose={handleFormClose} />
     </Box>
   );
 };

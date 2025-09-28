@@ -12,3 +12,16 @@ export const fetchLedgers = async (page, limit) => {
     console.log({ error });
   }
 };
+
+export const createLedger = async (ledgerData) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:5000/api/ledgers`,
+      ledgerData
+    );
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};

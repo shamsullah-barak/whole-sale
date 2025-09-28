@@ -33,6 +33,7 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import SettingsIcon from "@mui/icons-material/Settings";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useSelector } from "react-redux";
 import { selectDirection } from "../store/selectors/app.selector";
 
@@ -272,6 +273,7 @@ function DashboardSidebar({
                 !!matchPath("/expenses", pathname) ||
                 !!matchPath("/payable", pathname) ||
                 !!matchPath("/receivable", pathname) ||
+                !!matchPath("/installments", pathname) ||
                 !!matchPath("/cashbox", pathname) ||
                 !!matchPath("/ledgers", pathname) ||
                 !!matchPath("/journal", pathname)
@@ -306,6 +308,13 @@ function DashboardSidebar({
                     icon={<ArrowUpwardIcon />}
                     href="/receivable"
                     selected={!!matchPath("/receivable", pathname)}
+                  />
+                  <DashboardSidebarPageItem
+                    id="installments"
+                    title="Installments"
+                    icon={<AccountBalanceWalletIcon />}
+                    href="/installments"
+                    selected={!!matchPath("/installments", pathname)}
                   />
                   <DashboardSidebarPageItem
                     id="cashbox"

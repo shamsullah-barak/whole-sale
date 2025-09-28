@@ -35,6 +35,7 @@ import Category from "./features/master-data/categories/Categories";
 import CashBox from "./features/cashbox";
 import Incomes from "./features/income";
 import SalesModule from "./features/sale";
+import InstallmentsModule from "./features/installments";
 import NotificationsProvider from "./hooks/useNotifications/NotificationsProvider";
 import DialogsProvider from "./hooks/useDialogs/DialogsProvider";
 import AppTheme from "./shared-theme/AppTheme";
@@ -220,6 +221,11 @@ const router = createHashRouter([
       {
         path: "/sales/*",
         Component: SalesModule,
+      },
+      // Installment routes
+      {
+        path: "/installments/*",
+        Component: InstallmentsModule,
       },
       {
         path: "404",

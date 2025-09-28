@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MenuItem, TextField, Button } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
-import { selectReceivables } from "../../store/selectors/receivable.selector";
-import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
+import { 
+  createInstallmentAsync, 
+  fetchLoansAsync 
+} from "../../store/slices/installment.slice";
+import { 
+  selectLoans, 
+  selectCreateInstallmentLoading 
+} from "../../store/selectors/installment.selectors";
 
 const Receivable = () => {
   const { t } = useTranslation();
@@ -18,34 +23,52 @@ const Receivable = () => {
 
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
-  const receivables = useSelector(selectReceivables).receivables;
+  const loans = useSelector(selectLoans);
+  const createLoading = useSelector(selectCreateInstallmentLoading);
 
-  const [loading, setLoading] = useState(false);
   const [receivable, setReceivable] = useState({
     loanId: "",
     amount: "",
     type: "AR",
+    description: "",
+    paymentDate: new Date().toISOString().split("T")[0],
   });
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      await axios.post("http://localhost:5000/api/installments", receivable, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  // Load receivable loans on component mount
+  useEffect(() => {
+    dispatch(fetchLoansAsync("AR"));
+  }, [dispatch]);
 
-      setLoading(false);
-      toast.success("data added");
-      dispatch(fetchReceivablesAsync());
+  const handleSubmit = async () => {
+    if (!receivable.loanId) {
+      toast.error("Please select a loan");
+      return;
+    }
+    if (!receivable.amount || receivable.amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    try {
+      const installmentData = {
+        ...receivable,
+        amount: parseFloat(receivable.amount),
+      };
+
+      await dispatch(createInstallmentAsync(installmentData)).unwrap();
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
+      toast.success("Installment receipt added successfully");
+      
+      // Reset form
+      setReceivable({
+        loanId: "",
+        amount: "",
+        type: "AR",
+        description: "",
+        paymentDate: new Date().toISOString().split("T")[0],
+      });
     } catch (error) {
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
+      toast.error(error.message || "Something went wrong! Please try again");
     }
   };
 
@@ -75,10 +98,9 @@ const Receivable = () => {
             value={receivable.loanId}
             onChange={inputHandler}
           >
-            {receivables.map((item, index) => (
+            {loans.map((item, index) => (
               <MenuItem key={index} value={item.id}>
-                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
-                {t(`${item.amount}`)}
+                {item.name} - {item.address} - ${item.amount}
               </MenuItem>
             ))}
           </TextField>
@@ -103,7 +125,7 @@ const Receivable = () => {
         variant="contained"
         fullWidth
         color="inherit"
-        loading={loading}
+        disabled={createLoading}
         style={{ marginTop: 20 }}
         sx={(theme) => ({
           backgroundColor:

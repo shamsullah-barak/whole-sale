@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MenuItem, TextField, Button } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
-import { selectPayable } from "../../store/selectors/payable.selector";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
-import { fetchPayableAsync } from "../../store/slices/payable.slice";
+import { 
+  createInstallmentAsync, 
+  fetchLoansAsync 
+} from "../../store/slices/installment.slice";
+import { 
+  selectLoans, 
+  selectCreateInstallmentLoading 
+} from "../../store/selectors/installment.selectors";
 
 const Payable = () => {
   const { t } = useTranslation();
@@ -18,36 +23,53 @@ const Payable = () => {
   const dispatch = useDispatch();
 
   const journals = useSelector(selectJournals);
-  const payables = useSelector(selectPayable).payable;
+  const loans = useSelector(selectLoans);
   const selectedDirection = useSelector(selectDirection);
+  const createLoading = useSelector(selectCreateInstallmentLoading);
 
-  const [loading, setLoading] = useState(false);
   const [payable, setPayable] = useState({
     loanId: "",
     amount: "",
     type: "AP",
+    description: "",
+    paymentDate: new Date().toISOString().split("T")[0],
   });
 
+  // Load payable loans on component mount
+  useEffect(() => {
+    dispatch(fetchLoansAsync("AP"));
+  }, [dispatch]);
+
   const handleSubmit = async () => {
-    setLoading(true);
+    if (!payable.loanId) {
+      toast.error("Please select a loan");
+      return;
+    }
+    if (!payable.amount || payable.amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
 
     try {
-      await axios.post("http://localhost:5000/api/installments", payable, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const installmentData = {
+        ...payable,
+        amount: parseFloat(payable.amount),
+      };
 
-      setLoading(false);
+      await dispatch(createInstallmentAsync(installmentData)).unwrap();
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
-      dispatch(fetchPayableAsync());
-      toast.success("data added");
+      toast.success("Installment payment added successfully");
+      
+      // Reset form
+      setPayable({
+        loanId: "",
+        amount: "",
+        type: "AP",
+        description: "",
+        paymentDate: new Date().toISOString().split("T")[0],
+      });
     } catch (error) {
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
+      toast.error(error.message || "Something went wrong! Please try again");
     }
   };
 
@@ -77,10 +99,9 @@ const Payable = () => {
             value={payable.loanId}
             onChange={inputHandler}
           >
-            {payables.map((item, index) => (
+            {loans.map((item, index) => (
               <MenuItem key={index} value={item.id}>
-                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
-                {t(`${item.amount}`)}
+                {item.name} - {item.address} - ${item.amount}
               </MenuItem>
             ))}
           </TextField>
@@ -105,7 +126,7 @@ const Payable = () => {
         variant="contained"
         fullWidth
         color="inherit"
-        loading={loading}
+        disabled={createLoading}
         style={{ marginTop: 20 }}
         sx={(theme) => ({
           backgroundColor:

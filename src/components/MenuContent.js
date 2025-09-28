@@ -32,6 +32,8 @@ import StorageIcon from "@mui/icons-material/Storage";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import PersonIcon from "@mui/icons-material/Person";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 import {
   TreeItem2Content,
@@ -60,8 +62,10 @@ const mainListItems = [
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
   { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
+  { text: "Sales", icon: <PointOfSaleIcon />, path: "/sales" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
+  { text: "Installments", icon: <AccountBalanceWalletIcon />, path: "/installments" },
   { text: "payable", icon: <PaymentsIcon />, path: "/payable" },
   { text: "receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },

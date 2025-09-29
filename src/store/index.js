@@ -20,6 +20,7 @@ import payable from "./reducers/payable.reducer";
 import receivable from "./reducers/receivable.reducer";
 import incomes from "./reducers/incomes.reducer";
 import dashboardData from "./reducers/dashboard.reducer";
+import installmentReducer from "./reducers/installment.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -44,5 +45,6 @@ export const store = configureStore({
     receivable: receivable,
     incomes: incomes,
     dashboardData: dashboardData,
+    installments: installmentReducer,
   },
 });

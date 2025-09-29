@@ -55,7 +55,13 @@ const InstallmentList = ({ type = null, title = "Installments" }) => {
 
   useEffect(() => {
     const loadData = () => {
-      dispatch(fetchInstallmentsAsync({ page: 1, limit: pagination.limitPerPage || 20, type }));
+      dispatch(
+        fetchInstallmentsAsync({
+          page: 1,
+          limit: pagination.limitPerPage || 20,
+          type,
+        })
+      );
       dispatch(fetchLoansAsync(type));
     };
     loadData();
@@ -101,7 +107,13 @@ const InstallmentList = ({ type = null, title = "Installments" }) => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
     const newType = newValue === 0 ? null : newValue === 1 ? "AP" : "AR";
-    dispatch(fetchInstallmentsAsync({ page: 1, limit: pagination.limitPerPage || 20, type: newType }));
+    dispatch(
+      fetchInstallmentsAsync({
+        page: 1,
+        limit: pagination.limitPerPage || 20,
+        type: newType,
+      })
+    );
   };
 
   // Define columns inside component to access handler functions
@@ -303,9 +315,7 @@ const InstallmentList = ({ type = null, title = "Installments" }) => {
             borderColor: "divider",
           }}
         >
-          <PaymentIcon
-            sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
-          />
+          <PaymentIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
           <Typography variant="h6" gutterBottom>
             No Installments Found
           </Typography>
@@ -327,16 +337,17 @@ const InstallmentList = ({ type = null, title = "Installments" }) => {
           </Button>
         </Paper>
       ) : (
-        <Datagrid
-          rows={installments}
-          columns={columns}
-          limitPerPage={pagination.limitPerPage}
-          loading={loading}
-          totalRows={pagination.totalRows}
-          currentPage={pagination.currentPage}
-          stateChanged={stateChanged}
-          onRowClick={(params, event) => handleRowClick(params)}
-        />
+        // <Datagrid
+        //   rows={installments}
+        //   columns={columns}
+        //   limitPerPage={pagination.limitPerPage}
+        //   loading={loading}
+        //   totalRows={pagination.totalRows}
+        //   currentPage={pagination.currentPage}
+        //   stateChanged={stateChanged}
+        //   onRowClick={(params, event) => handleRowClick(params)}
+        // />
+        <></>
       )}
     </Box>
   );

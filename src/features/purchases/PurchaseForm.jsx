@@ -1,172 +1,448 @@
-import React, { useState } from "react";
-import { TextField, MenuItem, Button, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Grid2 as Grid,
+  Autocomplete,
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { selectJournals } from "../../store/selectors/journal.selector";
+import { useTranslation } from "react-i18next";
+import { selectDirection } from "../../store/selectors/app.selector";
+import COLORS from "../../constant/colors";
+import { selectProducts } from "../../store/selectors/product.selector";
+import { ToastContainer, toast } from "react-toastify";
+import { selectStocks } from "../../store/selectors/stock.selector";
+import moment from "moment/moment";
+import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
+import {
+  selectNextInvoiceNo,
+  selectPurchases,
+} from "../../store/selectors/purchase.selector";
+import { useParams } from "react-router-dom";
 
-const PurchaseForm = () => {
-  const [purchase, setPurchase] = useState({
-    note: "",
-    purchasedPrice: 0,
-    totalPrice: 0,
-    salePrice: 0,
-    status: "paid",
-    companyName: "",
-    category: "",
-    quantity: 0,
+// unit types for purchase component
+const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
+const paymentMethods = ["cash", "credit", "cashAndCredit"];
+
+const PurchaseOfGoods = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+
+  const { id } = useParams();
+  const { purchases } = useSelector(selectPurchases);
+
+  const [loading, setLoading] = useState(false);
+  const journals = useSelector(selectJournals);
+  const nextInvoiceNo = useSelector(selectNextInvoiceNo);
+  const stocks = useSelector(selectStocks).stockNames;
+  const { products } = useSelector(selectProducts);
+  const suppliers = useSelector(selectSuppliers).suppliers;
+  const selectedDirection = useSelector(selectDirection);
+  const [journalEntry, setJournalEntry] = useState({
+    productId: "",
+    expiryDate: "",
+    quantity: "",
+    unitType: "kg",
+    unitPerPackage: "",
+    unitPrice: "",
+    totalPrice: "",
+    paymentMethod: "cash",
+    invoiceNo: "",
+    stockId: "",
+    discount: 0,
+    givingCash: 0,
+    remainingCash: 0,
+    supplierId: "",
+    purchaseDate: moment().format("YYYY-MM-DD"),
   });
 
-  // purchase handler
-  const createPurchaseHandler = async (event) => {
+  useEffect(() => {
+    if (id) {
+      const selectedPurchase = purchases.find((item) => item._id === id);
+      console.log(selectedPurchase);
+      if (selectedPurchase) {
+        // setJournalEntry({ ...selectedPurchase });
+        const product = products.find(
+          (item) => item._id === selectedPurchase.productId
+        );
+        setJournalEntry({
+          ...selectedPurchase,
+          productId: product._id,
+          purchaseDate: moment().format("YYYY-MM-DD"),
+        });
+      }
+    }
+  }, [id]);
+
+  const clearState = () => {
+    setJournalEntry({
+      productId: "",
+      expiryDate: "",
+      quantity: "",
+      unitType: "",
+      unitPerPackage: "",
+      unitPrice: "",
+      totalPrice: "",
+      paymentMethod: "",
+      invoiceNo: "",
+      stockId: "",
+      discount: 0,
+      givingCash: 0,
+      remainingCash: 0,
+      purchaseDate: moment().format("YYYY-MM-DD"),
+    });
+  };
+
+  // handle input changes
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
+
+    setJournalEntry((prevState) => {
+      let updatedEntry = { ...prevState, [name]: value };
+      const {
+        discount,
+        givingCash,
+        quantity,
+        unitPerPackage,
+        unitPrice,
+        unitType,
+        paymentMethod,
+      } = updatedEntry;
+
+      // Set unitPerPackage = 1 for specific unit types
+      if (["kg", "piece", "liter"].includes(unitType)) {
+        updatedEntry.unitPerPackage = 1;
+      }
+
+      const totalPrice = quantity * unitPerPackage * unitPrice - discount;
+      updatedEntry.totalPrice = totalPrice;
+
+      if (paymentMethod === "credit") {
+        updatedEntry.remainingCash = totalPrice;
+        updatedEntry.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedEntry.remainingCash = 0;
+        updatedEntry.givingCash = totalPrice;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedEntry.remainingCash = totalPrice - givingCash;
+      }
+
+      return updatedEntry;
+    });
+  };
+
+  const journalEntryHandler = async (event) => {
     event.preventDefault(event);
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/purchases",
-        purchase,
-        {
+
+    setLoading(true);
+
+    const cleanedEntry = { ...journalEntry };
+
+    if (!cleanedEntry.expiryDate) delete cleanedEntry.expiryDate;
+    if (!cleanedEntry.purchaseDate) delete cleanedEntry.purchaseDate;
+    if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+
+    if (id) {
+      delete cleanedEntry.invoiceNo;
+      delete cleanedEntry.__v;
+      delete cleanedEntry.createdAt;
+      delete cleanedEntry.updatedAt;
+      delete cleanedEntry._id;
+
+      try {
+        await axios.patch(
+          `http://localhost:5000/api/purchases/${id}`,
+          cleanedEntry,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        dispatch(
+          fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
+        );
+        toast.success("data updated");
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        toast.error(
+          error?.response?.data?.message ??
+            "something went wrong! please try again"
+        );
+      }
+    } else {
+      try {
+        await axios.post(`http://localhost:5000/api/purchases`, cleanedEntry, {
           headers: {
             "Content-Type": "application/json",
           },
-        }
-      );
-      setPurchase({
-        note: "",
-        purchasedPrice: 0,
-        totalPrice: 0,
-        salePrice: 0,
-        status: "paid",
-        companyName: "",
-        category: "",
-        quantity: 0,
-      });
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
+        });
+        dispatch(
+          fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
+        );
+        toast.success("data added");
+        // clearState();
+        setLoading(false);
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ??
+            "something went wrong! please try again"
+        );
+      }
     }
   };
 
   return (
-    <form>
+    <>
       <ToastContainer />
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Name | Note | Description"
-            name="note"
-            value={purchase.note}
-            onChange={(event) =>
-              setPurchase({ ...purchase, note: event.target.value })
-            }
+      <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+        <Grid size={6} xs={12} sm={12}>
+          <Autocomplete
+            disablePortal
+            disableClearable
+            options={products}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("Products")}
+                variant="outlined"
+                required
+              />
+            )}
+            onChange={(event, value) => {
+              if (value) {
+                setJournalEntry({ ...journalEntry, productId: value._id });
+              }
+            }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Purchase Price"
-            name="purchasedPrice"
-            type="number"
-            value={purchase.purchasedPrice}
-            onChange={(event) =>
-              setPurchase({
-                ...purchase,
-                purchasedPrice: event.target.value,
-                totalPrice: purchase.quantity * event.target.value,
-              })
-            }
+            label={t("expiryDate")}
+            name="expiryDate"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={journalEntry.expiryDate}
+            onChange={inputHandler}
+            sx={{ height: "100%", width: "100%" }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Quantity"
+            label={t("purchaseDate")}
+            name="purchaseDate"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={journalEntry.purchaseDate}
+            onChange={inputHandler}
+            sx={{ height: "100%", width: "100%" }}
+          />
+        </Grid>
+        <Grid size={4} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            label={t("Quantity")}
             name="quantity"
             type="number"
-            value={purchase.quantity}
-            onChange={(event) =>
-              setPurchase({
-                ...purchase,
-                quantity: event.target.value,
-                totalPrice: purchase.purchasedPrice * event.target.value,
-              })
-            }
+            value={journalEntry.quantity}
+            onChange={inputHandler}
           />
         </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Total Price"
-            name="totalPrice"
-            type="number"
-            value={purchase.quantity * purchase.purchasedPrice}
-            disabled={true}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Sale Price"
-            name="salePrice"
-            type="number"
-            value={purchase.salePrice}
-            onChange={(event) =>
-              setPurchase({ ...purchase, salePrice: event.target.value })
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             select
             fullWidth
-            label="Status"
-            name="status"
-            value={purchase.status}
-            onChange={(event) =>
-              setPurchase({ ...purchase, status: event.target.value })
-            }
+            required
+            name="unitType"
+            label={t("unitType")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.unitType}
+            onChange={inputHandler}
           >
-            <MenuItem value="paid">Paid</MenuItem>
-            <MenuItem value="partial">Partial</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
+            {unitTypes.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={4} xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Company Name"
-            name="companyName"
-            value={purchase.companyName}
-            onChange={(event) =>
-              setPurchase({ ...purchase, companyName: event.target.value })
+            required
+            disabled={
+              journalEntry.unitType === "kg" ||
+              journalEntry.unitType === "piece" ||
+              journalEntry.unitType === "liter"
             }
+            label={t("unitPerPackage")}
+            name="unitPerPackage"
+            type="number"
+            value={journalEntry.unitPerPackage}
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Category "
-            name="category"
-            value={purchase.category}
-            onChange={(event) =>
-              setPurchase({ ...purchase, category: event.target.value })
-            }
+            required
+            label={t("unitPrice")}
+            name="unitPrice"
+            type="number"
+            value={journalEntry.unitPrice}
+            onChange={inputHandler}
           />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("totalPrice")}
+            name="totalPrice"
+            type="number"
+            value={journalEntry.totalPrice}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="paymentMethod"
+            label={t("paymentMethod")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.paymentMethod}
+            onChange={inputHandler}
+          >
+            {paymentMethods.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            required
+            disabled={
+              journalEntry.paymentMethod === "cash" ||
+              journalEntry.paymentMethod === "credit"
+            }
+            label={t("givingCash")}
+            name="givingCash"
+            type="number"
+            value={journalEntry.givingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("remainingCash")}
+            name="remainingCash"
+            type="number"
+            value={journalEntry.remainingCash}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("discount")}
+            name="discount"
+            type="number"
+            value={journalEntry.discount}
+            onChange={inputHandler}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("invoiceNo")}
+            name="invoiceNo"
+            type="number"
+            value={nextInvoiceNo}
+            disabled
+          />
+        </Grid>
+
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="stockId"
+            label={t("stockName")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.stockId}
+            onChange={inputHandler}
+          >
+            {stocks.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.engName}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid size={12} xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            required
+            name="supplierId"
+            label={t("supplier")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.supplierId}
+            onChange={inputHandler}
+          >
+            {suppliers.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
+                {t(`${item.phone}`)}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
       </Grid>
       <Button
         type="submit"
         variant="contained"
-        color="primary"
         fullWidth
+        color="inherit"
         style={{ marginTop: 20 }}
-        onClick={createPurchaseHandler}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
+        loading={loading}
+        disabled={loading}
+        onClick={journalEntryHandler}
       >
-        Create Purchase
+        {id ? <>{t("update")}</> : <>{t("Add")}</>}
       </Button>
-    </form>
+    </>
   );
 };
 
-export default PurchaseForm;
+export default PurchaseOfGoods;

@@ -13,6 +13,7 @@ import CreateCompany from "./features/master-data/companies/CreateCompany";
 import EditCompany from "./features/master-data/companies/EditCompany";
 import Purchases from "./features/purchases/Purchase";
 import CreatePurchases from "./features/purchases/CreatePurchase";
+import EditPurchase from "./features/purchases/EditPurchase";
 import Ledgers from "./features/ledgers/Ledgers";
 import SubLedgerList from "./features/ledgers/subLedgers";
 import LedgerTransactions from "./features/ledgers/ledgerTransactions";
@@ -64,6 +65,7 @@ import {
 import {
   fetchDashboardDataAsync,
   fetchNextInvoiceAsync,
+  fetchPurchasesAsync,
 } from "./store/slices/purchase.slice";
 import {
   fetchNextSaleNumberAsync,
@@ -136,6 +138,10 @@ const router = createHashRouter([
       {
         path: "/purchases/add",
         Component: CreatePurchases,
+      },
+      {
+        path: "/purchases/edit/:id",
+        Component: EditPurchase,
       },
       {
         path: "/stocks",
@@ -261,6 +267,7 @@ export default function CrudDashboard(props) {
     dispatch(fetchStockNamesAsync());
     dispatch(fetchDashboardDataAsync());
     dispatch(fetchIncomeAsync());
+    dispatch(fetchPurchasesAsync({ limit: 10, page: 1 }));
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));
     dispatch(fetchCustomersAsync({ limit: 10, page: 1 }));

@@ -27,7 +27,6 @@ import CreateUnit from "./features/master-data/units/CreateUnit";
 import EditUnit from "./features/master-data/units/EditUnit";
 import Partners from "./features/investment/partners";
 import AddInvest from "./features/investment/addInvest";
-import Expenses from "./features/expenses";
 import Suppliers from "./features/suppliers";
 import Customers from "./features/customers";
 import Payable from "./features/payable";
@@ -37,6 +36,7 @@ import CashBox from "./features/cashbox";
 import Incomes from "./features/income";
 import SalesModule from "./features/sale";
 import InstallmentsModule from "./features/installments";
+import ExpenseModule from "./features/expenses";
 import NotificationsProvider from "./hooks/useNotifications/NotificationsProvider";
 import DialogsProvider from "./hooks/useDialogs/DialogsProvider";
 import AppTheme from "./shared-theme/AppTheme";
@@ -200,8 +200,8 @@ const router = createHashRouter([
         Component: EditUnit,
       },
       {
-        path: "/expenses",
-        Component: Expenses,
+        path: "/expenses/*",
+        Component: ExpenseModule,
       },
       {
         path: "/categories",

@@ -119,10 +119,10 @@ function DashboardSidebarPageItem({
             ...(theme.palette.mode === "light"
               ? {
                   "&.Mui-selected": {
-                    backgroundColor: COLORS.LIGHT_PURPLE,
+                    backgroundColor: COLORS.PURPLE,
                     color: "#fff",
                     "&:hover": {
-                      backgroundColor: COLORS.PURPLE,
+                      backgroundColor: COLORS.LIGHT_PURPLE,
                     },
                   },
                   "&.Mui-selected .MuiListItemIcon-root": {

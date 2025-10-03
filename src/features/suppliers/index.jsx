@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid2 as Grid } from "@mui/material";
+import { Box, Grid2 as Grid, MenuItem } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
@@ -16,9 +16,13 @@ import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
 import Datagrid from "../../components/DataGrid";
 import Model from "../../components/Model";
 
+const currencyTypes = ["afn", "dollar", "rupee"];
+
 const CreateSupplier = ({ open, setOpen }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+
+  const selectedDirection = useSelector(selectDirection);
 
   //   states
   const [loading, setLoading] = useState(false);
@@ -26,6 +30,7 @@ const CreateSupplier = ({ open, setOpen }) => {
     name: "",
     phone: "",
     address: "",
+    currencyType: "",
   });
 
   // methods
@@ -84,7 +89,7 @@ const CreateSupplier = ({ open, setOpen }) => {
           Add new Supplier
         </Typography>
 
-        <Stack spacing={2}>
+        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
           <TextField
             label="name"
             name="name"
@@ -101,7 +106,29 @@ const CreateSupplier = ({ open, setOpen }) => {
             onChange={handleChange}
             fullWidth
             size="small"
-          />{" "}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+          <TextField
+            select
+            fullWidth
+            label={t("currencyType")}
+            name="currencyType"
+            value={formData.currencyType}
+            onChange={(event) => {
+              setFormData({
+                ...formData,
+                currencyType: event.target.value,
+              });
+            }}
+          >
+            {currencyTypes.map((item) => (
+              <MenuItem key={item} value={item} dir={selectedDirection}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             label="address"
             name="address"
@@ -111,7 +138,7 @@ const CreateSupplier = ({ open, setOpen }) => {
             fullWidth
             size="small"
           />
-        </Stack>
+        </Box>
       </Model>
     </>
   );
@@ -208,6 +235,14 @@ const SupplierList = () => {
     {
       field: "phone",
       headerName: "Phone",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 50,
+    },
+    {
+      field: "currencyType",
+      headerName: "currencyType",
       headerAlign: "center",
       align: "center",
       flex: 1,

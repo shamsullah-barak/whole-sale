@@ -30,15 +30,15 @@ const CreateProduct = ({ open, setOpen }) => {
   const [product, setProduct] = useState({
     name: "Sample Product",
     type: "Electronics",
-    unit: 10,
-    sku: "SKU-12345",
-    barCode: "9876543210123",
+    // unit: 10,
+    // sku: "SKU-12345",
+    // barCode: "9876543210123",
     description: "This is a sample product description.",
-    currentStock: 150,
-    mainStockLevel: 50,
+    // currentStock: 150,
+    minStockLevel: 50,
     purchasedPrice: 200,
     salePrice: 250,
-    status: "active",
+    // status: "active",
     companyId: "company123",
     categoryId: "category456",
   });
@@ -117,7 +117,7 @@ const CreateProduct = ({ open, setOpen }) => {
                   fullWidth
                   size="small"
                 />
-                <TextField
+                {/* <TextField
                   label="Unit"
                   name="unit"
                   type="number"
@@ -125,25 +125,25 @@ const CreateProduct = ({ open, setOpen }) => {
                   onChange={handleChange}
                   fullWidth
                   size="small"
-                />
+                /> */}
               </Box>
               <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                <TextField
+                {/* <TextField
                   label="SKU"
                   name="sku"
                   value={product.sku}
                   onChange={handleChange}
                   fullWidth
                   size="small"
-                />
-                <TextField
+                /> */}
+                {/* <TextField
                   label="Barcode"
                   name="barCode"
                   value={product.barCode}
                   onChange={handleChange}
                   fullWidth
                   size="small"
-                />
+                /> */}
                 <TextField
                   label="Description"
                   name="description"
@@ -163,7 +163,7 @@ const CreateProduct = ({ open, setOpen }) => {
                 Stock Information
               </Typography>
               <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField
+                {/* <TextField
                   label="Current Stock"
                   name="currentStock"
                   type="number"
@@ -171,12 +171,12 @@ const CreateProduct = ({ open, setOpen }) => {
                   onChange={handleChange}
                   fullWidth
                   size="small"
-                />
+                /> */}
                 <TextField
-                  label="Main Stock Level"
-                  name="mainStockLevel"
+                  label="Min Stock Level"
+                  name="minStockLevel"
                   type="number"
-                  value={product.mainStockLevel}
+                  value={product.minStockLevel}
                   onChange={handleChange}
                   fullWidth
                   size="small"
@@ -222,7 +222,7 @@ const CreateProduct = ({ open, setOpen }) => {
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-              <TextField
+              {/* <TextField
                 select
                 fullWidth
                 name="status"
@@ -233,7 +233,7 @@ const CreateProduct = ({ open, setOpen }) => {
               >
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="inactive">Inactive</MenuItem>
-              </TextField>
+              </TextField> */}
               <TextField
                 select
                 fullWidth
@@ -378,38 +378,38 @@ const ProductList = () => {
       flex: 0.5,
       minWidth: 80,
     },
-    {
-      field: "unit",
-      headerName: "Unit",
-      flex: 0.5,
-      minWidth: 80,
-    },
+    // {
+    //   field: "unit",
+    //   headerName: "Unit",
+    //   flex: 0.5,
+    //   minWidth: 80,
+    // },
     {
       field: "description",
       headerName: "Description",
       flex: 0.5,
       minWidth: 80,
     },
+    // {
+    //   field: "sku",
+    //   headerName: "SKU",
+    //   flex: 0.5,
+    //   minWidth: 80,
+    // },
+    // {
+    //   field: "barCode",
+    //   headerName: "Barcode",
+    //   flex: 0.5,
+    //   minWidth: 80,
+    // },
+    // {
+    //   field: "currentStock",
+    //   headerName: "Current Stock",
+    //   flex: 0.5,
+    //   minWidth: 80,
+    // },
     {
-      field: "sku",
-      headerName: "SKU",
-      flex: 0.5,
-      minWidth: 80,
-    },
-    {
-      field: "barCode",
-      headerName: "Barcode",
-      flex: 0.5,
-      minWidth: 80,
-    },
-    {
-      field: "currentStock",
-      headerName: "Current Stock",
-      flex: 0.5,
-      minWidth: 80,
-    },
-    {
-      field: "mainStockLevel",
+      field: "minStockLevel",
       headerName: "Main Stock Level",
       flex: 0.5,
       minWidth: 80,
@@ -426,12 +426,12 @@ const ProductList = () => {
       flex: 0.5,
       minWidth: 80,
     },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 0.5,
-      minWidth: 80,
-    },
+    // {
+    //   field: "status",
+    //   headerName: "Status",
+    //   flex: 0.5,
+    //   minWidth: 80,
+    // },
     {
       field: "categoryId",
       headerName: "Category",

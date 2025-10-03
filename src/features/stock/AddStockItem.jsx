@@ -31,7 +31,7 @@ const AddStockItem = () => {
     productId: "",
     quantity: "",
     unitType: "",
-    stockNotificationQuantity: "",
+    // stockNotificationQuantity: "",
     purchasePrice: "",
   });
 
@@ -82,7 +82,7 @@ const AddStockItem = () => {
         productId: "",
         quantity: "",
         unitType: "",
-        stockNotificationQuantity: "",
+        // stockNotificationQuantity: "",
         purchasePrice: "",
       });
     } catch (error) {
@@ -185,7 +185,7 @@ const AddStockItem = () => {
             </Grid>
 
             {/* Stock Notification Quantity */}
-            <Grid item xs={6}>
+            {/* <Grid item xs={6}>
               <TextField
                 fullWidth
                 label="Stock Notification Quantity"
@@ -197,7 +197,7 @@ const AddStockItem = () => {
                 helperText="Minimum quantity before notification"
                 inputProps={{ min: 0, step: 0.01 }}
               />
-            </Grid>
+            </Grid> */}
 
             {/* Purchase Price */}
             <Grid item xs={6}>

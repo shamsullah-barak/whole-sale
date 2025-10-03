@@ -15,6 +15,7 @@ import { fetchCustomersAsync } from "../../store/slices/businessEntity.slice";
 import { selectCustomers } from "../../store/selectors/businessEntity.selector";
 import Model from "../../components/Model";
 import Datagrid from "../../components/DataGrid";
+import { fetchLedgersAsync } from "../../store/slices/ledger.slice";
 
 const currencyTypes = ["afn", "dollar", "rupee"];
 
@@ -64,6 +65,7 @@ const CreateCustomers = ({ open, setOpen }) => {
       setLoading(false);
       toast.success("data added");
       dispatch(fetchCustomersAsync({ page: 1, limit: 10 }));
+      dispatch(fetchLedgersAsync({ page: 1, limit: 10 }));
     } catch (error) {
       setOpen(false);
       setLoading(false);

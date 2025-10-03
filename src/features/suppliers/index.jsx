@@ -15,6 +15,7 @@ import { fetchSuppliersAsync } from "../../store/slices/businessEntity.slice";
 import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
 import Datagrid from "../../components/DataGrid";
 import Model from "../../components/Model";
+import { fetchLedgersAsync } from "../../store/slices/ledger.slice";
 
 const currencyTypes = ["afn", "dollar", "rupee"];
 
@@ -65,6 +66,7 @@ const CreateSupplier = ({ open, setOpen }) => {
       setLoading(false);
       toast.success("data added");
       dispatch(fetchSuppliersAsync({ page: 1, limit: 10 }));
+      dispatch(fetchLedgersAsync({ page: 1, limit: 10 }));
     } catch (error) {
       setOpen(false);
       setLoading(false);

@@ -218,7 +218,11 @@ const LedgerList = () => {
           "& .MuiDrawer-paper": {
             width: { xs: "100%", sm: 520, md: 640 },
             maxWidth: "100%",
+            // Ensure drawer overlays header/app bar
+            zIndex: (theme) => theme.zIndex.drawer + 3,
           },
+          // Also raise the modal container z-index just in case
+          zIndex: (theme) => theme.zIndex.drawer + 3,
         }}
       >
         <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>

@@ -21,6 +21,7 @@ import receivable from "./reducers/receivable.reducer";
 import incomes from "./reducers/incomes.reducer";
 import dashboardData from "./reducers/dashboard.reducer";
 import installmentReducer from "./reducers/installment.reducer";
+import cashboxReducer from "./slices/cashbox.slice";
 
 export const store = configureStore({
   reducer: {
@@ -46,5 +47,6 @@ export const store = configureStore({
     incomes: incomes,
     dashboardData: dashboardData,
     installments: installmentReducer,
+    cashbox: cashboxReducer,
   },
 });

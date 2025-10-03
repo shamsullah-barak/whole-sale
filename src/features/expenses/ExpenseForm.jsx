@@ -8,12 +8,7 @@ import {
   Paper,
   TextField,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   CircularProgress,
-  Alert,
-  Divider,
 } from "@mui/material";
 import {
   Save as SaveIcon,
@@ -56,74 +51,45 @@ const ExpenseForm = () => {
   const ledgers = useSelector(selectLedgers);
   const selectedDirection = useSelector(selectDirection);
 
-  const journalEntryHandler = async (event) => {
-    event.preventDefault(event);
-    try {
-      await axios.post(
-        `http://localhost:5000/api/journal-entries/money-deposit`,
-        journalEntry,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
-      setJournalEntry({
-        description: "",
-        amount: 0,
-      });
+  // const journalEntryHandler = async (event) => {
+  //   event.preventDefault(event);
+  //   try {
+  //     await axios.post(
+  //       `http://localhost:5000/api/journal-entries/money-deposit`,
+  //       journalEntry,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     // dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
+  //     setJournalEntry({
+  //       description: "",
+  //       amount: 0,
+  //     });
 
-      toast.success("data successfully added");
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
-    }
-  };
-
-  const [journalEntry, setJournalEntry] = useState({
-    description: "",
-    amount: 0,
-    ledgerId: "",
-    ledgerInfo: "",
-  });
+  //     toast.success("data successfully added");
+  //   } catch (error) {
+  //     toast.error(
+  //       error?.response?.data?.message ??
+  //         "something went wrong! please try again"
+  //     );
+  //   }
+  // };
 
   const [formData, setFormData] = useState({
-    loanId: "",
-    amount: "",
-    type: type || "AP",
+    ledgerId: "",
+    amount: 0,
     description: "",
-    paymentDate: new Date().toISOString().split("T")[0],
   });
 
-  // Load expense data for edit mode
-  useEffect(() => {
-    if (isEdit && id) {
-      dispatch(fetchExpenseByIdAsync(id));
-    }
-  }, [dispatch, isEdit, id]);
-
-  // Update form data when selected expense changes (edit mode)
-  useEffect(() => {
-    if (isEdit && selectedExpense) {
-      setFormData({
-        loanId: selectedExpense.loanId || "",
-        amount: selectedExpense.amount || "",
-        type: selectedExpense.type || "AP",
-        description: selectedExpense.description || "",
-        paymentDate:
-          selectedExpense.paymentDate || new Date().toISOString().split("T")[0],
-      });
-    }
-  }, [isEdit, selectedExpense]);
-
-  const handleChange = (field) => (event) => {
-    const value = event.target.value;
+  const handleChange = (event) => {
+    const { value, name } = event.target.value;
+    console.log({ value, name });
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [name]: value,
     }));
   };
 
@@ -165,11 +131,6 @@ const ExpenseForm = () => {
   const handleCancel = () => {
     navigate("/expenses");
   };
-
-  const expenseTypes = [
-    { value: "AP", label: "Accounts Payable (Payable)" },
-    { value: "AR", label: "Accounts Receivable (Receivable)" },
-  ];
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -229,17 +190,10 @@ const ExpenseForm = () => {
                 label={t("select ledger")}
                 style={{ minWidth: "200px" }}
                 dir={selectedDirection === "rtl" ? "right" : "left"}
-                value={journalEntry.ledgerId}
-                onChange={(event) => {
-                  const selectedLedger = ledgers.ledgers.find(
-                    (ledger) => ledger._id === event.target.value
-                  );
-                  setJournalEntry({
-                    ...journalEntry,
-                    ledgerId: selectedLedger._id,
-                    ledgerInfo: selectedLedger.name,
-                  });
-                }}
+                value={formData.ledgerId}
+                onChange={(value) =>
+                  setFormData({ ...formData, ledgerId: value.target.value })
+                }
               >
                 {ledgers.ledgers?.map((item, index) => (
                   <MenuItem key={index} value={item._id}>
@@ -252,16 +206,13 @@ const ExpenseForm = () => {
             <Grid size={6} xs={6} sm={6} padding={1}>
               <TextField
                 fullWidth
-                label={t("Quantity")}
+                label={t("amount")}
                 name="amount"
                 type="number"
-                value={journalEntry.amount}
-                onChange={(event) =>
-                  setJournalEntry({
-                    ...journalEntry,
-                    amount: event.target.value,
-                  })
-                }
+                value={formData.amount}
+                onChange={(event) => {
+                  setFormData({ ...formData, amount: event.target.value });
+                }}
               />
             </Grid>
             <Grid size={12} xs={12} sm={12} padding={1}>
@@ -270,131 +221,13 @@ const ExpenseForm = () => {
                 label={t("description")}
                 name="description"
                 type="text"
-                value={journalEntry.description}
-                onChange={(event) =>
-                  setJournalEntry({
-                    ...journalEntry,
-                    description: event.target.value,
-                  })
-                }
-              />
-            </Grid>
-          </Grid>
-          {/* <Button
-                    type="submit"
-                    variant="contained"
-                    fullWidth
-                    color="inherit"
-                    style={{ marginTop: 20 }}
-                    sx={(theme) => ({
-                      backgroundColor:
-                        theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
-                      color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
-                    })}
-                    onClick={journalEntryHandler}
-                  >
-                    {t("Add")}
-                  </Button> */}
-
-          {/*    <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                label="Loan"
-                name="loanId"
-                value={formData.loanId}
-                onChange={handleChange("loanId")}
-                fullWidth
-                required
-                disabled={loansLoading}
-                size="small"
-                helperText={
-                  loansLoading
-                    ? "Loading loans..."
-                    : "Select the loan for this expense"
-                }
-              >
-                {filteredLoans.map((loan) => (
-                  <MenuItem key={loan.id} value={loan.id}>
-                    {loan.name} - {loan.address} - ${loan.amount}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-     
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                label="Expense Type"
-                name="type"
-                value={formData.type}
-                onChange={handleChange("type")}
-                fullWidth
-                required
-                disabled={!!type} // Disable if type is specified in URL
-                size="small"
-                helperText={
-                  type
-                    ? "Type is fixed based on context"
-                    : "Select the expense type"
-                }
-              >
-                {expenseTypes.map((typeOption) => (
-                  <MenuItem key={typeOption.value} value={typeOption.value}>
-                    {typeOption.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Amount"
-                name="amount"
-                type="number"
-                value={formData.amount}
-                onChange={handleChange("amount")}
-                fullWidth
-                required
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-                helperText="Enter the expense amount"
-              />
-            </Grid>
-
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Payment Date"
-                name="paymentDate"
-                type="date"
-                value={formData.paymentDate}
-                onChange={handleChange("paymentDate")}
-                fullWidth
-                required
-                size="small"
-                InputLabelProps={{
-                  shrink: true,
+                value={formData.description}
+                onChange={(event) => {
+                  setFormData({ ...formData, description: event.target.value });
                 }}
               />
             </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange("description")}
-                fullWidth
-                multiline
-                rows={3}
-                size="small"
-                helperText="Optional description for this expense"
-              />
-            </Grid>
-
-*/}
+          </Grid>
           <Grid item xs={12}>
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               <Button

@@ -48,14 +48,14 @@ const ExpensesList = () => {
   const deleteLoading = useSelector(selectDeleteExpenseLoading);
   const pagination = useSelector(selectExpensesPagination);
 
-  useEffect(() => {
-    const loadExpenses = () => {
-      dispatch(
-        fetchExpensesAsync({ page: 1, limit: pagination.limitPerPage || 20 })
-      );
-    };
-    loadExpenses();
-  }, [dispatch, pagination.limitPerPage]);
+  // useEffect(() => {
+  //   const loadExpenses = () => {
+  //     dispatch(
+  //       fetchExpensesAsync({ page: 1, limit: pagination.limitPerPage || 20 })
+  //     );
+  //   };
+  //   loadExpenses();
+  // }, [dispatch, pagination.limitPerPage]);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;

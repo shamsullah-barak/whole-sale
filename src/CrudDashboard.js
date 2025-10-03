@@ -160,7 +160,7 @@ const router = createHashRouter([
         Component: Receivable,
       },
       {
-        path: "/stocks/:stockName",
+        path: "/stocks/:id",
         Component: StockItems,
       },
       {

@@ -1,10 +1,10 @@
 import axios from "axios";
 
 // A mock function to mimic making an async request for data
-export const fetchStockItems = async (stockName, page, limit) => {
+export const fetchStockItems = async (stockId, page, limit) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/stocks/stock-items?stockName=${stockName}&page=${page}&limit=${limit}`
+      `http://localhost:5000/api/stocks/${stockId}/stock-items?page=${page}&limit=${limit}`
     );
     return response.data;
   } catch (error) {

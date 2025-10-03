@@ -51,7 +51,7 @@ function AreaGradient({ color, id }) {
   );
 }
 
-function StatCard({ title, value, interval, trend, data, engName }) {
+function StatCard({ title, value, interval, trend, data, engName, _id }) {
   const theme = useTheme();
   const daysInWeek = getDaysInMonth(4, 2024);
 
@@ -81,7 +81,7 @@ function StatCard({ title, value, interval, trend, data, engName }) {
   const trendValues = { up: "+25%", down: "-25%", neutral: "+5%" };
 
   return (
-    <NavLink to={engName}>
+    <NavLink to={_id}>
       <Card
         variant="outlined"
         sx={{
@@ -175,6 +175,7 @@ const StockList = () => {
               title={card.stockEngName}
               engName={card.stockEngName}
               value={card.productCount}
+              _id={card._id}
             />
           </Grid>
         ))}

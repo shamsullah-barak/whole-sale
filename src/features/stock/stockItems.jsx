@@ -73,22 +73,25 @@ const StockItems = () => {
   const selectedDirection = useSelector(selectDirection);
   const stockItems = useSelector(selectStockItems);
 
-  const stockName = useParams().stockName;
+  const { id } = useParams();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const loadStockItems = () => {
-      dispatch(
-        fetchStockItemsAsync({
-          stockName,
-          page: stockItems.currentPage,
-          limit: stockItems.limitPerPage,
-        })
-      );
-    };
+    if (id) {
+      const loadStockItems = () => {
+        dispatch(
+          fetchStockItemsAsync({
+            id,
+            page: stockItems.currentPage,
+            limit: stockItems.limitPerPage,
+          })
+        );
+      };
 
-    loadStockItems();
-  }, []);
+      loadStockItems();
+    }
+  }, [dispatch, id]);
+
   return (
     <>
       <>

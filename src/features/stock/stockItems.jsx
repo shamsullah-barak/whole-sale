@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
-import { useParams } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStockItemsAsync } from "../../store/slices/stock.items.slice";
 import { selectStockItems } from "../../store/selectors/stock.items.selector";
 import Datagrid from "../../components/DataGrid";
 import formatDate from "../../utils/moment";
+import { Button, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import COLORS from "../../constant/colors";
 
 const columns = [
   {
@@ -72,6 +75,7 @@ const StockItemsList = () => {
 const StockItems = () => {
   const selectedDirection = useSelector(selectDirection);
   const stockItems = useSelector(selectStockItems);
+  const { t } = useTranslation();
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -104,6 +108,22 @@ const StockItems = () => {
               textAlign: selectedDirection === "rtl" ? "left" : "right",
             }}
           >
+            <Box sx={{ mb: 2 }}>
+              <NavLink to={`/stocks/${id}/add-item`}>
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  sx={(theme) => ({
+                    backgroundColor:
+                      theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+                    color:
+                      theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+                  })}
+                >
+                  {t("Add New Item")}
+                </Button>
+              </NavLink>
+            </Box>
             <StockItemsList />
           </Grid>
         </Grid>

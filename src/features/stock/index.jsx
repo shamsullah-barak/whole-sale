@@ -81,7 +81,7 @@ function StatCard({ title, value, interval, trend, data, engName, _id }) {
   const trendValues = { up: "+25%", down: "-25%", neutral: "+5%" };
 
   return (
-    <NavLink to={_id}>
+    <NavLink to={`${_id}/stock-items`}>
       <Card
         variant="outlined"
         sx={{

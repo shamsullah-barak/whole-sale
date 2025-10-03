@@ -22,6 +22,7 @@ import Settings from "./features/settings";
 import Stock from "./features/stock";
 import CreateStock from "./features/stock/createStock";
 import StockItems from "./features/stock/stockItems";
+import AddStockItem from "./features/stock/AddStockItem";
 import Units from "./features/master-data/units/Units";
 import CreateUnit from "./features/master-data/units/CreateUnit";
 import EditUnit from "./features/master-data/units/EditUnit";
@@ -160,8 +161,12 @@ const router = createHashRouter([
         Component: Receivable,
       },
       {
-        path: "/stocks/:id",
+        path: "/stocks/:id/stock-items",
         Component: StockItems,
+      },
+      {
+        path: "/stocks/:id/add-item",
+        Component: AddStockItem,
       },
       {
         path: "/suppliers",

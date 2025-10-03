@@ -12,14 +12,14 @@ const columns = [
     minWidth: 80,
   },
   {
-    field: "address",
-    headerName: "address",
+    field: "currentBalance",
+    headerName: "Current Balance",
     flex: 0.5,
     minWidth: 80,
   },
   {
-    field: "amount",
-    headerName: "Total Amount",
+    field: "currencyType",
+    headerName: "Currency",
     flex: 0.5,
     minWidth: 80,
   },

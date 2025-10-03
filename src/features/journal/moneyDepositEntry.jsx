@@ -16,6 +16,7 @@ import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { toast, ToastContainer } from "react-toastify";
 import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
+import { fetchPayableAsync } from "../../store/slices/payable.slice";
 
 const MoneyDeposit = ({ statusId }) => {
   const { t } = useTranslation();
@@ -37,6 +38,7 @@ const MoneyDeposit = ({ statusId }) => {
         }
       );
       dispatch(fetchCashboxBalancesAsync());
+      dispatch(fetchPayableAsync());
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       setJournalEntry({
         description: "",

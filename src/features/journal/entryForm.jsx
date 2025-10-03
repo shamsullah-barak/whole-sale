@@ -38,7 +38,7 @@ const EntryForm = () => {
               statusId: selectedId,
             });
           }}
-          style={{ minWidth: "200px" }}
+          sx={{ width: "100%" }}
         >
           {transactionTypes.map((item) => (
             <MenuItem key={item.id} value={item.id} dir={selectedDirection}>

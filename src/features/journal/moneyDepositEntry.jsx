@@ -55,12 +55,12 @@ const MoneyDeposit = ({ statusId }) => {
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={6} md={4}>
           <TextField
             select
             fullWidth
             label={t("select ledger")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.ledgerId}
             onChange={(event) => {
@@ -82,7 +82,7 @@ const MoneyDeposit = ({ statusId }) => {
           </TextField>
         </Grid>
 
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={6} md={4}>
           <TextField
             fullWidth
             label={t("Quantity")}
@@ -97,7 +97,7 @@ const MoneyDeposit = ({ statusId }) => {
             }
           />
         </Grid>
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={12} md={4}>
           <TextField
             fullWidth
             label={t("description")}

@@ -214,7 +214,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             required
             name="unitType"
             label={t("unitType")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.unitType}
             onChange={inputHandler}
@@ -270,7 +270,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             required
             name="paymentMethod"
             label={t("paymentMethod")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.paymentMethod}
             onChange={inputHandler}
@@ -336,7 +336,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             required
             name="stockId"
             label={t("stockName")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.stockId}
             onChange={inputHandler}
@@ -356,7 +356,7 @@ const PurchaseOfGoods = ({ statusId }) => {
             required
             name="supplierId"
             label={t("supplier")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.supplierId}
             onChange={inputHandler}

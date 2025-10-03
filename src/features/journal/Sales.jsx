@@ -218,7 +218,7 @@ const Sales = () => {
                     required
                     name="unitType"
                     label={t("unitType")}
-                    style={{ minWidth: "200px" }}
+                    sx={{ width: "100%" }}
                     dir={selectedDirection === "rtl" ? "right" : "left"}
                     value={sale.unitType}
                     onChange={inputHandler}
@@ -274,7 +274,7 @@ const Sales = () => {
                     required
                     name="paymentMethod"
                     label={t("paymentMethod")}
-                    style={{ minWidth: "200px" }}
+                    sx={{ width: "100%" }}
                     dir={selectedDirection === "rtl" ? "right" : "left"}
                     value={sale.paymentMethod}
                     onChange={inputHandler}
@@ -339,7 +339,7 @@ const Sales = () => {
                     required
                     name="customerId"
                     label={t("customer")}
-                    style={{ minWidth: "200px" }}
+                    sx={{ width: "100%" }}
                     dir={selectedDirection === "rtl" ? "right" : "left"}
                     value={sale.customerId}
                     onChange={inputHandler}

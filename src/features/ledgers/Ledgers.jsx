@@ -8,10 +8,14 @@ import {
   Paper,
   CircularProgress,
   Alert,
+  Drawer,
+  Divider,
+  IconButton,
 } from "@mui/material";
 import {
   Add as AddIcon,
   AccountBalance as AccountBalanceIcon,
+  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +29,7 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import Datagrid from "../../components/DataGrid";
 import COLORS from "../../constant/colors";
 import formatDate from "../../utils/moment";
+import EntryForm from "../journal/entryForm";
 
 export const columns = [
   {
@@ -59,9 +64,12 @@ const LedgerList = () => {
   const { t } = useTranslation();
   const ledgers = useSelector(selectLedgers);
   const [formOpen, setFormOpen] = useState(false);
+  const [entryDrawerOpen, setEntryDrawerOpen] = useState(false);
   const handleFormClose = () => {
     setFormOpen(false);
   };
+  const handleOpenEntryDrawer = () => setEntryDrawerOpen(true);
+  const handleCloseEntryDrawer = () => setEntryDrawerOpen(false);
 
   // useEffect(() => {
   //   const loadLedgers = () => {
@@ -126,19 +134,27 @@ const LedgerList = () => {
               Manage your chart of accounts and ledger entries
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateLedger}
-            sx={{
-              backgroundColor: COLORS.PURPLE,
-              "&:hover": {
-                backgroundColor: COLORS.PURPLE_DARK,
-              },
-            }}
-          >
-            Create Ledger
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              onClick={handleOpenEntryDrawer}
+            >
+              New Entry
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreateLedger}
+              sx={{
+                backgroundColor: COLORS.PURPLE,
+                "&:hover": {
+                  backgroundColor: COLORS.PURPLE_DARK,
+                },
+              }}
+            >
+              Create Ledger
+            </Button>
+          </Stack>
         </Stack>
       </Paper>
 
@@ -191,6 +207,31 @@ const LedgerList = () => {
 
       {/* Create Ledger Form Modal */}
       <CreateLedgerForm open={formOpen} onClose={handleFormClose} />
+
+      {/* Journal Entry Drawer */}
+      <Drawer
+        anchor="right"
+        open={entryDrawerOpen}
+        onClose={handleCloseEntryDrawer}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: { xs: "100%", sm: 520, md: 640 },
+            maxWidth: "100%",
+          },
+        }}
+      >
+        <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton aria-label="close drawer" onClick={handleCloseEntryDrawer} size="small">
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6">New Journal Entry</Typography>
+        </Box>
+        <Divider />
+        <Box sx={{ p: 2 }}>
+          <EntryForm />
+        </Box>
+      </Drawer>
     </Box>
   );
 };

@@ -66,7 +66,7 @@ const MoneyWithdrawal = ({ transactionTypeId }) => {
             fullWidth
             label={t("ledger")}
             name="ledgerId"
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={data.ledgerId}
             onChange={handleInput}

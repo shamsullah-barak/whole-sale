@@ -14,7 +14,6 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,6 +28,7 @@ import {
   selectCompaniesLoading,
   selectCompaniesError,
 } from "../../../store/selectors/company.selector";
+import Datagrid from "../../../components/DataGrid";
 
 const Companies = () => {
   const dispatch = useDispatch();
@@ -211,7 +211,7 @@ const Companies = () => {
 
         {/* Data Grid */}
         <Box sx={{ width: "100%", height: 600 }}>
-          <DataGrid
+          <Datagrid
             rows={companiesList}
             columns={columns}
             getRowClassName={(params) =>

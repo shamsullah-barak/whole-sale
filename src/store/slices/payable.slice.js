@@ -31,7 +31,6 @@ export const payableSlice = createSlice({
       .addCase(fetchPayableAsync.fulfilled, (state, action) => {
         // console.log({ payload: action.payload });
         // state.loading = false;
-        console.log({ p: action.payload });
         state.payable = action?.payload;
         state.loading = false;
         // state.currentPage = action?.payload?.page;

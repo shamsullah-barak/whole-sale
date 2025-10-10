@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import {
   TextField,
@@ -6,7 +6,17 @@ import {
   Button,
   Grid2 as Grid,
   Autocomplete,
+  Divider,
+  Typography,
+  IconButton,
+  Box,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useDispatch, useSelector } from "react-redux";
 import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
@@ -18,11 +28,9 @@ import { selectStocks } from "../../store/selectors/stock.selector";
 import moment from "moment/moment";
 import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
 import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
-import {
-  selectNextInvoiceNo,
-  selectPurchases,
-} from "../../store/selectors/purchase.selector";
+import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
 import { useParams } from "react-router-dom";
+import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -33,7 +41,6 @@ const PurchaseOfGoods = () => {
   const dispatch = useDispatch();
 
   const { id } = useParams();
-  const { purchases } = useSelector(selectPurchases);
 
   const [loading, setLoading] = useState(false);
   const journals = useSelector(selectJournals);
@@ -43,97 +50,156 @@ const PurchaseOfGoods = () => {
   const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);
   const [journalEntry, setJournalEntry] = useState({
-    productId: "",
-    expiryDate: "",
-    quantity: "",
-    unitType: "kg",
-    unitPerPackage: "",
-    unitPrice: "",
-    totalPrice: "",
+    items: [
+      {
+        productId: "",
+        quantity: 20,
+        unitType: "kg",
+        unitPerPackage: 1,
+        unitPrice: 120,
+        stockId: "",
+        expiryDate: "2025-12-31",
+      },
+      {
+        productId: "",
+        quantity: 10,
+        unitType: "piece",
+        unitPerPackage: 1,
+        unitPrice: 250,
+        stockId: "",
+        expiryDate: "2026-03-15",
+      },
+    ],
     paymentMethod: "cash",
-    invoiceNo: "",
-    stockId: "",
-    discount: 0,
-    givingCash: 0,
+    givingCash: 3000,
     remainingCash: 0,
     supplierId: "",
+    discount: 0,
     purchaseDate: moment().format("YYYY-MM-DD"),
   });
 
-  useEffect(() => {
-    if (id) {
-      const selectedPurchase = purchases.find((item) => item._id === id);
-      console.log(selectedPurchase);
-      if (selectedPurchase) {
-        // setJournalEntry({ ...selectedPurchase });
-        const product = products.find(
-          (item) => item._id === selectedPurchase.productId
-        );
-        setJournalEntry({
-          ...selectedPurchase,
-          productId: product._id,
-          purchaseDate: moment().format("YYYY-MM-DD"),
-        });
-      }
-    }
-  }, [id]);
+  // const clearState = () => {
+  //   setJournalEntry({
+  //     items: [
+  //       {
+  //         productId: "",
+  //         quantity: "",
+  //         unitType: "kg",
+  //         unitPerPackage: "",
+  //         unitPrice: "",
+  //         stockId: "",
+  //         expiryDate: "",
+  //       },
+  //     ],
+  //     paymentMethod: "cash",
+  //     invoiceNo: "",
+  //     givingCash: 0,
+  //     remainingCash: 0,
+  //     supplierId: "",
+  //     purchaseDate: moment().format("YYYY-MM-DD"),
+  //   });
+  // };
 
-  const clearState = () => {
-    setJournalEntry({
-      productId: "",
-      expiryDate: "",
-      quantity: "",
-      unitType: "",
-      unitPerPackage: "",
-      unitPrice: "",
-      totalPrice: "",
-      paymentMethod: "",
-      invoiceNo: "",
-      stockId: "",
-      discount: 0,
-      givingCash: 0,
-      remainingCash: 0,
-      purchaseDate: moment().format("YYYY-MM-DD"),
-    });
-  };
+  // handle top-level input changes
 
-  // handle input changes
   const inputHandler = (event) => {
     const { name, value } = event.target;
-
     setJournalEntry((prevState) => {
-      let updatedEntry = { ...prevState, [name]: value };
-      const {
-        discount,
-        givingCash,
-        quantity,
-        unitPerPackage,
-        unitPrice,
-        unitType,
-        paymentMethod,
-      } = updatedEntry;
-
-      // Set unitPerPackage = 1 for specific unit types
-      if (["kg", "piece", "liter"].includes(unitType)) {
-        updatedEntry.unitPerPackage = 1;
-      }
-
-      const totalPrice = quantity * unitPerPackage * unitPrice - discount;
-      updatedEntry.totalPrice = totalPrice;
+      const updatedEntry = { ...prevState, [name]: value };
+      const { paymentMethod, givingCash } = updatedEntry;
+      const total = calculateGrandTotal(
+        updatedEntry.items,
+        updatedEntry.discount
+      );
 
       if (paymentMethod === "credit") {
-        updatedEntry.remainingCash = totalPrice;
+        updatedEntry.remainingCash = total;
         updatedEntry.givingCash = 0;
       } else if (paymentMethod === "cash") {
         updatedEntry.remainingCash = 0;
-        updatedEntry.givingCash = totalPrice;
+        updatedEntry.givingCash = total;
       } else if (paymentMethod === "cashAndCredit") {
-        updatedEntry.remainingCash = totalPrice - givingCash;
+        updatedEntry.remainingCash = total - (Number(givingCash) || 0);
       }
-
       return updatedEntry;
     });
   };
+
+  const handleItemChange = (index, field, value) => {
+    setJournalEntry((prev) => {
+      const items = [...prev.items];
+      const updatedItem = { ...items[index], [field]: value };
+      if (field === "unitType" && ["kg", "piece", "liter"].includes(value)) {
+        updatedItem.unitPerPackage = 1;
+      }
+      items[index] = updatedItem;
+      const updated = { ...prev, items };
+      const total = calculateGrandTotal(items, updated.discount);
+      if (updated.paymentMethod === "credit") {
+        updated.remainingCash = total;
+        updated.givingCash = 0;
+      } else if (updated.paymentMethod === "cash") {
+        updated.remainingCash = 0;
+        updated.givingCash = total;
+      } else if (updated.paymentMethod === "cashAndCredit") {
+        updated.remainingCash = total - (Number(updated.givingCash) || 0);
+      }
+      return updated;
+    });
+  };
+
+  const addItem = () => {
+    setJournalEntry((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          productId: "",
+          quantity: "",
+          unitType: "kg",
+          unitPerPackage: "",
+          unitPrice: "",
+          stockId: "",
+          expiryDate: "",
+        },
+      ],
+    }));
+  };
+
+  const removeItem = (index) => {
+    setJournalEntry((prev) => {
+      const items = prev.items.filter((_, i) => i !== index);
+      const updated = { ...prev, items };
+      const total = calculateGrandTotal(items, updated.discount);
+      if (updated.paymentMethod === "credit") {
+        updated.remainingCash = total;
+        updated.givingCash = 0;
+      } else if (updated.paymentMethod === "cash") {
+        updated.remainingCash = 0;
+        updated.givingCash = total;
+      } else if (updated.paymentMethod === "cashAndCredit") {
+        updated.remainingCash = total - (Number(updated.givingCash) || 0);
+      }
+      return updated;
+    });
+  };
+
+  const calculateLineTotal = (item) => {
+    const quantity = Number(item.quantity) || 0;
+    const unitPerPackage = Number(item.unitPerPackage) || 0;
+    const unitPrice = Number(item.unitPrice) || 0;
+    return quantity * unitPerPackage * unitPrice;
+  };
+
+  const calculateGrandTotal = (items, discount = 0) => {
+    const subtotal = items.reduce((sum, it) => sum + calculateLineTotal(it), 0);
+    return subtotal - (Number(discount) || 0);
+  };
+
+  const grandTotal = useMemo(
+    () => calculateGrandTotal(journalEntry.items, journalEntry.discount),
+    [journalEntry.items, journalEntry.discount]
+  );
 
   const journalEntryHandler = async (event) => {
     event.preventDefault(event);
@@ -141,13 +207,11 @@ const PurchaseOfGoods = () => {
     setLoading(true);
 
     const cleanedEntry = { ...journalEntry };
-
-    if (!cleanedEntry.expiryDate) delete cleanedEntry.expiryDate;
     if (!cleanedEntry.purchaseDate) delete cleanedEntry.purchaseDate;
     if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+    cleanedEntry.totalPrice = grandTotal;
 
     if (id) {
-      delete cleanedEntry.invoiceNo;
       delete cleanedEntry.__v;
       delete cleanedEntry.createdAt;
       delete cleanedEntry.updatedAt;
@@ -166,6 +230,7 @@ const PurchaseOfGoods = () => {
         dispatch(
           fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
         );
+        dispatch(fetchCashboxBalancesAsync());
         toast.success("data updated");
         setLoading(false);
       } catch (error) {
@@ -189,6 +254,7 @@ const PurchaseOfGoods = () => {
         // clearState();
         setLoading(false);
       } catch (error) {
+        setLoading(false);
         toast.error(
           error?.response?.data?.message ??
             "something went wrong! please try again"
@@ -201,121 +267,195 @@ const PurchaseOfGoods = () => {
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid size={6} xs={12} sm={12}>
-          <Autocomplete
-            disablePortal
-            disableClearable
-            options={products}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("Products")}
-                variant="outlined"
-                required
-              />
-            )}
-            onChange={(event, value) => {
-              if (value) {
-                setJournalEntry({ ...journalEntry, productId: value._id });
-              }
+        <Grid size={12} xs={12} sx={{ textAlign: "right" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            {t("invoiceNo")} #{nextInvoiceNo}
+          </Typography>
+        </Grid>
+
+        <Grid size={12} xs={12}>
+          <Divider>
+            <Typography variant="subtitle1">{t("Products")}</Typography>
+          </Divider>
+        </Grid>
+
+        {journalEntry.items.map((item, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: "relative",
+              // border: "1px solid #ddd",
+              // borderRadius: 2,
+              borderRIghtColor: "divider",
+              borderLeftColor: "divider",
+              p: 2,
+              mb: 2,
+              "&:hover .delete-icon": {
+                opacity: 1,
+              },
             }}
-          />
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("expiryDate")}
-            name="expiryDate"
-            type="date"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            value={journalEntry.expiryDate}
-            onChange={inputHandler}
-            sx={{ height: "100%", width: "100%" }}
-          />
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("purchaseDate")}
-            name="purchaseDate"
-            type="date"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            value={journalEntry.purchaseDate}
-            onChange={inputHandler}
-            sx={{ height: "100%", width: "100%" }}
-          />
-        </Grid>
-        <Grid size={4} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            required
-            label={t("Quantity")}
-            name="quantity"
-            type="number"
-            value={journalEntry.quantity}
-            onChange={inputHandler}
-          />
-        </Grid>
-        <Grid size={4} xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            required
-            name="unitType"
-            label={t("unitType")}
-            style={{ minWidth: "200px" }}
-            dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.unitType}
-            onChange={inputHandler}
           >
-            {unitTypes.map((item, index) => (
-              <MenuItem key={index} value={item}>
-                {t(`${item}`)}
-              </MenuItem>
-            ))}
-          </TextField>
+            {/* Delete Icon */}
+            <IconButton
+              className="delete-icon"
+              onClick={() => removeItem(index)}
+              disabled={journalEntry.items.length === 1}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: "-15px",
+                transform: "translateY(-50%)",
+                bgcolor: "white",
+                color: "red",
+                boxShadow: 2,
+                opacity: 0,
+                transition: "opacity 0.3s",
+                zIndex: 10,
+                "&:hover": { bgcolor: "#ffe6e6" },
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+
+            {/* Main Grid Content */}
+            <Grid container spacing={1}>
+              {/* Row 1 */}
+              <Grid size={3} xs={12} sm={6}>
+                <Autocomplete
+                  disablePortal
+                  disableClearable
+                  options={products}
+                  getOptionLabel={(option) => option.name}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("Products")} required />
+                  )}
+                  value={products.find((p) => p._id === item.productId) || null}
+                  onChange={(event, value) =>
+                    value && handleItemChange(index, "productId", value._id)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Quantity")}
+                  required
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleItemChange(index, "quantity", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  select
+                  fullWidth
+                  label={t("Unit Type")}
+                  required
+                  value={item.unitType}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitType", e.target.value)
+                  }
+                >
+                  {unitTypes.map((ut, i) => (
+                    <MenuItem key={i} value={ut}>
+                      {t(`${ut}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  disabled={["kg", "piece", "liter"].includes(item.unitType)}
+                  label={t("Unit Per Package")}
+                  type="number"
+                  value={item.unitPerPackage}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitPerPackage", e.target.value)
+                  }
+                />
+              </Grid>
+
+              {/* Row 2 */}
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  select
+                  fullWidth
+                  label={t("Stock Name")}
+                  required
+                  value={item.stockId}
+                  onChange={(e) =>
+                    handleItemChange(index, "stockId", e.target.value)
+                  }
+                >
+                  {stocks.map((s) => (
+                    <MenuItem key={s._id} value={s._id}>
+                      {t(s.engName)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Unit Price")}
+                  type="number"
+                  required
+                  value={item.unitPrice}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitPrice", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Expiry Date")}
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={item.expiryDate}
+                  onChange={(e) =>
+                    handleItemChange(index, "expiryDate", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  disabled
+                  label={t("Total Price")}
+                  type="number"
+                  value={calculateLineTotal(item)}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+
+        <Grid size={12} xs={12} sx={{ mt: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={addItem}
+            style={{ width: "100%" }}
+          >
+            {t("Add Product")}
+          </Button>
         </Grid>
-        <Grid size={4} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            required
-            disabled={
-              journalEntry.unitType === "kg" ||
-              journalEntry.unitType === "piece" ||
-              journalEntry.unitType === "liter"
-            }
-            label={t("unitPerPackage")}
-            name="unitPerPackage"
-            type="number"
-            value={journalEntry.unitPerPackage}
-            onChange={inputHandler}
-          />
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            required
-            label={t("unitPrice")}
-            name="unitPrice"
-            type="number"
-            value={journalEntry.unitPrice}
-            onChange={inputHandler}
-          />
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            disabled
-            label={t("totalPrice")}
-            name="totalPrice"
-            type="number"
-            value={journalEntry.totalPrice}
-          />
+
+        <Grid size={12} xs={12}>
+          <Divider sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">{t("Payment & Party")}</Typography>
+          </Divider>
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
@@ -364,47 +504,6 @@ const PurchaseOfGoods = () => {
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
-            fullWidth
-            label={t("discount")}
-            name="discount"
-            type="number"
-            value={journalEntry.discount}
-            onChange={inputHandler}
-          />
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={t("invoiceNo")}
-            name="invoiceNo"
-            type="number"
-            value={nextInvoiceNo}
-            disabled
-          />
-        </Grid>
-
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            required
-            name="stockId"
-            label={t("stockName")}
-            style={{ minWidth: "200px" }}
-            dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.stockId}
-            onChange={inputHandler}
-          >
-            {stocks.map((item, index) => (
-              <MenuItem key={index} value={item._id}>
-                {t(`${item.engName}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid size={12} xs={12} sm={6}>
-          <TextField
             select
             fullWidth
             required
@@ -422,6 +521,32 @@ const PurchaseOfGoods = () => {
               </MenuItem>
             ))}
           </TextField>
+        </Grid>
+
+        <Grid size={12} xs={12}>
+          <Divider sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">{t("Summary & Date")}</Typography>
+          </Divider>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            disabled
+            label={t("totalPrice")}
+            name="grandTotal"
+            type="number"
+            value={grandTotal}
+          />
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label={t("discount")}
+            name="discount"
+            type="number"
+            value={journalEntry.discount}
+            onChange={inputHandler}
+          />
         </Grid>
       </Grid>
       <Button

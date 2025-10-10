@@ -76,6 +76,7 @@ import { fetchCategoriesAsync } from "./store/slices/category.slice";
 import { fetchPayableAsync } from "./store/slices/payable.slice";
 import { fetchReceivablesAsync } from "./store/slices/receivable.slice";
 import { fetchIncomeAsync } from "./store/slices/income.slice";
+import { fetchCashboxBalancesAsync } from "./store/slices/cashbox.slice";
 
 const Page404 = () => {
   return <>404</>;
@@ -272,6 +273,7 @@ export default function CrudDashboard(props) {
     dispatch(fetchStockNamesAsync());
     dispatch(fetchDashboardDataAsync());
     dispatch(fetchIncomeAsync());
+    dispatch(fetchCashboxBalancesAsync());
     dispatch(fetchPurchasesAsync({ limit: 10, page: 1 }));
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));

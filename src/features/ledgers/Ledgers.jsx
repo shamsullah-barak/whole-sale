@@ -40,8 +40,15 @@ export const columns = [
     align: "left",
   },
   {
-    field: "description",
-    headerName: "Description",
+    field: "ledgerType",
+    headerName: "Ledger Type",
+    flex: 1,
+    minWidth: 200,
+    align: "left",
+  },
+  {
+    field: "currencyType",
+    headerName: "Currency",
     flex: 1,
     minWidth: 200,
     align: "left",
@@ -51,7 +58,7 @@ export const columns = [
     headerName: "Created Date",
     flex: 0.5,
     minWidth: 150,
-    align: "center",
+    align: "left",
     valueFormatter: (params) => {
       return formatDate(params);
     },
@@ -135,10 +142,7 @@ const LedgerList = () => {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1}>
-            <Button
-              variant="outlined"
-              onClick={handleOpenEntryDrawer}
-            >
+            <Button variant="outlined" onClick={handleOpenEntryDrawer}>
               New Entry
             </Button>
             <Button
@@ -226,7 +230,11 @@ const LedgerList = () => {
         }}
       >
         <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton aria-label="close drawer" onClick={handleCloseEntryDrawer} size="small">
+          <IconButton
+            aria-label="close drawer"
+            onClick={handleCloseEntryDrawer}
+            size="small"
+          >
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6">New Journal Entry</Typography>

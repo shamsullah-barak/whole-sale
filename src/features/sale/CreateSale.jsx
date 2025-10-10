@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Grid,
   Typography,
@@ -14,12 +14,15 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  IconButton,
 } from "@mui/material";
 import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -57,105 +60,111 @@ const CreateSale = () => {
   const [formData, setFormData] = useState({
     saleNumber: "",
     customerId: "",
-    stockId: "",
-    stockItemId: "",
-    quantity: "",
-    unitType: "",
-    unitPerPackage: "",
-    unitPrice: "",
-    totalPrice: "",
-    discount: 0,
+    items: [
+      {
+        stockId: "",
+        stockItemId: "",
+        quantity: "",
+        unitType: "kg",
+        unitPerPackage: "",
+        unitPrice: "",
+        discount: 0,
+      },
+    ],
     paymentMethod: "cash",
     givingCash: "",
     remainingCash: "",
     description: "",
   });
 
-  const [stockItems, setStockItems] = useState([]);
-  const [loadingStockItems, setLoadingStockItems] = useState(false);
+  const [stockItems, setStockItems] = useState({});
+  const [loadingStockItems, setLoadingStockItems] = useState({});
 
   // Load sale data for edit mode
-  useEffect(() => {
-    if (isEdit && id) {
-      dispatch(fetchSaleByIdAsync(id));
-    } else {
-      // Load next sale number for create mode
-      dispatch(fetchNextSaleNumberAsync());
-    }
-  }, [dispatch, isEdit, id]);
+  // useEffect(() => {
+  //   if (isEdit && id) {
+  //     dispatch(fetchSaleByIdAsync(id));
+  //   } else {
+  //     // Load next sale number for create mode
+  //     dispatch(fetchNextSaleNumberAsync());
+  //   }
+  // }, [dispatch, isEdit, id]);
 
   // Update form data when selected sale changes (edit mode)
-  useEffect(() => {
-    if (isEdit && selectedSale) {
-      setFormData({
-        saleNumber: selectedSale.saleNumber || "",
-        customerId: selectedSale.customerId || "",
-        stockId: selectedSale.stockId || "",
-        stockItemId: selectedSale.stockItemId || "",
-        quantity: selectedSale.quantity || "",
-        unitType: selectedSale.unitType || "",
-        unitPerPackage: selectedSale.unitPerPackage || "",
-        unitPrice: selectedSale.unitPrice || "",
-        totalPrice: selectedSale.totalPrice || "",
-        discount: selectedSale.discount || 0,
-        paymentMethod: selectedSale.paymentMethod || "cash",
-        givingCash: selectedSale.givingCash || "",
-        remainingCash: selectedSale.remainingCash || "",
-        description: selectedSale.description || "",
-      });
-    } else if (!isEdit && nextSaleNumber) {
-      setFormData(prev => ({
-        ...prev,
-        saleNumber: nextSaleNumber.toString(),
-      }));
-    }
-  }, [isEdit, selectedSale, nextSaleNumber]);
+  // useEffect(() => {
+  //   if (isEdit && selectedSale) {
+  //     setFormData({
+  //       saleNumber: selectedSale.saleNumber || "",
+  //       customerId: selectedSale.customerId || "",
+  //       items: selectedSale.items?.length
+  //         ? selectedSale.items.map((it) => ({
+  //             stockId: it.stockId || "",
+  //             stockItemId: it.stockItemId || "",
+  //             quantity: it.quantity || "",
+  //             unitType: it.unitType || "kg",
+  //             unitPerPackage: it.unitPerPackage || "",
+  //             unitPrice: it.unitPrice || "",
+  //             discount: it.discount || 0,
+  //           }))
+  //         : [
+  //             {
+  //               stockId: "",
+  //               stockItemId: "",
+  //               quantity: "",
+  //               unitType: "kg",
+  //               unitPerPackage: "",
+  //               unitPrice: "",
+  //               discount: 0,
+  //             },
+  //           ],
+  //       paymentMethod: selectedSale.paymentMethod || "cash",
+  //       givingCash: selectedSale.givingCash || "",
+  //       remainingCash: selectedSale.remainingCash || "",
+  //       description: selectedSale.description || "",
+  //     });
+  //   } else if (!isEdit && nextSaleNumber) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       saleNumber: nextSaleNumber.toString(),
+  //     }));
+  //   }
+  // }, [isEdit, selectedSale, nextSaleNumber]);
 
-  // Load stock items when stock is selected
-  useEffect(() => {
-    const fetchStockItems = async () => {
-      if (!formData.stockId) return;
-
-      setLoadingStockItems(true);
-      try {
-        const selectedStock = stocks.find(stock => stock._id === formData.stockId);
-        if (selectedStock) {
-          const response = await fetch(
-            `http://localhost:5000/api/stocks/stock-items?stockName=${selectedStock.engName}`
-          );
-          const data = await response.json();
-          setStockItems(data);
-        }
-      } catch (error) {
-        toast.error("Failed to load stock items");
-      } finally {
-        setLoadingStockItems(false);
+  const ensureStockItemsLoaded = async (stockId) => {
+    if (!stockId) return;
+    if (stockItems[stockId]) return;
+    setLoadingStockItems((prev) => ({ ...prev, [stockId]: true }));
+    try {
+      const selectedStock = stocks.find((stock) => stock._id === stockId);
+      if (selectedStock) {
+        const response = await fetch(
+          `http://localhost:5000/api/stocks/stock-items?stockName=${selectedStock.engName}`
+        );
+        const data = await response.json();
+        setStockItems((prev) => ({ ...prev, [stockId]: data }));
       }
-    };
-
-    fetchStockItems();
-  }, [formData.stockId, stocks]);
+    } catch (error) {
+      toast.error("Failed to load stock items");
+    } finally {
+      setLoadingStockItems((prev) => ({ ...prev, [stockId]: false }));
+    }
+  };
 
   const handleChange = (field) => (event) => {
     const value = event.target.value;
-    setFormData(prev => {
+    setFormData((prev) => {
       let updatedData = { ...prev, [field]: value };
 
-      // Auto-calculate total price
-      if (["quantity", "unitPerPackage", "unitPrice", "discount"].includes(field)) {
-        const { quantity, unitPerPackage, unitPrice, discount } = updatedData;
-        const totalPrice = (quantity * unitPerPackage * unitPrice) - (discount || 0);
-        updatedData.totalPrice = totalPrice;
-
-        // Update payment fields based on payment method
-        if (updatedData.paymentMethod === "credit") {
-          updatedData.remainingCash = totalPrice;
+      const total = grandTotal;
+      if (field === "paymentMethod") {
+        if (value === "credit") {
+          updatedData.remainingCash = total;
           updatedData.givingCash = 0;
-        } else if (updatedData.paymentMethod === "cash") {
+        } else if (value === "cash") {
           updatedData.remainingCash = 0;
-          updatedData.givingCash = totalPrice;
-        } else if (updatedData.paymentMethod === "cashAndCredit") {
-          updatedData.remainingCash = totalPrice - (updatedData.givingCash || 0);
+          updatedData.givingCash = total;
+        } else if (value === "cashAndCredit") {
+          updatedData.remainingCash = total - (updatedData.givingCash || 0);
         }
       }
 
@@ -174,18 +183,70 @@ const CreateSale = () => {
       }
 
       // Handle giving cash changes for cashAndCredit
-      if (field === "givingCash" && updatedData.paymentMethod === "cashAndCredit") {
-        updatedData.remainingCash = updatedData.totalPrice - value;
-      }
-
-      // Set unitPerPackage = 1 for specific unit types
-      if (field === "unitType" && ["kg", "piece", "liter"].includes(value)) {
-        updatedData.unitPerPackage = 1;
+      if (
+        field === "givingCash" &&
+        updatedData.paymentMethod === "cashAndCredit"
+      ) {
+        updatedData.remainingCash = total - value;
       }
 
       return updatedData;
     });
   };
+
+  const handleItemChange = (index, field) => async (event) => {
+    const value = event.target.value;
+    setFormData((prev) => {
+      const items = [...prev.items];
+      const updatedItem = { ...items[index], [field]: value };
+      if (field === "unitType" && ["kg", "piece", "liter"].includes(value)) {
+        updatedItem.unitPerPackage = 1;
+      }
+      items[index] = updatedItem;
+      return { ...prev, items };
+    });
+    if (field === "stockId") {
+      await ensureStockItemsLoaded(event.target.value);
+    }
+  };
+
+  const addItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          stockId: "",
+          stockItemId: "",
+          quantity: "",
+          unitType: "kg",
+          unitPerPackage: "",
+          unitPrice: "",
+          discount: 0,
+        },
+      ],
+    }));
+  };
+
+  const removeItem = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+    }));
+  };
+
+  const lineTotal = (item) => {
+    const q = Number(item.quantity) || 0;
+    const upp = Number(item.unitPerPackage) || 0;
+    const up = Number(item.unitPrice) || 0;
+    const d = Number(item.discount) || 0;
+    return q * upp * up - d;
+  };
+
+  const grandTotal = useMemo(
+    () => formData.items.reduce((sum, it) => sum + lineTotal(it), 0),
+    [formData.items]
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -195,28 +256,37 @@ const CreateSale = () => {
       toast.error("Please select a customer");
       return;
     }
-    if (!formData.stockId) {
-      toast.error("Please select a stock");
-      return;
-    }
-    if (!formData.quantity || formData.quantity <= 0) {
-      toast.error("Please enter a valid quantity");
-      return;
-    }
-    if (!formData.unitPrice || formData.unitPrice <= 0) {
-      toast.error("Please enter a valid unit price");
+    const invalid = formData.items.some(
+      (it) =>
+        !it.stockId ||
+        !it.stockItemId ||
+        !(Number(it.quantity) > 0) ||
+        !(Number(it.unitPrice) > 0)
+    );
+    if (invalid) {
+      toast.error("Please fill all product rows correctly");
       return;
     }
 
     try {
       const saleData = {
-        ...formData,
-        quantity: parseFloat(formData.quantity),
-        unitPrice: parseFloat(formData.unitPrice),
-        totalPrice: parseFloat(formData.totalPrice),
-        discount: parseFloat(formData.discount || 0),
-        givingCash: parseFloat(formData.givingCash || 0),
-        remainingCash: parseFloat(formData.remainingCash || 0),
+        saleNumber: formData.saleNumber,
+        customerId: formData.customerId,
+        items: formData.items.map((it) => ({
+          stockId: it.stockId,
+          stockItemId: it.stockItemId,
+          quantity: Number(it.quantity),
+          unitType: it.unitType,
+          unitPerPackage: Number(it.unitPerPackage),
+          unitPrice: Number(it.unitPrice),
+          discount: Number(it.discount || 0),
+          totalPrice: lineTotal(it),
+        })),
+        totalPrice: grandTotal,
+        paymentMethod: formData.paymentMethod,
+        givingCash: Number(formData.givingCash || 0),
+        remainingCash: Number(formData.remainingCash || 0),
+        description: formData.description,
       };
 
       if (isEdit) {
@@ -268,7 +338,9 @@ const CreateSale = () => {
               {isEdit ? "Edit Sale" : "Create New Sale"}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {isEdit ? "Update sale information" : "Add a new sale transaction"}
+              {isEdit
+                ? "Update sale information"
+                : "Add a new sale transaction"}
             </Typography>
           </Box>
           <Button
@@ -292,18 +364,11 @@ const CreateSale = () => {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            {/* Sale Number */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Sale Number"
-                name="saleNumber"
-                value={formData.saleNumber}
-                onChange={handleChange("saleNumber")}
-                fullWidth
-                disabled
-                size="small"
-              />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sx={{ textAlign: "right" }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Sale #{formData.saleNumber}
+              </Typography>
             </Grid>
 
             {/* Customer */}
@@ -325,133 +390,212 @@ const CreateSale = () => {
                 ))}
               </TextField>
             </Grid>
+            <Grid item xs={12}>
+              <Divider>
+                <Typography variant="subtitle1">Products</Typography>
+              </Divider>
+            </Grid>
 
-            {/* Stock */}
-            <Grid item xs={12} sm={6}>
+            {formData.items.map((it, idx) => (
+              <React.Fragment key={idx}>
+                <Grid item xs={12}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        select
+                        label="Stock"
+                        name={`stockId-${idx}`}
+                        value={it.stockId}
+                        onChange={handleItemChange(idx, "stockId")}
+                        fullWidth
+                        required
+                        size="small"
+                      >
+                        {stocks.map((stock) => (
+                          <MenuItem key={stock._id} value={stock._id}>
+                            {stock.engName}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        select
+                        label="Stock Item"
+                        name={`stockItemId-${idx}`}
+                        value={it.stockItemId}
+                        onChange={handleItemChange(idx, "stockItemId")}
+                        fullWidth
+                        required
+                        disabled={!it.stockId || loadingStockItems[it.stockId]}
+                        size="small"
+                      >
+                        {(stockItems[it.stockId] || []).map((item) => (
+                          <MenuItem key={item._id} value={item._id}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        label="Quantity"
+                        name={`quantity-${idx}`}
+                        type="number"
+                        value={it.quantity}
+                        onChange={handleItemChange(idx, "quantity")}
+                        fullWidth
+                        required
+                        size="small"
+                        inputProps={{ min: 0, step: 0.01 }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        select
+                        label="Unit Type"
+                        name={`unitType-${idx}`}
+                        value={it.unitType}
+                        onChange={handleItemChange(idx, "unitType")}
+                        fullWidth
+                        required
+                        size="small"
+                      >
+                        {unitTypes.map((unit) => (
+                          <MenuItem key={unit} value={unit}>
+                            {unit}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        label="Unit Per Package"
+                        name={`unitPerPackage-${idx}`}
+                        type="number"
+                        value={it.unitPerPackage}
+                        onChange={handleItemChange(idx, "unitPerPackage")}
+                        fullWidth
+                        required
+                        size="small"
+                        inputProps={{ min: 1, step: 1 }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        label="Unit Price"
+                        name={`unitPrice-${idx}`}
+                        type="number"
+                        value={it.unitPrice}
+                        onChange={handleItemChange(idx, "unitPrice")}
+                        fullWidth
+                        required
+                        size="small"
+                        inputProps={{ min: 0, step: 0.01 }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        label="Discount"
+                        name={`discount-${idx}`}
+                        type="number"
+                        value={it.discount}
+                        onChange={handleItemChange(idx, "discount")}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: 0, step: 0.01 }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        label="Line Total"
+                        name={`lineTotal-${idx}`}
+                        value={lineTotal(it)}
+                        fullWidth
+                        disabled
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={1}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <IconButton
+                        aria-label="delete"
+                        color="error"
+                        onClick={() => removeItem(idx)}
+                        disabled={formData.items.length === 1}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            ))}
+            <Grid item xs={12}>
+              <Button
+                variant="outlined"
+                startIcon={<AddCircleOutlineIcon />}
+                onClick={addItem}
+              >
+                Add Product
+              </Button>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 1 }} />
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <TextField
+                label="Grand Total"
+                name="grandTotal"
+                value={grandTotal}
+                fullWidth
+                disabled
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
               <TextField
                 select
-                label="Stock"
-                name="stockId"
-                value={formData.stockId}
-                onChange={handleChange("stockId")}
+                label="Payment Method"
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange("paymentMethod")}
                 fullWidth
                 required
                 size="small"
               >
-                {stocks.map((stock) => (
-                  <MenuItem key={stock._id} value={stock._id}>
-                    {stock.engName}
+                {paymentMethods.map((method) => (
+                  <MenuItem key={method.value} value={method.value}>
+                    {method.label}
                   </MenuItem>
                 ))}
               </TextField>
             </Grid>
-
-            {/* Stock Item */}
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={3}>
               <TextField
-                select
-                label="Stock Item"
-                name="stockItemId"
-                value={formData.stockItemId}
-                onChange={handleChange("stockItemId")}
-                fullWidth
-                required
-                disabled={!formData.stockId || loadingStockItems}
-                size="small"
-              >
-                {stockItems.map((item) => (
-                  <MenuItem key={item._id} value={item._id}>
-                    {item.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            {/* Quantity */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Quantity"
-                name="quantity"
+                label="Giving Cash"
+                name="givingCash"
                 type="number"
-                value={formData.quantity}
-                onChange={handleChange("quantity")}
+                value={formData.givingCash}
+                onChange={handleChange("givingCash")}
                 fullWidth
-                required
+                disabled={formData.paymentMethod === "credit"}
                 size="small"
                 inputProps={{ min: 0, step: 0.01 }}
               />
             </Grid>
-
-            {/* Unit Type */}
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
               <TextField
-                select
-                label="Unit Type"
-                name="unitType"
-                value={formData.unitType}
-                onChange={handleChange("unitType")}
-                fullWidth
-                required
-                size="small"
-              >
-                {unitTypes.map((unit) => (
-                  <MenuItem key={unit} value={unit}>
-                    {unit}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            {/* Unit Per Package */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Unit Per Package"
-                name="unitPerPackage"
-                type="number"
-                value={formData.unitPerPackage}
-                onChange={handleChange("unitPerPackage")}
-                fullWidth
-                required
-                size="small"
-                inputProps={{ min: 1, step: 1 }}
-              />
-            </Grid>
-
-            {/* Unit Price */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Unit Price"
-                name="unitPrice"
-                type="number"
-                value={formData.unitPrice}
-                onChange={handleChange("unitPrice")}
-                fullWidth
-                required
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-              />
-            </Grid>
-
-            {/* Discount */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Discount"
-                name="discount"
-                type="number"
-                value={formData.discount}
-                onChange={handleChange("discount")}
-                fullWidth
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-              />
-            </Grid>
-
-            {/* Total Price */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Total Price"
-                name="totalPrice"
-                value={formData.totalPrice}
+                label="Remaining Cash"
+                name="remainingCash"
+                value={formData.remainingCash}
                 fullWidth
                 disabled
                 size="small"
@@ -459,7 +603,16 @@ const CreateSale = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
+              <TextField
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange("description")}
+                fullWidth
+                multiline
+                rows={3}
+                size="small"
+              />
             </Grid>
 
             {/* Payment Method */}
@@ -538,7 +691,7 @@ const CreateSale = () => {
                   type="submit"
                   variant="contained"
                   startIcon={
-                    (createLoading || updateLoading) ? (
+                    createLoading || updateLoading ? (
                       <CircularProgress size={20} />
                     ) : (
                       <SaveIcon />

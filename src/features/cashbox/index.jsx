@@ -145,6 +145,8 @@ const CashboxList = () => {
   const loading = useSelector(selectCashboxLoading);
   const error = useSelector(selectCashboxError);
 
+  console.log({ balances });
+
   const data = {
     title: "Investment",
     value: "14k",

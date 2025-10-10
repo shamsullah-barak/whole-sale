@@ -17,7 +17,18 @@ const CreatePurchases = () => {
         </Grid>
       </Grid>
 
-      <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          mt: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+          backgroundColor: "white",
+        }}
+      >
         <Typography variant="h5" gutterBottom>
           Create Purchase
         </Typography>

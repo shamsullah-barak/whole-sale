@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  Grid,
+  Grid2 as Grid,
   Typography,
   Button,
   Box,
@@ -58,23 +58,32 @@ const CreateSale = () => {
   const stocks = useSelector(selectStocks).stockNames;
 
   const [formData, setFormData] = useState({
-    saleNumber: "",
-    customerId: "",
+    saleNumber: "SALE-2025-0012",
+    customerId: "CUST-1024",
     items: [
       {
-        stockId: "",
-        stockItemId: "",
-        quantity: "",
+        stockId: "STOCK-001",
+        stockItemId: "ITEM-001-A",
+        quantity: 5,
         unitType: "kg",
-        unitPerPackage: "",
-        unitPrice: "",
+        unitPerPackage: 10,
+        unitPrice: 200,
+        discount: 20,
+      },
+      {
+        stockId: "STOCK-002",
+        stockItemId: "ITEM-002-B",
+        quantity: 3,
+        unitType: "pcs",
+        unitPerPackage: 1,
+        unitPrice: 1500,
         discount: 0,
       },
     ],
     paymentMethod: "cash",
-    givingCash: "",
-    remainingCash: "",
-    description: "",
+    givingCash: 6000,
+    remainingCash: 500,
+    description: "Sale to regular customer — includes rice and LED bulbs.",
   });
 
   const [stockItems, setStockItems] = useState({});
@@ -289,13 +298,13 @@ const CreateSale = () => {
         description: formData.description,
       };
 
-      if (isEdit) {
-        await dispatch(updateSaleAsync({ saleId: id, saleData })).unwrap();
-        toast.success("Sale updated successfully");
-      } else {
-        await dispatch(createSaleAsync(saleData)).unwrap();
-        toast.success("Sale created successfully");
-      }
+      // if (isEdit) {
+      //   await dispatch(updateSaleAsync({ saleId: id, saleData })).unwrap();
+      //   toast.success("Sale updated successfully");
+      // } else {
+      //   await dispatch(createSaleAsync(saleData)).unwrap();
+      //   toast.success("Sale created successfully");
+      // }
 
       navigate("/sales");
     } catch (error) {
@@ -364,15 +373,16 @@ const CreateSale = () => {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sx={{ textAlign: "right" }}>
+          <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+            <Grid size={12} xs={12} sx={{ textAlign: "right" }}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 Sale #{formData.saleNumber}
               </Typography>
             </Grid>
 
             {/* Customer */}
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6} size={12}> */}
+            <Grid size={12} xs={12} sm={6}>
               <TextField
                 select
                 label="Customer"
@@ -390,294 +400,250 @@ const CreateSale = () => {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12} xs={12}>
               <Divider>
                 <Typography variant="subtitle1">Products</Typography>
               </Divider>
             </Grid>
 
             {formData.items.map((it, idx) => (
-              <React.Fragment key={idx}>
-                <Grid item xs={12}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <TextField
-                        select
-                        label="Stock"
-                        name={`stockId-${idx}`}
-                        value={it.stockId}
-                        onChange={handleItemChange(idx, "stockId")}
-                        fullWidth
-                        required
-                        size="small"
-                      >
-                        {stocks.map((stock) => (
-                          <MenuItem key={stock._id} value={stock._id}>
-                            {stock.engName}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <TextField
-                        select
-                        label="Stock Item"
-                        name={`stockItemId-${idx}`}
-                        value={it.stockItemId}
-                        onChange={handleItemChange(idx, "stockItemId")}
-                        fullWidth
-                        required
-                        disabled={!it.stockId || loadingStockItems[it.stockId]}
-                        size="small"
-                      >
-                        {(stockItems[it.stockId] || []).map((item) => (
-                          <MenuItem key={item._id} value={item._id}>
-                            {item.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        label="Quantity"
-                        name={`quantity-${idx}`}
-                        type="number"
-                        value={it.quantity}
-                        onChange={handleItemChange(idx, "quantity")}
-                        fullWidth
-                        required
-                        size="small"
-                        inputProps={{ min: 0, step: 0.01 }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        select
-                        label="Unit Type"
-                        name={`unitType-${idx}`}
-                        value={it.unitType}
-                        onChange={handleItemChange(idx, "unitType")}
-                        fullWidth
-                        required
-                        size="small"
-                      >
-                        {unitTypes.map((unit) => (
-                          <MenuItem key={unit} value={unit}>
-                            {unit}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        label="Unit Per Package"
-                        name={`unitPerPackage-${idx}`}
-                        type="number"
-                        value={it.unitPerPackage}
-                        onChange={handleItemChange(idx, "unitPerPackage")}
-                        fullWidth
-                        required
-                        size="small"
-                        inputProps={{ min: 1, step: 1 }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        label="Unit Price"
-                        name={`unitPrice-${idx}`}
-                        type="number"
-                        value={it.unitPrice}
-                        onChange={handleItemChange(idx, "unitPrice")}
-                        fullWidth
-                        required
-                        size="small"
-                        inputProps={{ min: 0, step: 0.01 }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        label="Discount"
-                        name={`discount-${idx}`}
-                        type="number"
-                        value={it.discount}
-                        onChange={handleItemChange(idx, "discount")}
-                        fullWidth
-                        size="small"
-                        inputProps={{ min: 0, step: 0.01 }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <TextField
-                        label="Line Total"
-                        name={`lineTotal-${idx}`}
-                        value={lineTotal(it)}
-                        fullWidth
-                        disabled
-                        size="small"
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={12}
-                      md={1}
-                      sx={{ display: "flex", alignItems: "center" }}
+              <Box
+                key={idx}
+                sx={{
+                  position: "relative",
+                  // border: "1px solid #ddd",
+                  // borderRadius: 2,
+                  borderRIghtColor: "divider",
+                  borderLeftColor: "divider",
+                  p: 2,
+                  mb: 2,
+                  "&:hover .delete-icon": {
+                    opacity: 1,
+                  },
+                }}
+              >
+                {/* Delete Icon */}
+                <IconButton
+                  className="delete-icon"
+                  onClick={() => removeItem(idx)}
+                  disabled={formData.items.length === 1}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "-15px",
+                    transform: "translateY(-50%)",
+                    bgcolor: "white",
+                    color: "red",
+                    boxShadow: 2,
+                    opacity: 0,
+                    transition: "opacity 0.3s",
+                    zIndex: 10,
+                    "&:hover": { bgcolor: "#ffe6e6" },
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+
+                {/* Main Grid Content */}
+                <Grid container spacing={1}>
+                  {/* Row 1 */}
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      select
+                      label="Stock"
+                      name={`stockId-${idx}`}
+                      value={it.stockId}
+                      onChange={handleItemChange(idx, "stockId")}
+                      fullWidth
+                      required
+                      size="small"
                     >
-                      <IconButton
-                        aria-label="delete"
-                        color="error"
-                        onClick={() => removeItem(idx)}
-                        disabled={formData.items.length === 1}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
+                      {stocks.map((stock) => (
+                        <MenuItem key={stock._id} value={stock._id}>
+                          {stock.engName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      select
+                      label="Stock Item"
+                      name={`stockItemId-${idx}`}
+                      value={it.stockItemId}
+                      onChange={handleItemChange(idx, "stockItemId")}
+                      fullWidth
+                      required
+                      disabled={!it.stockId || loadingStockItems[it.stockId]}
+                      size="small"
+                    >
+                      {(stockItems[it.stockId] || []).map((item) => (
+                        <MenuItem key={item._id} value={item._id}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      label="Quantity"
+                      name={`quantity-${idx}`}
+                      type="number"
+                      value={it.quantity}
+                      onChange={handleItemChange(idx, "quantity")}
+                      fullWidth
+                      required
+                      size="small"
+                      inputProps={{ min: 0, step: 0.01 }}
+                    />
+                  </Grid>
+
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      select
+                      label="Unit Type"
+                      name={`unitType-${idx}`}
+                      value={it.unitType}
+                      onChange={handleItemChange(idx, "unitType")}
+                      fullWidth
+                      required
+                      size="small"
+                    >
+                      {unitTypes.map((unit) => (
+                        <MenuItem key={unit} value={unit}>
+                          {unit}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  {/* Row 2 */}
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      label="Unit Per Package"
+                      name={`unitPerPackage-${idx}`}
+                      type="number"
+                      value={it.unitPerPackage}
+                      onChange={handleItemChange(idx, "unitPerPackage")}
+                      fullWidth
+                      required
+                      size="small"
+                      inputProps={{ min: 1, step: 1 }}
+                    />
+                  </Grid>
+
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      label="Unit Price"
+                      name={`unitPrice-${idx}`}
+                      type="number"
+                      value={it.unitPrice}
+                      onChange={handleItemChange(idx, "unitPrice")}
+                      fullWidth
+                      required
+                      size="small"
+                      inputProps={{ min: 0, step: 0.01 }}
+                    />
+                  </Grid>
+
+                  <Grid size={3} xs={12} sm={6}>
+                    <TextField
+                      label="Line Total"
+                      name={`lineTotal-${idx}`}
+                      value={lineTotal(it)}
+                      fullWidth
+                      disabled
+                      size="small"
+                    />
                   </Grid>
                 </Grid>
-              </React.Fragment>
+              </Box>
             ))}
-            <Grid item xs={12}>
+            <Grid size={12} xs={12}>
               <Button
                 variant="outlined"
                 startIcon={<AddCircleOutlineIcon />}
                 onClick={addItem}
+                fullWidth
               >
                 Add Product
               </Button>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={12} xs={12}>
               <Divider sx={{ my: 1 }} />
             </Grid>
+            <Grid size={12} container xs={12} sm={6}>
+              <Grid size={3} xs={12} sm={3}>
+                <TextField
+                  label="Grand Total"
+                  name="grandTotal"
+                  value={grandTotal}
+                  fullWidth
+                  disabled
+                  size="small"
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={3}>
-              <TextField
-                label="Grand Total"
-                name="grandTotal"
-                value={grandTotal}
-                fullWidth
-                disabled
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                select
-                label="Payment Method"
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleChange("paymentMethod")}
-                fullWidth
-                required
-                size="small"
-              >
-                {paymentMethods.map((method) => (
-                  <MenuItem key={method.value} value={method.value}>
-                    {method.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                label="Giving Cash"
-                name="givingCash"
-                type="number"
-                value={formData.givingCash}
-                onChange={handleChange("givingCash")}
-                fullWidth
-                disabled={formData.paymentMethod === "credit"}
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                label="Remaining Cash"
-                name="remainingCash"
-                value={formData.remainingCash}
-                fullWidth
-                disabled
-                size="small"
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange("description")}
-                fullWidth
-                multiline
-                rows={3}
-                size="small"
-              />
-            </Grid>
-
-            {/* Payment Method */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                select
-                label="Payment Method"
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleChange("paymentMethod")}
-                fullWidth
-                required
-                size="small"
-              >
-                {paymentMethods.map((method) => (
-                  <MenuItem key={method.value} value={method.value}>
-                    {method.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            {/* Giving Cash */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Giving Cash"
-                name="givingCash"
-                type="number"
-                value={formData.givingCash}
-                onChange={handleChange("givingCash")}
-                fullWidth
-                disabled={formData.paymentMethod === "credit"}
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-              />
-            </Grid>
-
-            {/* Remaining Cash */}
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Remaining Cash"
-                name="remainingCash"
-                value={formData.remainingCash}
-                fullWidth
-                disabled
-                size="small"
-              />
-            </Grid>
-
-            {/* Description */}
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange("description")}
-                fullWidth
-                multiline
-                rows={3}
-                size="small"
-              />
+              <Grid size={3} xs={12} sm={3}>
+                <TextField
+                  select
+                  label="Payment Method"
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
+                  onChange={handleChange("paymentMethod")}
+                  fullWidth
+                  required
+                  size="small"
+                >
+                  {paymentMethods.map((method) => (
+                    <MenuItem key={method.value} value={method.value}>
+                      {method.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid size={3} xs={12} sm={3}>
+                <TextField
+                  label="Giving Cash"
+                  name="givingCash"
+                  type="number"
+                  value={formData.givingCash}
+                  onChange={handleChange("givingCash")}
+                  fullWidth
+                  disabled={formData.paymentMethod === "credit"}
+                  size="small"
+                  inputProps={{ min: 0, step: 0.01 }}
+                />
+              </Grid>
+              <Grid size={3} xs={12} sm={3}>
+                <TextField
+                  label="Remaining Cash"
+                  name="remainingCash"
+                  value={formData.remainingCash}
+                  fullWidth
+                  disabled
+                  size="small"
+                />
+              </Grid>
+              <Grid size={12} xs={12}>
+                <TextField
+                  label="Description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange("description")}
+                  fullWidth
+                  multiline
+                  rows={3}
+                  size="small"
+                />
+              </Grid>
             </Grid>
 
             {/* Action Buttons */}
-            <Grid item xs={12}>
+            <Grid container xs={12}>
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <Button
                   variant="outlined"

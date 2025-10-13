@@ -31,6 +31,7 @@ import {
   updateSaleAsync,
   fetchSaleByIdAsync,
   fetchNextSaleNumberAsync,
+  fetchSalesAsync,
 } from "../../store/slices/sale.slice";
 import {
   selectCreateSaleLoading,
@@ -41,7 +42,10 @@ import {
 import { selectCustomers } from "../../store/selectors/businessEntity.selector";
 import { selectStocks } from "../../store/selectors/stock.selector";
 import COLORS from "../../constant/colors";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
+import axios from "axios";
+import { PAYMENT_METHODS } from "../../constant/variables";
 
 const CreateSale = () => {
   const dispatch = useDispatch();
@@ -58,31 +62,29 @@ const CreateSale = () => {
   const stocks = useSelector(selectStocks).stockNames;
 
   const [formData, setFormData] = useState({
-    saleNumber: "SALE-2025-0012",
-    customerId: "CUST-1024",
+    customerId: "",
     items: [
       {
-        stockId: "STOCK-001",
-        stockItemId: "ITEM-001-A",
+        stockId: "",
+        stockItemId: "",
         quantity: 5,
         unitType: "kg",
         unitPerPackage: 10,
         unitPrice: 200,
-        discount: 20,
       },
       {
-        stockId: "STOCK-002",
-        stockItemId: "ITEM-002-B",
+        stockId: "",
+        stockItemId: "",
         quantity: 3,
         unitType: "pcs",
         unitPerPackage: 1,
         unitPrice: 1500,
-        discount: 0,
       },
     ],
     paymentMethod: "cash",
-    givingCash: 6000,
-    remainingCash: 500,
+    givingCash: 0,
+    remainingCash: 0,
+    discount: 0,
     description: "Sale to regular customer — includes rice and LED bulbs.",
   });
 
@@ -140,6 +142,7 @@ const CreateSale = () => {
   // }, [isEdit, selectedSale, nextSaleNumber]);
 
   const ensureStockItemsLoaded = async (stockId) => {
+    console.log({ stockId });
     if (!stockId) return;
     if (stockItems[stockId]) return;
     setLoadingStockItems((prev) => ({ ...prev, [stockId]: true }));
@@ -147,7 +150,7 @@ const CreateSale = () => {
       const selectedStock = stocks.find((stock) => stock._id === stockId);
       if (selectedStock) {
         const response = await fetch(
-          `http://localhost:5000/api/stocks/stock-items?stockName=${selectedStock.engName}`
+          `http://localhost:5000/api/stocks/${stockId}/stock-items`
         );
         const data = await response.json();
         setStockItems((prev) => ({ ...prev, [stockId]: data }));
@@ -164,40 +167,44 @@ const CreateSale = () => {
     setFormData((prev) => {
       let updatedData = { ...prev, [field]: value };
 
-      const total = grandTotal;
-      if (field === "paymentMethod") {
-        if (value === "credit") {
-          updatedData.remainingCash = total;
-          updatedData.givingCash = 0;
-        } else if (value === "cash") {
-          updatedData.remainingCash = 0;
-          updatedData.givingCash = total;
-        } else if (value === "cashAndCredit") {
-          updatedData.remainingCash = total - (updatedData.givingCash || 0);
-        }
-      }
+      const total = grandTotal - updatedData.discount;
+      // if (field === "paymentMethod") {
+      //   if (value === "credit") {
+      //     updatedData.remainingCash = total;
+      //     updatedData.givingCash = 0;
+      //   } else if (value === "cash") {
+      //     updatedData.remainingCash = "0";
+      //     updatedData.givingCash = total;
+      //   } else if (value === "cashAndCredit") {
+      //     updatedData.remainingCash = total - (updatedData.givingCash || 0);
+      //   }
+      // }
 
-      // Handle payment method changes
-      if (field === "paymentMethod") {
-        const { totalPrice, givingCash } = updatedData;
-        if (value === "credit") {
-          updatedData.remainingCash = totalPrice;
-          updatedData.givingCash = 0;
-        } else if (value === "cash") {
-          updatedData.remainingCash = 0;
-          updatedData.givingCash = totalPrice;
-        } else if (value === "cashAndCredit") {
-          updatedData.remainingCash = totalPrice - (givingCash || 0);
-        }
-      }
+      // if (field === "givingCash") {
+      // updatedData.remainingCash = total - updatedData.givingCash;
+      // Set unitPerPackage = 1 for specific unit types
+      // if (["kg", "piece", "liter"].includes(unitType)) {
+      //   updatedSale.unitPerPackage = 1;
+      // }
 
-      // Handle giving cash changes for cashAndCredit
-      if (
-        field === "givingCash" &&
-        updatedData.paymentMethod === "cashAndCredit"
-      ) {
-        updatedData.remainingCash = total - value;
-      }
+      // const totalPrice = quantity * unitPerPackage * unitPrice - discount;
+      // updatedSale.totalPrice = totalPrice;
+
+      // const { paymentMethod, givingCash } = updatedData;
+
+      // const total =
+      //   updatedData.items.reduce((sum, it) => sum + lineTotal(it), 0) -
+      //   formData.discount;
+
+      // if (paymentMethod === "credit") {
+      //   updatedData.remainingCash = total;
+      //   updatedData.givingCash = 0;
+      // } else if (paymentMethod === "cash") {
+      //   updatedData.remainingCash = 0;
+      //   updatedData.givingCash = total;
+      // } else if (paymentMethod === "cashAndCredit") {
+      //   updatedData.remainingCash = total - givingCash;
+      // }
 
       return updatedData;
     });
@@ -208,7 +215,8 @@ const CreateSale = () => {
     setFormData((prev) => {
       const items = [...prev.items];
       const updatedItem = { ...items[index], [field]: value };
-      if (field === "unitType" && ["kg", "piece", "liter"].includes(value)) {
+      console.log(updatedItem);
+      if (["kg", "piece", "liter"].includes(updatedItem.unitType)) {
         updatedItem.unitPerPackage = 1;
       }
       items[index] = updatedItem;
@@ -231,7 +239,6 @@ const CreateSale = () => {
           unitType: "kg",
           unitPerPackage: "",
           unitPrice: "",
-          discount: 0,
         },
       ],
     }));
@@ -252,19 +259,72 @@ const CreateSale = () => {
     return q * upp * up - d;
   };
 
-  const grandTotal = useMemo(
-    () => formData.items.reduce((sum, it) => sum + lineTotal(it), 0),
-    [formData.items]
-  );
+  // const grandTotal = useMemo(
+  //   () =>
+  //     formData.items.reduce(
+  //       (sum, it) => sum + lineTotal(it) - formData.discount,
+  //       0
+  //     ),
+  //   [formData]
+  // );
+
+  const grandTotal = useMemo(() => {
+    const subtotal = formData.items.reduce((sum, it) => sum + lineTotal(it), 0);
+    return subtotal - formData.discount;
+  }, [formData.items, formData.discount]);
+
+  const remainingCash = useMemo(() => {
+    if (formData.paymentMethod === PAYMENT_METHODS.CASH) {
+      return 0;
+    } else if (formData.paymentMethod === PAYMENT_METHODS.CREDIT) {
+      return grandTotal - formData.discount;
+    } else if (formData.paymentMethod === PAYMENT_METHODS.CASH_AND_CREDIT) {
+      return grandTotal - (formData.discount || 0) - (formData.givingCash || 0);
+    }
+  }, [
+    grandTotal,
+    formData.discount,
+    formData.givingCash,
+    formData.paymentMethod,
+  ]);
+
+  const givingCash = useMemo(() => {
+    if (formData.paymentMethod === PAYMENT_METHODS.CASH) {
+      return grandTotal - formData.discount;
+    } else if (formData.paymentMethod === PAYMENT_METHODS.CREDIT) {
+      return 0;
+    }
+    // else if (formData.paymentMethod === PAYMENT_METHODS.CASH_AND_CREDIT) {
+    //   return grandTotal - (formData.discount || 0) - (formData.givingCash || 0);
+    // }
+  }, [
+    grandTotal,
+    formData.discount,
+    formData.givingCash,
+    formData.paymentMethod,
+  ]);
+
+  console.log({ remainingCash });
+
+  // useEffect(() => {
+  //   const subtotal = formData.items.reduce((sum, it) => sum + lineTotal(it), 0);
+  //   const total = subtotal - formData.discount;
+
+  //   if (formData.paymentMethod === PAYMENT_METHODS.CASH) {
+  //     setFormData((prev) => ({ ...prev, givingCash: total }));
+  //   } else if (formData.paymentMethod === PAYMENT_METHODS.CREDIT) {
+  //     setFormData((prev) => ({ ...prev, remainingCash: total }));
+  //   }
+  // }, [
+  //   formData.items,
+  //   formData.discount,
+  //   formData.paymentMethod,
+  //   formData.givingCash,
+  // ]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validation
-    if (!formData.customerId) {
-      toast.error("Please select a customer");
-      return;
-    }
     const invalid = formData.items.some(
       (it) =>
         !it.stockId ||
@@ -279,8 +339,7 @@ const CreateSale = () => {
 
     try {
       const saleData = {
-        saleNumber: formData.saleNumber,
-        customerId: formData.customerId,
+        customerId: formData.customerId === "" ? null : formData.customerId,
         items: formData.items.map((it) => ({
           stockId: it.stockId,
           stockItemId: it.stockItemId,
@@ -288,7 +347,6 @@ const CreateSale = () => {
           unitType: it.unitType,
           unitPerPackage: Number(it.unitPerPackage),
           unitPrice: Number(it.unitPrice),
-          discount: Number(it.discount || 0),
           totalPrice: lineTotal(it),
         })),
         totalPrice: grandTotal,
@@ -296,7 +354,20 @@ const CreateSale = () => {
         givingCash: Number(formData.givingCash || 0),
         remainingCash: Number(formData.remainingCash || 0),
         description: formData.description,
+        discount: formData.discount,
       };
+
+      console.log({ saleData });
+
+      await axios.post(`http://localhost:5000/api/sales`, saleData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      toast.success("data added");
+      dispatch(fetchSalesAsync());
+      dispatch(fetchReceivablesAsync());
+      dispatch(fetchNextSaleNumberAsync());
 
       // if (isEdit) {
       //   await dispatch(updateSaleAsync({ saleId: id, saleData })).unwrap();
@@ -308,7 +379,10 @@ const CreateSale = () => {
 
       navigate("/sales");
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(
+        error?.response?.data?.message ??
+          "something went wrong! please try again"
+      );
     }
   };
 
@@ -337,6 +411,7 @@ const CreateSale = () => {
           borderRadius: 2,
         }}
       >
+        <ToastContainer />
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -376,7 +451,7 @@ const CreateSale = () => {
           <Grid container spacing={2} sx={{ marginTop: "15px" }}>
             <Grid size={12} xs={12} sx={{ textAlign: "right" }}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Sale #{formData.saleNumber}
+                Sale #abc123
               </Typography>
             </Grid>
 
@@ -390,12 +465,11 @@ const CreateSale = () => {
                 value={formData.customerId}
                 onChange={handleChange("customerId")}
                 fullWidth
-                required
                 size="small"
               >
                 {customers.map((customer) => (
                   <MenuItem key={customer._id} value={customer._id}>
-                    {customer.name}
+                    {/* {customer.name} */}
                   </MenuItem>
                 ))}
               </TextField>
@@ -478,11 +552,23 @@ const CreateSale = () => {
                       disabled={!it.stockId || loadingStockItems[it.stockId]}
                       size="small"
                     >
-                      {(stockItems[it.stockId] || []).map((item) => (
-                        <MenuItem key={item._id} value={item._id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
+                      {(stockItems[it.stockId] || []).map((item) => {
+                        return (
+                          <MenuItem key={item._id} value={item._id}>
+                            <Typography variant="body1">
+                              {`${item.productName}    &   `}
+                            </Typography>
+
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {"         "} quantity:{" "}
+                              {item.quantity + "  " + item.unitType}
+                            </Typography>
+                          </MenuItem>
+                        );
+                      })}
                     </TextField>
                   </Grid>
 
@@ -530,6 +616,7 @@ const CreateSale = () => {
                       fullWidth
                       required
                       size="small"
+                      disabled={["kg", "piece", "liter"].includes(it.unitType)}
                       inputProps={{ min: 1, step: 1 }}
                     />
                   </Grid>
@@ -576,7 +663,7 @@ const CreateSale = () => {
               <Divider sx={{ my: 1 }} />
             </Grid>
             <Grid size={12} container xs={12} sm={6}>
-              <Grid size={3} xs={12} sm={3}>
+              <Grid size={2.5} xs={12} sm={3}>
                 <TextField
                   label="Grand Total"
                   name="grandTotal"
@@ -587,7 +674,7 @@ const CreateSale = () => {
                 />
               </Grid>
 
-              <Grid size={3} xs={12} sm={3}>
+              <Grid size={2.5} xs={12} sm={3}>
                 <TextField
                   select
                   label="Payment Method"
@@ -605,7 +692,7 @@ const CreateSale = () => {
                   ))}
                 </TextField>
               </Grid>
-              <Grid size={3} xs={12} sm={3}>
+              <Grid size={2.5} xs={12} sm={3}>
                 <TextField
                   label="Giving Cash"
                   name="givingCash"
@@ -613,18 +700,30 @@ const CreateSale = () => {
                   value={formData.givingCash}
                   onChange={handleChange("givingCash")}
                   fullWidth
-                  disabled={formData.paymentMethod === "credit"}
+                  disabled={["cash", "credit"].includes(formData.paymentMethod)}
                   size="small"
-                  inputProps={{ min: 0, step: 0.01 }}
+                  // inputProps={{ min: 0, step: 0.01 }}
                 />
               </Grid>
-              <Grid size={3} xs={12} sm={3}>
+              <Grid size={2.5} xs={12} sm={3}>
                 <TextField
                   label="Remaining Cash"
                   name="remainingCash"
-                  value={formData.remainingCash}
+                  value={remainingCash}
                   fullWidth
                   disabled
+                  type="number"
+                  size="small"
+                />
+              </Grid>
+              <Grid size={2} xs={12} sm={3}>
+                <TextField
+                  label="Discount"
+                  name="discount"
+                  value={formData.discount}
+                  fullWidth
+                  type="number"
+                  onChange={handleChange("discount")}
                   size="small"
                 />
               </Grid>

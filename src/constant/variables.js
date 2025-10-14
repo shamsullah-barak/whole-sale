@@ -8,3 +8,5 @@ export const PAYMENT_METHODS = {
   CREDIT: "credit",
   CASH_AND_CREDIT: "cashAndCredit",
 };
+
+export const CURRENCY_TYPES = ["afn", "dollar", "rupee"];

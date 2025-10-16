@@ -10,10 +10,6 @@ import {
   Typography,
   IconButton,
   Box,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -25,12 +21,12 @@ import COLORS from "../../constant/colors";
 import { selectProducts } from "../../store/selectors/product.selector";
 import { ToastContainer, toast } from "react-toastify";
 import { selectStocks } from "../../store/selectors/stock.selector";
-import moment from "moment/moment";
 import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
 import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
 import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
 import { useParams } from "react-router-dom";
 import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
+import { CURRENCY_TYPES } from "../../constant/variables";
 
 // unit types for purchase component
 const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -60,47 +56,14 @@ const PurchaseOfGoods = () => {
         stockId: "",
         expiryDate: "2025-12-31",
       },
-      {
-        productId: "",
-        quantity: 10,
-        unitType: "piece",
-        unitPerPackage: 1,
-        unitPrice: 250,
-        stockId: "",
-        expiryDate: "2026-03-15",
-      },
     ],
     paymentMethod: "cash",
     givingCash: 3000,
     remainingCash: 0,
     supplierId: "",
     discount: 0,
-    purchaseDate: moment().format("YYYY-MM-DD"),
+    currencyType: "afn",
   });
-
-  // const clearState = () => {
-  //   setJournalEntry({
-  //     items: [
-  //       {
-  //         productId: "",
-  //         quantity: "",
-  //         unitType: "kg",
-  //         unitPerPackage: "",
-  //         unitPrice: "",
-  //         stockId: "",
-  //         expiryDate: "",
-  //       },
-  //     ],
-  //     paymentMethod: "cash",
-  //     invoiceNo: "",
-  //     givingCash: 0,
-  //     remainingCash: 0,
-  //     supplierId: "",
-  //     purchaseDate: moment().format("YYYY-MM-DD"),
-  //   });
-  // };
-
-  // handle top-level input changes
 
   const inputHandler = (event) => {
     const { name, value } = event.target;
@@ -207,9 +170,10 @@ const PurchaseOfGoods = () => {
     setLoading(true);
 
     const cleanedEntry = { ...journalEntry };
-    if (!cleanedEntry.purchaseDate) delete cleanedEntry.purchaseDate;
     if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
     cleanedEntry.totalPrice = grandTotal;
+
+    if (cleanedEntry.supplierId === "") cleanedEntry.supplierId = null;
 
     if (id) {
       delete cleanedEntry.__v;
@@ -327,7 +291,12 @@ const PurchaseOfGoods = () => {
                   options={products}
                   getOptionLabel={(option) => option.name}
                   renderInput={(params) => (
-                    <TextField {...params} label={t("Products")} required />
+                    <TextField
+                      {...params}
+                      label={t("Products")}
+                      required
+                      size="small"
+                    />
                   )}
                   value={products.find((p) => p._id === item.productId) || null}
                   onChange={(event, value) =>
@@ -338,6 +307,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   fullWidth
                   label={t("Quantity")}
                   required
@@ -351,6 +321,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   select
                   fullWidth
                   label={t("Unit Type")}
@@ -370,6 +341,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   fullWidth
                   required
                   disabled={["kg", "piece", "liter"].includes(item.unitType)}
@@ -385,6 +357,7 @@ const PurchaseOfGoods = () => {
               {/* Row 2 */}
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   select
                   fullWidth
                   label={t("Stock Name")}
@@ -404,6 +377,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   fullWidth
                   label={t("Unit Price")}
                   type="number"
@@ -417,6 +391,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   fullWidth
                   label={t("Expiry Date")}
                   type="date"
@@ -430,6 +405,7 @@ const PurchaseOfGoods = () => {
 
               <Grid size={3} xs={12} sm={6}>
                 <TextField
+                  size="small"
                   fullWidth
                   disabled
                   label={t("Total Price")}
@@ -457,8 +433,50 @@ const PurchaseOfGoods = () => {
             <Typography variant="subtitle1">{t("Payment & Party")}</Typography>
           </Divider>
         </Grid>
+        <Grid size={12} xs={12} sm={6}>
+          <TextField
+            size="small"
+            select
+            fullWidth
+            required
+            name="supplierId"
+            label={t("supplier")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.supplierId}
+            onChange={inputHandler}
+          >
+            {suppliers.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
+                {t(`${item.phone}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
+            select
+            fullWidth
+            required
+            name="currencyType"
+            label={t("currencyType")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.currencyType}
+            onChange={inputHandler}
+          >
+            {CURRENCY_TYPES.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            size="small"
             select
             fullWidth
             required
@@ -478,6 +496,7 @@ const PurchaseOfGoods = () => {
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
             required
             disabled={
@@ -493,6 +512,7 @@ const PurchaseOfGoods = () => {
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
             disabled
             label={t("remainingCash")}
@@ -502,26 +522,6 @@ const PurchaseOfGoods = () => {
             onChange={inputHandler}
           />
         </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            required
-            name="supplierId"
-            label={t("supplier")}
-            style={{ minWidth: "200px" }}
-            dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.supplierId}
-            onChange={inputHandler}
-          >
-            {suppliers.map((item, index) => (
-              <MenuItem key={index} value={item._id}>
-                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
-                {t(`${item.phone}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
 
         <Grid size={12} xs={12}>
           <Divider sx={{ mt: 2 }}>
@@ -530,6 +530,7 @@ const PurchaseOfGoods = () => {
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
             disabled
             label={t("totalPrice")}
@@ -540,6 +541,7 @@ const PurchaseOfGoods = () => {
         </Grid>
         <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
             label={t("discount")}
             name="discount"

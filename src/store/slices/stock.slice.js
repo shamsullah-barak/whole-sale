@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchStockNames, fetchStocks } from "../actions/stock.actions";
+import {
+  fetchStockNames,
+  fetchStocks,
+  deleteStock,
+} from "../actions/stock.actions";
 
 const initialState = {
   stocks: [],
@@ -14,8 +18,8 @@ const initialState = {
 // async reducers
 export const fetchStocksAsync = createAsyncThunk(
   "stocks/fetchStocks",
-  async ({ page, limit }) => {
-    const stocks = await fetchStocks(page, limit);
+  async () => {
+    const stocks = await fetchStocks();
     return stocks;
   }
 );
@@ -29,6 +33,15 @@ export const fetchStockNamesAsync = createAsyncThunk(
   }
 );
 
+// Delete stock async thunk
+export const deleteStockAsync = createAsyncThunk(
+  "stocks/deleteStock",
+  async (stockId) => {
+    const result = await deleteStock(stockId);
+    return { stockId, result };
+  }
+);
+
 export const stockSlice = createSlice({
   name: "stocks",
   initialState,
@@ -37,6 +50,11 @@ export const stockSlice = createSlice({
     addStockToList: (state, action) => {
       const arr = [...state.stocks, action.payload.stock];
       state.stocks = [...arr];
+    },
+    removeStockFromList: (state, action) => {
+      state.stocks = state.stocks.filter(
+        (stock) => stock._id !== action.payload
+      );
     },
   },
 
@@ -58,7 +76,21 @@ export const stockSlice = createSlice({
         state.loading = false;
         state.stockNames = action.payload;
       });
+
+    builder
+      .addCase(deleteStockAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteStockAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stocks = state.stocks.filter(
+          (stock) => stock._id !== action.payload.stockId
+        );
+      })
+      .addCase(deleteStockAsync.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 
-export const { addStockToList } = stockSlice.actions;
+export const { addStockToList, removeStockFromList } = stockSlice.actions;

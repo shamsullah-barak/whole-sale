@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Typography,
@@ -35,6 +35,8 @@ import {
 import COLORS from "../../constant/colors";
 import formatDate from "../../utils/moment";
 import { toast } from "react-toastify";
+import axios from "axios";
+import Datagrid from "../../components/DataGrid";
 
 const ViewSale = () => {
   const dispatch = useDispatch();
@@ -51,6 +53,15 @@ const ViewSale = () => {
       dispatch(fetchSaleByIdAsync(id));
     }
   }, [dispatch, id]);
+
+  const [items, setItems] = useState([]);
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await axios.get(`/api/sales/${id}/with-items`);
+      setItems(data.items || []);
+    };
+    if (id) load();
+  }, [id]);
 
   const handleEdit = () => {
     navigate(`/sales/edit/${id}`);
@@ -361,6 +372,29 @@ const ViewSale = () => {
                 </Typography>
               </Box>
             </Stack>
+          </Paper>
+        </Grid>
+
+        {/* Items */}
+        <Grid item xs={12}>
+          <Paper elevation={0} sx={{ p: 3, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Items
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Datagrid
+              rows={items}
+              columns={[
+                { field: "productId", headerName: "Product", flex: 1, minWidth: 140 },
+                { field: "quantity", headerName: "Qty", flex: 0.5, minWidth: 80 },
+                { field: "unitType", headerName: "Type", flex: 0.5, minWidth: 80 },
+                { field: "unitPerPackage", headerName: "Per Pack", flex: 0.6, minWidth: 100 },
+                { field: "unitPrice", headerName: "Unit Price", flex: 0.6, minWidth: 120 },
+                { field: "totalPrice", headerName: "Total", flex: 0.6, minWidth: 120 },
+              ]}
+              autoHeight
+              hideFooterSelectedRowCount
+            />
           </Paper>
         </Grid>
 

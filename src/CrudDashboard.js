@@ -1,6 +1,6 @@
 import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
-import { createHashRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import DashboardLayout from "./components/DashboardLayout";
 import EmployeeList from "./components/EmployeeList";
 import Dashboard from "./pages/Dashboard";
@@ -14,6 +14,7 @@ import EditCompany from "./features/master-data/companies/EditCompany";
 import Purchases from "./features/purchases/Purchase";
 import CreatePurchases from "./features/purchases/CreatePurchase";
 import EditPurchase from "./features/purchases/EditPurchase";
+import ViewPurchase from "./features/purchases/ViewPurchase";
 import Ledgers from "./features/ledgers/Ledgers";
 import SubLedgerList from "./features/ledgers/subLedgers";
 import LedgerTransactions from "./features/ledgers/ledgerTransactions";
@@ -36,6 +37,8 @@ import Category from "./features/master-data/categories/Categories";
 import CashBox from "./features/cashbox";
 import Incomes from "./features/income";
 import SalesModule from "./features/sale";
+import SaleReturnsModule from "./features/saleReturns";
+import PurchaseReturnsModule from "./features/purchaseReturns";
 import InstallmentsModule from "./features/installments";
 import ExpenseModule from "./features/expenses";
 import NotificationsProvider from "./hooks/useNotifications/NotificationsProvider";
@@ -82,7 +85,7 @@ const Page404 = () => {
   return <>404</>;
 };
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     Component: DashboardLayout,
     children: [
@@ -144,6 +147,10 @@ const router = createHashRouter([
       {
         path: "/purchases/edit/:id",
         Component: EditPurchase,
+      },
+      {
+        path: "/purchases/:id",
+        Component: ViewPurchase,
       },
       {
         path: "/stocks",
@@ -233,6 +240,14 @@ const router = createHashRouter([
       {
         path: "/sales/*",
         Component: SalesModule,
+      },
+      {
+        path: "/sales/returns/*",
+        Component: SaleReturnsModule,
+      },
+      {
+        path: "/purchases/returns/*",
+        Component: PurchaseReturnsModule,
       },
       // Installment routes
       {

@@ -33,6 +33,7 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import SettingsIcon from "@mui/icons-material/Settings";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useSelector } from "react-redux";
 import { selectDirection } from "../store/selectors/app.selector";
@@ -176,6 +177,13 @@ function DashboardSidebar({
                     href="/sales"
                     selected={!!matchPath("/sales", pathname)}
                   />
+                  <DashboardSidebarPageItem
+                    id="sale-returns"
+                    title="Sale Returns"
+                    icon={<KeyboardReturnIcon />}
+                    href="/sales/returns"
+                    selected={!!matchPath("/sales/returns", pathname)}
+                  />
                 </List>
               }
             />
@@ -194,6 +202,13 @@ function DashboardSidebar({
                     icon={<ShoppingCartIcon />}
                     href="/purchases"
                     selected={!!matchPath("/purchases", pathname)}
+                  />
+                  <DashboardSidebarPageItem
+                    id="purchase-returns"
+                    title="Purchase Returns"
+                    icon={<KeyboardReturnIcon />}
+                    href="/purchases/returns"
+                    selected={!!matchPath("/purchases/returns", pathname)}
                   />
                 </List>
               }

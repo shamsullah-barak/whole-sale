@@ -192,15 +192,17 @@ function DashboardSidebarPageItem({
                   sx={{
                     position: "absolute",
                     bottom: -18,
-                    left: "50%",
+                    left: "60%",
                     transform: "translateX(-50%)",
-                    fontSize: 10,
+                    fontSize: 7,
                     fontWeight: 500,
-                    textAlign: "center",
+                    textAlign: "left",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     maxWidth: MINI_DRAWER_WIDTH - 28,
+                    paddingLeft: 1,
+                    paddingRight: 1,
                   }}
                 >
                   {title}

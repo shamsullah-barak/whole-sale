@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid2";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import COLORS from "../../constant/colors";
@@ -17,6 +17,7 @@ import { toast, ToastContainer } from "react-toastify";
 import {
   addStockToList,
   fetchStocksAsync,
+  deleteStockAsync,
 } from "../../store/slices/stock.slice";
 // import StatCard from "../../components/StatCard";
 import Card from "@mui/material/Card";
@@ -24,6 +25,7 @@ import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 import { areaElementClasses } from "@mui/x-charts/LineChart";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function getDaysInMonth(month, year) {
   const date = new Date(year, month, 0);
@@ -51,7 +53,16 @@ function AreaGradient({ color, id }) {
   );
 }
 
-function StatCard({ title, value, interval, trend, data, engName, _id }) {
+function StatCard({
+  title,
+  value,
+  interval,
+  trend,
+  data,
+  engName,
+  _id,
+  onDelete,
+}) {
   const theme = useTheme();
   const daysInWeek = getDaysInMonth(4, 2024);
 
@@ -80,25 +91,87 @@ function StatCard({ title, value, interval, trend, data, engName, _id }) {
   const chartColor = trendColors[trend];
   const trendValues = { up: "+25%", down: "-25%", neutral: "+5%" };
 
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(_id, title);
+  };
+
   return (
-    <NavLink to={`${_id}/stock-items`}>
-      <Card
-        variant="outlined"
-        sx={{
-          cursor: "pointer",
-          height: "100%",
-          flexGrow: 1,
-          transition: "transform 0.3s ease-in-out", // smooth animation
-          "&:hover": {
-            transform: "scale(1.05)", // increase size on hover
-            boxShadow: 4, // optional: give a nice shadow
-          },
-        }}
-      >
-        <CardContent>
-          <Typography component="h2" variant="subtitle2" gutterBottom>
+    <Card
+      variant="outlined"
+      sx={{
+        height: "100%",
+        flexGrow: 1,
+        transition: "all 0.3s ease-in-out", // smooth animation
+        background:
+          "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255,255,255,0.2)",
+        borderRadius: 3,
+        "&:hover": {
+          transform: "translateY(-8px) scale(1.02)", // lift and scale on hover
+          boxShadow:
+            "0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.1)",
+          border: "1px solid rgba(255,255,255,0.3)",
+        },
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "3px",
+          background: `linear-gradient(90deg, ${chartColor} 0%, ${chartColor}80 100%)`,
+        },
+      }}
+    >
+      <CardContent>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mb: 1,
+          }}
+        >
+          <Typography
+            component="h2"
+            variant="subtitle2"
+            gutterBottom
+            sx={{ flex: 1 }}
+          >
             {title}
           </Typography>
+          <Tooltip title="Delete Stock" placement="top">
+            <IconButton
+              size="small"
+              onClick={handleDeleteClick}
+              sx={{
+                color: "error.main",
+                backgroundColor: "rgba(244, 67, 54, 0.1)",
+                border: "1px solid rgba(244, 67, 54, 0.2)",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "error.light",
+                  color: "error.dark",
+                  transform: "scale(1.1)",
+                  boxShadow: "0 4px 12px rgba(244, 67, 54, 0.3)",
+                },
+                zIndex: 1,
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <NavLink
+          to={`${_id}/stock-items`}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           <Stack
             direction="column"
             sx={{ justifyContent: "space-between", flexGrow: "1", gap: 1 }}
@@ -111,13 +184,37 @@ function StatCard({ title, value, interval, trend, data, engName, _id }) {
                 <Typography variant="h4" component="p">
                   {value}
                 </Typography>
-                <Chip size="small" color={color} label={trendValues[trend]} />
+                <Chip
+                  size="small"
+                  color={color}
+                  label={trendValues[trend]}
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    "& .MuiChip-label": {
+                      px: 1.5,
+                    },
+                  }}
+                />
               </Stack>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {interval}
               </Typography>
             </Stack>
-            <Box sx={{ width: "100%", height: 50 }}>
+            <Box
+              sx={{
+                width: "100%",
+                height: 50,
+                borderRadius: 2,
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                p: 1,
+                mt: 1,
+              }}
+            >
               <SparkLineChart
                 colors={[chartColor]}
                 data={data}
@@ -141,14 +238,18 @@ function StatCard({ title, value, interval, trend, data, engName, _id }) {
               </SparkLineChart>
             </Box>
           </Stack>
-        </CardContent>
-      </Card>
-    </NavLink>
+        </NavLink>
+      </CardContent>
+    </Card>
   );
 }
 
 const StockList = () => {
   const stocks = useSelector(selectStocks).stocks;
+  const dispatch = useDispatch();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [stockToDelete, setStockToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const data = {
     title: "Shop",
@@ -160,27 +261,77 @@ const StockList = () => {
     ],
   };
 
+  const handleDeleteClick = (stockId, stockName) => {
+    setStockToDelete({ id: stockId, name: stockName });
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!stockToDelete) return;
+
+    setLoading(true);
+    try {
+      await dispatch(deleteStockAsync(stockToDelete.id));
+      toast.success(`Stock "${stockToDelete.name}" deleted successfully`);
+      setDeleteModalOpen(false);
+      setStockToDelete(null);
+      dispatch(fetchStocksAsync());
+    } catch (error) {
+      toast.error("Failed to delete stock. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setStockToDelete(null);
+  };
+
   return (
-    <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-      <Grid
-        container
-        spacing={2}
-        columns={12}
-        sx={{ mb: (theme) => theme.spacing(2) }}
+    <>
+      <ToastContainer />
+      <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+        <Grid
+          container
+          spacing={2}
+          columns={12}
+          sx={{ mb: (theme) => theme.spacing(2) }}
+        >
+          {stocks.map((card, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
+              <StatCard
+                {...data}
+                title={card.stockEngName}
+                engName={card.stockEngName}
+                value={card.productCount}
+                _id={card._id}
+                onDelete={handleDeleteClick}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+
+      {/* Delete Confirmation Modal */}
+      <Model
+        open={deleteModalOpen}
+        handleClose={handleDeleteCancel}
+        handleSubmit={handleDeleteConfirm}
+        loading={loading}
+        submit="delete"
+        cancel="cancel"
+        disabled={loading}
       >
-        {stocks.map((card, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
-            <StatCard
-              {...data}
-              title={card.stockEngName}
-              engName={card.stockEngName}
-              value={card.productCount}
-              _id={card._id}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+        <Typography variant="h6" component="h2">
+          Are you sure?
+        </Typography>
+        <Typography sx={{ mt: 2 }}>
+          You want to delete the stock "{stockToDelete?.name}". This action
+          cannot be undone.
+        </Typography>
+      </Model>
+    </>
   );
 };
 

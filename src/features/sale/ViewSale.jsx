@@ -6,8 +6,6 @@ import {
   Box,
   Stack,
   Paper,
-  Card,
-  CardContent,
   Divider,
   Chip,
   CircularProgress,
@@ -16,22 +14,11 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   ArrowBack as ArrowBackIcon,
-  Print as PrintIcon,
-  Share as ShareIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import {
-  fetchSaleByIdAsync,
-  deleteSaleAsync,
-  setSelectedSale,
-} from "../../store/slices/sale.slice";
-import {
-  selectSelectedSale,
-  selectSalesLoading,
-  selectDeleteSaleLoading,
-} from "../../store/selectors/sale.selectors";
+import { deleteSaleAsync } from "../../store/slices/sale.slice";
+import { selectDeleteSaleLoading } from "../../store/selectors/sale.selectors";
 import COLORS from "../../constant/colors";
 import formatDate from "../../utils/moment";
 import { toast } from "react-toastify";
@@ -41,24 +28,27 @@ import Datagrid from "../../components/DataGrid";
 const ViewSale = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { id } = useParams();
+  const [sale, setSale] = useState({});
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState([]);
 
-  const selectedSale = useSelector(selectSelectedSale);
-  const loading = useSelector(selectSalesLoading);
+  // const sale = useSelector(selectsale);
+  // const loading = useSelector(selectSalesLoading);
   const deleteLoading = useSelector(selectDeleteSaleLoading);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchSaleByIdAsync(id));
-    }
-  }, [dispatch, id]);
-
-  const [items, setItems] = useState([]);
-  useEffect(() => {
     const load = async () => {
-      const { data } = await axios.get(`/api/sales/${id}/with-items`);
-      setItems(data.items || []);
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          `http://localhost:5000/api/sales/${id}/with-items`
+        );
+        setSale(data.sale);
+        setItems(data.items || []);
+      } finally {
+        setLoading(false);
+      }
     };
     if (id) load();
   }, [id]);
@@ -81,10 +71,6 @@ const ViewSale = () => {
 
   const handleBack = () => {
     navigate("/sales");
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   const getPaymentMethodColor = (method) => {
@@ -113,7 +99,7 @@ const ViewSale = () => {
     );
   }
 
-  if (!selectedSale) {
+  if (!sale) {
     return (
       <Box sx={{ width: "100%" }}>
         <Paper
@@ -169,7 +155,7 @@ const ViewSale = () => {
         >
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
-              Sale #{selectedSale.saleNumber}
+              Sale #{sale.saleNumber}
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Sale Details and Information
@@ -182,24 +168,6 @@ const ViewSale = () => {
               onClick={handleBack}
             >
               Back
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<PrintIcon />}
-              onClick={handlePrint}
-            >
-              Print
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ShareIcon />}
-              onClick={() => {
-                // Handle share functionality
-                navigator.clipboard.writeText(window.location.href);
-                toast.success("Sale link copied to clipboard");
-              }}
-            >
-              Share
             </Button>
             <Button
               variant="contained"
@@ -244,77 +212,50 @@ const ViewSale = () => {
               Sale Information
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
                   Sale Number
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  #{selectedSale.saleNumber}
+                  #{sale.saleNumber}
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
                   Date
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  {formatDate(selectedSale.createdAt)}
+                  {formatDate(sale.createdAt)}
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
                   Customer
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  {selectedSale.customerName || "N/A"}
+                  {sale.customerName || "N/A"}
                 </Typography>
               </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary">
-                  Product
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {selectedSale.productName || "N/A"}
-                </Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary">
-                  Quantity
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {selectedSale.quantity} {selectedSale.unitType}
-                </Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary">
-                  Unit Price
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  ${selectedSale.unitPrice?.toFixed(2) || "0.00"}
-                </Typography>
-              </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
                   Discount
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  ${selectedSale.discount?.toFixed(2) || "0.00"}
+                  ${sale.discount?.toFixed(2) || "0.00"}
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Typography variant="body2" color="text.secondary">
                   Total Price
                 </Typography>
                 <Typography variant="h6" fontWeight="bold" color="primary">
-                  ${selectedSale.totalPrice?.toFixed(2) || "0.00"}
+                  ${sale.totalPrice?.toFixed(2) || "0.00"}
                 </Typography>
               </Grid>
             </Grid>
@@ -336,39 +277,39 @@ const ViewSale = () => {
               Payment Information
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Stack spacing={2}>
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Payment Method
                 </Typography>
                 <Chip
-                  label={selectedSale.paymentMethod}
-                  color={getPaymentMethodColor(selectedSale.paymentMethod)}
+                  label={sale.paymentMethod}
+                  color={getPaymentMethodColor(sale.paymentMethod)}
                   variant="outlined"
                   sx={{ mt: 0.5 }}
                 />
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Cash Given
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  ${selectedSale.givingCash?.toFixed(2) || "0.00"}
+                  ${sale.givingCash?.toFixed(2) || "0.00"}
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Remaining Balance
                 </Typography>
-                <Typography 
-                  variant="body1" 
+                <Typography
+                  variant="body1"
                   fontWeight="medium"
-                  color={selectedSale.remainingCash > 0 ? "error" : "success"}
+                  color={sale.remainingCash > 0 ? "error" : "success"}
                 >
-                  ${selectedSale.remainingCash?.toFixed(2) || "0.00"}
+                  ${sale.remainingCash?.toFixed(2) || "0.00"}
                 </Typography>
               </Box>
             </Stack>
@@ -377,7 +318,15 @@ const ViewSale = () => {
 
         {/* Items */}
         <Grid item xs={12}>
-          <Paper elevation={0} sx={{ p: 3, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 2,
+            }}
+          >
             <Typography variant="h6" gutterBottom>
               Items
             </Typography>
@@ -385,12 +334,47 @@ const ViewSale = () => {
             <Datagrid
               rows={items}
               columns={[
-                { field: "productId", headerName: "Product", flex: 1, minWidth: 140 },
-                { field: "quantity", headerName: "Qty", flex: 0.5, minWidth: 80 },
-                { field: "unitType", headerName: "Type", flex: 0.5, minWidth: 80 },
-                { field: "unitPerPackage", headerName: "Per Pack", flex: 0.6, minWidth: 100 },
-                { field: "unitPrice", headerName: "Unit Price", flex: 0.6, minWidth: 120 },
-                { field: "totalPrice", headerName: "Total", flex: 0.6, minWidth: 120 },
+                {
+                  field: "productId",
+                  headerName: "Product",
+                  flex: 1,
+                  minWidth: 140,
+                  renderCell: (params) => {
+                    return params?.row?.productId
+                      ? `${params?.row?.productId?.name}`
+                      : "N/A";
+                  },
+                },
+                {
+                  field: "quantity",
+                  headerName: "Qty",
+                  flex: 0.5,
+                  minWidth: 80,
+                },
+                {
+                  field: "unitType",
+                  headerName: "Type",
+                  flex: 0.5,
+                  minWidth: 80,
+                },
+                {
+                  field: "unitPerPackage",
+                  headerName: "Per Pack",
+                  flex: 0.6,
+                  minWidth: 100,
+                },
+                {
+                  field: "unitPrice",
+                  headerName: "Unit Price",
+                  flex: 0.6,
+                  minWidth: 120,
+                },
+                {
+                  field: "totalPrice",
+                  headerName: "Total",
+                  flex: 0.6,
+                  minWidth: 120,
+                },
               ]}
               autoHeight
               hideFooterSelectedRowCount
@@ -399,7 +383,7 @@ const ViewSale = () => {
         </Grid>
 
         {/* Description */}
-        {selectedSale.description && (
+        {sale.description && (
           <Grid item xs={12}>
             <Paper
               elevation={0}
@@ -414,9 +398,7 @@ const ViewSale = () => {
                 Description
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              <Typography variant="body1">
-                {selectedSale.description}
-              </Typography>
+              <Typography variant="body1">{sale.description}</Typography>
             </Paper>
           </Grid>
         )}

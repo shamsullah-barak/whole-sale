@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Grid,
   Typography,
   Button,
   Box,
   Stack,
   Paper,
   CircularProgress,
-  Alert,
   IconButton,
   Chip,
 } from "@mui/material";
@@ -37,15 +35,12 @@ import COLORS from "../../constant/colors";
 import formatDate from "../../utils/moment";
 import { toast } from "react-toastify";
 
-// Columns will be defined inside the component to access handler functions
-
 const SalesList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const sales = useSelector(selectSalesList);
   const loading = useSelector(selectSalesLoading);
-  const deleteLoading = useSelector(selectDeleteSaleLoading);
   const pagination = useSelector(selectSalesPagination);
 
   useEffect(() => {
@@ -93,11 +88,11 @@ const SalesList = () => {
   // Define columns inside component to access handler functions
   const columns = [
     {
-      field: "saleNumber",
+      field: "saleCounter",
       headerName: "Sale #",
       flex: 0.5,
       minWidth: 100,
-      align: "center",
+      align: "left",
     },
     {
       field: "customerName",
@@ -105,47 +100,49 @@ const SalesList = () => {
       flex: 1,
       minWidth: 150,
       align: "left",
-    },
-    {
-      field: "productName",
-      headerName: "Product",
-      flex: 1,
-      minWidth: 150,
-      align: "left",
-    },
-    {
-      field: "quantity",
-      headerName: "Quantity",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-    },
-    {
-      field: "unitPrice",
-      headerName: "Unit Price",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-      valueFormatter: (params) => {
-        return params ? `$${params.toFixed(2)}` : "$0.00";
+      renderCell: (params) => {
+        return params?.row?.customerId
+          ? `${params?.row?.customerId?.name}`
+          : "N/A";
       },
+    },
+    {
+      field: "currencyType",
+      headerName: "Currency",
+      flex: 0.5,
+      minWidth: 100,
+      align: "left",
     },
     {
       field: "totalPrice",
       headerName: "Total",
       flex: 0.5,
       minWidth: 100,
-      align: "center",
+      align: "left",
       valueFormatter: (params) => {
         return params ? `$${params.toFixed(2)}` : "$0.00";
       },
+    },
+    {
+      field: "givingCash",
+      headerName: "Cash paid",
+      flex: 0.5,
+      minWidth: 100,
+      align: "left",
+    },
+    {
+      field: "discount",
+      headerName: "Discount",
+      flex: 0.5,
+      minWidth: 100,
+      align: "left",
     },
     {
       field: "paymentMethod",
       headerName: "Payment",
       flex: 0.5,
       minWidth: 100,
-      align: "center",
+      align: "left",
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -166,7 +163,7 @@ const SalesList = () => {
       headerName: "Date",
       flex: 0.5,
       minWidth: 120,
-      align: "center",
+      align: "left",
       valueFormatter: (params) => {
         return formatDate(params);
       },

@@ -1,11 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { 
-  fetchSales, 
-  fetchSaleById, 
-  createSale, 
-  updateSale, 
-  deleteSale, 
-  fetchNextSaleNumber 
+import {
+  fetchSales,
+  createSale,
+  updateSale,
+  deleteSale,
+  fetchNextSaleNumber,
 } from "../actions/sale.action";
 
 const initialState = {
@@ -28,14 +27,6 @@ export const fetchSalesAsync = createAsyncThunk(
   async ({ page, limit }) => {
     const sales = await fetchSales(page, limit);
     return sales;
-  }
-);
-
-export const fetchSaleByIdAsync = createAsyncThunk(
-  "sales/fetchSaleById",
-  async (saleId) => {
-    const sale = await fetchSaleById(saleId);
-    return sale;
   }
 );
 
@@ -102,19 +93,6 @@ export const saleSlice = createSlice({
         state.loading = false;
       })
 
-      // Fetch Sale by ID
-      .addCase(fetchSaleByIdAsync.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchSaleByIdAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.selectedSale = action.payload;
-      })
-      .addCase(fetchSaleByIdAsync.rejected, (state) => {
-        state.loading = false;
-      })
-
-      // Create Sale
       .addCase(createSaleAsync.pending, (state) => {
         state.createLoading = true;
       })
@@ -132,11 +110,16 @@ export const saleSlice = createSlice({
       })
       .addCase(updateSaleAsync.fulfilled, (state, action) => {
         state.updateLoading = false;
-        const index = state.sales.findIndex(sale => sale._id === action.payload._id);
+        const index = state.sales.findIndex(
+          (sale) => sale._id === action.payload._id
+        );
         if (index !== -1) {
           state.sales[index] = action.payload;
         }
-        if (state.selectedSale && state.selectedSale._id === action.payload._id) {
+        if (
+          state.selectedSale &&
+          state.selectedSale._id === action.payload._id
+        ) {
           state.selectedSale = action.payload;
         }
       })
@@ -150,7 +133,7 @@ export const saleSlice = createSlice({
       })
       .addCase(deleteSaleAsync.fulfilled, (state, action) => {
         state.deleteLoading = false;
-        state.sales = state.sales.filter(sale => sale._id !== action.payload);
+        state.sales = state.sales.filter((sale) => sale._id !== action.payload);
         if (state.selectedSale && state.selectedSale._id === action.payload) {
           state.selectedSale = null;
         }

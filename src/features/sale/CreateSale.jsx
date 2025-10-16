@@ -35,11 +35,7 @@ import COLORS from "../../constant/colors";
 import { toast, ToastContainer } from "react-toastify";
 import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
 import axios from "axios";
-import {
-  CURRENCY_TYPE,
-  CURRENCY_TYPES,
-  PAYMENT_METHODS,
-} from "../../constant/variables";
+import { CURRENCY_TYPES, PAYMENT_METHODS } from "../../constant/variables";
 import { t } from "i18next";
 
 const CreateSale = () => {
@@ -54,8 +50,6 @@ const CreateSale = () => {
   const stocks = useSelector(selectStocks).stockNames;
   const [formErrors, setFormErrors] = useState({});
 
-  console.log({ customers });
-
   const [formData, setFormData] = useState({
     customerId: "",
     items: [
@@ -66,14 +60,7 @@ const CreateSale = () => {
         unitType: "kg",
         unitPerPackage: 10,
         unitPrice: 200,
-      },
-      {
-        stockId: "",
-        stockItemId: "",
-        quantity: 3,
-        unitType: "piece",
-        unitPerPackage: 1,
-        unitPrice: 1500,
+        productId: "",
       },
     ],
     paymentMethod: "cash",
@@ -98,7 +85,6 @@ const CreateSale = () => {
           `http://localhost:5000/api/stocks/${stockId}/stock-items`
         );
         const data = await response.json();
-        console.log({ data });
         setStockItems((prev) => ({ ...prev, [stockId]: data }));
       }
     } catch (error) {
@@ -124,6 +110,18 @@ const CreateSale = () => {
       if (["kg", "piece", "liter"].includes(updatedItem.unitType)) {
         updatedItem.unitPerPackage = 1;
       }
+
+      if (field === "stockItemId") {
+        const selectedStockItem = (stockItems[updatedItem.stockId] || []).find(
+          (item) => item._id === value
+        );
+        if (selectedStockItem) {
+          updatedItem.productId = selectedStockItem.productId;
+        } else {
+          updatedItem.productId = "";
+        }
+      }
+
       items[index] = updatedItem;
       return { ...prev, items };
     });
@@ -144,6 +142,7 @@ const CreateSale = () => {
           unitType: "kg",
           unitPerPackage: "",
           unitPrice: "",
+          productId: "",
         },
       ],
     }));
@@ -216,6 +215,7 @@ const CreateSale = () => {
         items: formData.items.map((it) => ({
           stockId: it.stockId,
           stockItemId: it.stockItemId,
+          productId: it.productId,
           quantity: Number(it.quantity),
           unitType: it.unitType,
           unitPerPackage: Number(it.unitPerPackage),
@@ -240,14 +240,6 @@ const CreateSale = () => {
       dispatch(fetchSalesAsync());
       dispatch(fetchReceivablesAsync());
       dispatch(fetchNextSaleNumberAsync());
-
-      // if (isEdit) {
-      //   await dispatch(updateSaleAsync({ saleId: id, saleData })).unwrap();
-      //   toast.success("Sale updated successfully");
-      // } else {
-      //   await dispatch(createSaleAsync(saleData)).unwrap();
-      //   toast.success("Sale created successfully");
-      // }
 
       navigate("/sales");
     } catch (error) {
@@ -417,56 +409,6 @@ const CreateSale = () => {
                       ))}
                     </TextField>
                   </Grid>
-
-                  {/* <Grid size={3} xs={12} sm={6}>
-                    <TextField
-                      select
-                      label="Stock Item"
-                      name={`stockItemId-${idx}`}
-                      value={it.stockItemId}
-                      onChange={handleItemChange(idx, "stockItemId")}
-                      fullWidth
-                      required
-                      disabled={!it.stockId || loadingStockItems[it.stockId]}
-                      size="small"
-                    >
-                      {(stockItems[it.stockId] || []).map((item) => {
-                        return (
-                          <MenuItem key={item._id} value={item._id}>
-                            <Typography variant="body1">
-                              {`${item.productName}    &   `}
-                            </Typography>
-
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              quantity:
-                              {`  ${item.quantity}  ${item.unitType}`}
-                            </Typography>
-                          </MenuItem>
-                        );
-                      })}
-                    </TextField>
-                  </Grid>
-
-                  <Grid size={3} xs={12} sm={6}>
-                    <TextField
-                      label="Quantity"
-                      type="number"
-                      name={`quantity-${idx}`}
-                      value={it.quantity}
-                      onChange={handleItemChange(idx, "quantity")}
-                      fullWidth
-                      required
-                      size="small"
-                      inputProps={{
-                        min: 0,
-                        max: it.quantity, // 👈 dynamic max limit
-                        step: 0.01,
-                      }}
-                    />
-                  </Grid> */}
 
                   <Grid size={3} xs={12} sm={6}>
                     <TextField

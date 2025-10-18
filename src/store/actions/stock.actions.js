@@ -33,3 +33,21 @@ export const deleteStock = async (stockId) => {
     throw error;
   }
 };
+
+// Update stock
+export const updateStock = async (stockId, payload) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/api/stocks/${stockId}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

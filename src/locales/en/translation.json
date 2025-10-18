@@ -122,5 +122,8 @@
   "addNewInvest": "Add new Invest",
   "newCategory": "New Category",
   "categoryName": "Category Name",
-  "newSupplier": "New Supplier"
+  "newSupplier": "New Supplier",
+  "engName": "English Name",
+  "psName": "Pashto Name",
+  "drName": "Dari Name"
 }

@@ -9,15 +9,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Snackbar,
   IconButton,
   Tooltip,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
 import { DataGrid } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { NavLink, useNavigate } from "react-router-dom";
+import StraightenIcon from "@mui/icons-material/Straighten";
 import {
   fetchUnitsAsync,
   deleteUnitAsync,
@@ -27,16 +30,165 @@ import {
   selectUnitsLoading,
   selectUnitsError,
 } from "../../../store/selectors/unit.selector";
-import { selectCompaniesList } from "../../../store/selectors/company.selector";
 import { fetchCompaniesAsync } from "../../../store/slices/company.slice";
+import Model from "../../../components/Model";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { selectDirection } from "../../../store/selectors/app.selector";
+import COLORS from "../../../constant/colors";
+
+const CreateOrUpdateUnit = ({
+  open,
+  setOpen,
+  isUpdate,
+  setIsUpdate,
+  updatedUnit,
+  setUpdatedUnit,
+}) => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const selectedDirection = useSelector(selectDirection);
+
+  const [loading, setLoading] = useState(false);
+  const [unit, setUnit] = useState({
+    engName: "",
+    psName: "",
+    drName: "",
+  });
+
+  // ✅ Only run when updatedUnit changes
+  useEffect(() => {
+    if (isUpdate && updatedUnit) {
+      setUnit({
+        engName: updatedUnit.engName || "",
+        psName: updatedUnit.psName || "",
+        drName: updatedUnit.drName || "",
+      });
+    } else {
+      setUnit({
+        engName: "",
+        psName: "",
+        drName: "",
+      });
+    }
+  }, [isUpdate, updatedUnit]);
+
+  // Methods
+  const handleClose = () => {
+    setOpen(false);
+    setIsUpdate(false);
+    setUpdatedUnit({});
+  };
+
+  const clearState = () => {
+    handleClose();
+    setUnit({
+      engName: "",
+      psName: "",
+      drName: "",
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const url = isUpdate
+        ? `http://localhost:5000/api/units/${updatedUnit._id}`
+        : "http://localhost:5000/api/units";
+
+      const method = isUpdate ? "patch" : "post";
+      await axios[method](url, unit, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      dispatch(fetchUnitsAsync());
+      clearState();
+      toast.success(
+        isUpdate ? "Unit updated successfully!" : "Unit created successfully!"
+      );
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ??
+          "Something went wrong, please try again"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <ToastContainer />
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          {isUpdate ? "Update Unit" : "Add New Unit"}
+        </Typography>
+
+        <Grid xs={12} spacing={2}>
+          <Grid>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <TextField
+                fullWidth
+                label={t("engName")}
+                name="engName"
+                type="text"
+                value={unit.engName}
+                onChange={(e) => setUnit({ ...unit, engName: e.target.value })}
+                size="small"
+              />
+              <TextField
+                fullWidth
+                label={t("psName")}
+                name="psName"
+                type="text"
+                required
+                size="small"
+                value={unit.psName}
+                onChange={(e) => setUnit({ ...unit, psName: e.target.value })}
+              />
+              <TextField
+                fullWidth
+                required
+                size="small"
+                label={t("drName")}
+                name="drName"
+                type="text"
+                value={unit.drName}
+                onChange={(e) => setUnit({ ...unit, drName: e.target.value })}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Model>
+    </>
+  );
+};
+
+// export default CreateOrUpdateUnit;
 
 const Units = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const units = useSelector(selectUnits);
   const loading = useSelector(selectUnitsLoading);
+
+  const [open, setOpen] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+
+  const [updatedUnit, setUpdatedUnit] = useState({});
+
   const error = useSelector(selectUnitsError);
-  const companies = useSelector(selectCompaniesList);
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [snackbar, setSnackbar] = useState({
@@ -50,15 +202,10 @@ const Units = () => {
     dispatch(fetchCompaniesAsync({ page: 1, limit: 100 }));
   }, [dispatch]);
 
-  const getCompanyName = (companyId) => {
-    const company = companies.find(
-      (c) => c.id === companyId || c._id === companyId
-    );
-    return company ? company.name : companyId;
-  };
-
-  const handleEdit = (unitId) => {
-    navigate(`/master-data/units/edit/${unitId}`);
+  const handleEdit = (updatedUnit) => {
+    setIsUpdate(true);
+    setOpen(true);
+    setUpdatedUnit(updatedUnit);
   };
 
   const handleDeleteClick = (unit) => {
@@ -100,20 +247,9 @@ const Units = () => {
   };
 
   const columns = [
-    { field: "name", headerName: "Unit Name", flex: 1, minWidth: 150 },
-    {
-      field: "companyId",
-      headerName: "Unit Company",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => getCompanyName(params.value),
-    },
-    {
-      field: "abbreviation",
-      headerName: "Abbreviation",
-      flex: 1,
-      minWidth: 100,
-    },
+    { field: "engName", headerName: "English Name", flex: 1, minWidth: 150 },
+    { field: "psName", headerName: "Pashto Name", flex: 1, minWidth: 150 },
+    { field: "drName", headerName: "Dari Name", flex: 1, minWidth: 100 },
     {
       field: "actions",
       headerName: "Actions",
@@ -126,7 +262,7 @@ const Units = () => {
           <Tooltip title="Edit">
             <IconButton
               color="primary"
-              onClick={() => handleEdit(params.row.id || params.row._id)}
+              onClick={() => handleEdit(params.row)}
               size="small"
             >
               <EditIcon />
@@ -148,8 +284,17 @@ const Units = () => {
 
   return (
     <>
+      <ToastContainer />
+      <CreateOrUpdateUnit
+        isUpdate={isUpdate}
+        setIsUpdate={setIsUpdate}
+        open={open}
+        setOpen={setOpen}
+        updatedUnit={updatedUnit}
+        setUpdatedUnit={setUpdatedUnit}
+      />
       <Box sx={{ width: "100%" }}>
-        <Box
+        {/* <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -160,20 +305,55 @@ const Units = () => {
           <Typography variant="h4" component="h1">
             Unit Management
           </Typography>
-          <NavLink
-            to="/master-data/units/add"
-            style={{ textDecoration: "none" }}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            size="large"
+            onClick={() => setOpen(!open)}
           >
-            <Button variant="contained" startIcon={<AddIcon />} size="large">
-              New Unit
+            New Unit
+          </Button>
+        </Box> */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 3,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+          }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography variant="h4" component="h1" gutterBottom>
+                <StraightenIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                Units Management
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Manage your units
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpen(true)}
+              sx={{
+                backgroundColor: COLORS.PURPLE,
+                "&:hover": {
+                  backgroundColor: COLORS.PURPLE_DARK,
+                },
+              }}
+            >
+              Create Unit
             </Button>
-          </NavLink>
-        </Box>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          </Stack>
+        </Paper>
+
         <Box sx={{ width: "100%", height: 600 }}>
           <DataGrid
             rows={units || []}
@@ -186,7 +366,7 @@ const Units = () => {
         <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
           <DialogTitle>Delete Unit</DialogTitle>
           <DialogContent>
-            Are you sure you want to delete the unit "{selectedUnit?.name}"?
+            Are you sure you want to delete the unit "{selectedUnit?.engName}"?
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDeleteCancel}>Cancel</Button>
@@ -199,20 +379,6 @@ const Units = () => {
             </Button>
           </DialogActions>
         </Dialog>
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={4000}
-          onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={handleSnackbarClose}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
       </Box>
     </>
   );

@@ -25,8 +25,6 @@ import CreateStock from "./features/stock/createStock";
 import StockItems from "./features/stock/stockItems";
 import AddStockItem from "./features/stock/AddStockItem";
 import Units from "./features/master-data/units/Units";
-import CreateUnit from "./features/master-data/units/CreateUnit";
-import EditUnit from "./features/master-data/units/EditUnit";
 import Partners from "./features/investment/partners";
 import AddInvest from "./features/investment/addInvest";
 import Suppliers from "./features/suppliers";
@@ -203,14 +201,6 @@ const router = createBrowserRouter([
       {
         path: "/master-data/units",
         Component: Units,
-      },
-      {
-        path: "/master-data/units/add",
-        Component: CreateUnit,
-      },
-      {
-        path: "/master-data/units/edit/:unitId",
-        Component: EditUnit,
       },
       {
         path: "/expenses/*",

@@ -20,6 +20,7 @@ import {
 } from "../mixins";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import StraightenIcon from "@mui/icons-material/Straighten";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
@@ -221,7 +222,8 @@ function DashboardSidebar({
               defaultExpanded={
                 !!matchPath("/products", pathname) ||
                 !!matchPath("/stocks", pathname) ||
-                !!matchPath("/categories", pathname)
+                !!matchPath("/categories", pathname) ||
+                !!matchPath("/master-data/units", pathname)
               }
               expanded={expandedItemIds.includes("inventory-group")}
               nestedNavigation={
@@ -232,6 +234,13 @@ function DashboardSidebar({
                     icon={<ProductionQuantityLimitsIcon />}
                     href="/products"
                     selected={!!matchPath("/products", pathname)}
+                  />
+                  <DashboardSidebarPageItem
+                    id="units"
+                    title="Units"
+                    icon={<StraightenIcon />}
+                    href="/master-data/units"
+                    selected={!!matchPath("/master-data/units", pathname)}
                   />
                   <DashboardSidebarPageItem
                     id="stocks"

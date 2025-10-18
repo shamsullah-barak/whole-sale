@@ -3,6 +3,7 @@ import {
   fetchStockNames,
   fetchStocks,
   deleteStock,
+  updateStock,
 } from "../actions/stock.actions";
 
 const initialState = {
@@ -39,6 +40,15 @@ export const deleteStockAsync = createAsyncThunk(
   async (stockId) => {
     const result = await deleteStock(stockId);
     return { stockId, result };
+  }
+);
+
+// Update stock async thunk
+export const updateStockAsync = createAsyncThunk(
+  "stocks/updateStock",
+  async ({ stockId, payload }) => {
+    const updated = await updateStock(stockId, payload);
+    return updated;
   }
 );
 
@@ -88,6 +98,21 @@ export const stockSlice = createSlice({
         );
       })
       .addCase(deleteStockAsync.rejected, (state) => {
+        state.loading = false;
+      });
+
+    builder
+      .addCase(updateStockAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateStockAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const updated = action.payload;
+        state.stocks = state.stocks.map((s) =>
+          s._id === updated._id ? { ...s, ...updated } : s
+        );
+      })
+      .addCase(updateStockAsync.rejected, (state) => {
         state.loading = false;
       });
   },

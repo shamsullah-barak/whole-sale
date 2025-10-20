@@ -77,6 +77,7 @@ import { fetchReceivablesAsync } from "./store/slices/receivable.slice";
 import { fetchIncomeAsync } from "./store/slices/income.slice";
 import { fetchCashboxBalancesAsync } from "./store/slices/cashbox.slice";
 import { fetchCompaniesAsync } from "./store/slices/company.slice";
+import { fetchUnitsAsync } from "./store/slices/unit.slice";
 
 const Page404 = () => {
   return <>404</>;
@@ -185,7 +186,7 @@ const router = createBrowserRouter([
         Component: Settings,
       },
       {
-        path: "/master-data/units",
+        path: "/units",
         Component: Units,
       },
       {
@@ -266,6 +267,7 @@ export default function CrudDashboard(props) {
     dispatch(fetchIncomeAsync());
     dispatch(fetchCashboxBalancesAsync());
     dispatch(fetchCompaniesAsync());
+    dispatch(fetchUnitsAsync());
     dispatch(fetchPurchasesAsync({ limit: 10, page: 1 }));
     dispatch(fetchCategoriesAsync({ limit: 10, page: 1 }));
     dispatch(fetchSuppliersAsync({ limit: 10, page: 1 }));

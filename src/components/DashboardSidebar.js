@@ -231,7 +231,7 @@ function DashboardSidebar({
                 !!matchPath("/stocks", pathname) ||
                 !!matchPath("/categories", pathname) ||
                 !!matchPath("/companies", pathname) ||
-                !!matchPath("/master-data/units", pathname)
+                !!matchPath("/units", pathname)
               }
               expanded={expandedItemIds.includes("inventory-group")}
               nestedNavigation={
@@ -251,7 +251,7 @@ function DashboardSidebar({
                     id="units"
                     title="Units"
                     icon={<StraightenIcon />}
-                    href="/master-data/units"
+                    href="/units"
                     selected={!!matchPath("/units", pathname)}
                   />
                   <DashboardSidebarPageItem

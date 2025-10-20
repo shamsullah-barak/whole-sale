@@ -19,6 +19,7 @@ import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BusinessIcon from "@mui/icons-material/Business";
 import {
   fetchCompaniesAsync,
   deleteCompanyAsync,
@@ -340,7 +341,7 @@ const Companies = () => {
           >
             <Box>
               <Typography variant="h4" component="h1" gutterBottom>
-                <StraightenIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                <BusinessIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Companies Management
               </Typography>
               <Typography variant="body1" color="text.secondary">

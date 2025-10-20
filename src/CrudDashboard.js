@@ -9,8 +9,6 @@ import Products from "./features/products/Product";
 import MasterData from "./features/master-data/MasterData";
 import Categories from "./features/master-data/categories/Categories";
 import Companies from "./features/master-data/companies/Companies";
-import CreateCompany from "./features/master-data/companies/CreateCompany";
-import EditCompany from "./features/master-data/companies/EditCompany";
 import Purchases from "./features/purchases/Purchase";
 import CreatePurchases from "./features/purchases/CreatePurchase";
 import EditPurchase from "./features/purchases/EditPurchase";
@@ -121,19 +119,6 @@ const router = createBrowserRouter([
       {
         path: "/master-data/categories",
         Component: Categories,
-      },
-      // Company routes
-      {
-        path: "/master-data/companies",
-        Component: Companies,
-      },
-      {
-        path: "/master-data/companies/add",
-        Component: CreateCompany,
-      },
-      {
-        path: "/master-data/companies/edit/:companyId",
-        Component: EditCompany,
       },
       {
         path: "/purchases",

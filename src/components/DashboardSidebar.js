@@ -30,7 +30,6 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import BusinessIcon from "@mui/icons-material/Business";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import StorageIcon from "@mui/icons-material/Storage";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";

@@ -28,6 +28,7 @@ import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantity
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
+import BusinessIcon from "@mui/icons-material/Business";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import StorageIcon from "@mui/icons-material/Storage";
 import PaymentsIcon from "@mui/icons-material/Payments";
@@ -159,11 +160,15 @@ function DashboardSidebar({
               title="Sales"
               icon={<PointOfSaleIcon />}
               defaultExpanded={
-                !!matchPath("/invoices", pathname) || !!matchPath("/sales", pathname)
+                !!matchPath("/invoices", pathname) ||
+                !!matchPath("/sales", pathname)
               }
               expanded={expandedItemIds.includes("sales-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="invoices"
                     title="Invoices"
@@ -196,7 +201,10 @@ function DashboardSidebar({
               defaultExpanded={!!matchPath("/purchases", pathname)}
               expanded={expandedItemIds.includes("purchases-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="purchases"
                     title="Purchases"
@@ -223,11 +231,37 @@ function DashboardSidebar({
                 !!matchPath("/products", pathname) ||
                 !!matchPath("/stocks", pathname) ||
                 !!matchPath("/categories", pathname) ||
+                !!matchPath("/companies", pathname) ||
                 !!matchPath("/master-data/units", pathname)
               }
               expanded={expandedItemIds.includes("inventory-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
+                  <DashboardSidebarPageItem
+                    id="companies"
+                    title="Companies"
+                    icon={<BusinessIcon />}
+                    href="/companies"
+                    selected={!!matchPath("/companies", pathname)}
+                  />
+
+                  <DashboardSidebarPageItem
+                    id="units"
+                    title="Units"
+                    icon={<StraightenIcon />}
+                    href="/master-data/units"
+                    selected={!!matchPath("/units", pathname)}
+                  />
+                  <DashboardSidebarPageItem
+                    id="categories"
+                    title="Categories"
+                    icon={<LayersIcon />}
+                    href="/categories"
+                    selected={!!matchPath("/categories", pathname)}
+                  />
                   <DashboardSidebarPageItem
                     id="products"
                     title="Products"
@@ -236,25 +270,11 @@ function DashboardSidebar({
                     selected={!!matchPath("/products", pathname)}
                   />
                   <DashboardSidebarPageItem
-                    id="units"
-                    title="Units"
-                    icon={<StraightenIcon />}
-                    href="/master-data/units"
-                    selected={!!matchPath("/master-data/units", pathname)}
-                  />
-                  <DashboardSidebarPageItem
                     id="stocks"
                     title="Stock"
                     icon={<InventoryIcon />}
                     href="/stocks"
                     selected={!!matchPath("/stocks", pathname)}
-                  />
-                  <DashboardSidebarPageItem
-                    id="categories"
-                    title="Categories"
-                    icon={<LayersIcon />}
-                    href="/categories"
-                    selected={!!matchPath("/categories", pathname)}
                   />
                 </List>
               }
@@ -265,11 +285,15 @@ function DashboardSidebar({
               title="People"
               icon={<PeopleRoundedIcon />}
               defaultExpanded={
-                !!matchPath("/customers", pathname) || !!matchPath("/suppliers", pathname)
+                !!matchPath("/customers", pathname) ||
+                !!matchPath("/suppliers", pathname)
               }
               expanded={expandedItemIds.includes("people-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="customers"
                     title="Customers"
@@ -304,7 +328,10 @@ function DashboardSidebar({
               }
               expanded={expandedItemIds.includes("finance-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="incomes"
                     title="Incomes"
@@ -374,7 +401,10 @@ function DashboardSidebar({
               defaultExpanded={!!matchPath("/reports", pathname)}
               expanded={expandedItemIds.includes("reports")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="reports-balance-sheet"
                     title="Balance Sheet"
@@ -418,17 +448,13 @@ function DashboardSidebar({
               id="administration-group"
               title="Administration"
               icon={<LayersIcon />}
-              defaultExpanded={!!matchPath("/companies", pathname)}
+              defaultExpanded={!!matchPath("/settings", pathname)}
               expanded={expandedItemIds.includes("administration-group")}
               nestedNavigation={
-                <List dense sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}>
-                  <DashboardSidebarPageItem
-                    id="companies"
-                    title="Companies"
-                    icon={<EqualizerIcon />}
-                    href="/companies"
-                    selected={!!matchPath("/companies", pathname)}
-                  />
+                <List
+                  dense
+                  sx={{ padding: 0, my: 1, pl: mini ? 0 : 1, minWidth: 240 }}
+                >
                   <DashboardSidebarPageItem
                     id="settings"
                     title="Settings"

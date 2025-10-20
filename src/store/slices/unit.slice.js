@@ -9,10 +9,10 @@ const initialState = {
 };
 
 export const fetchUnitsAsync = createAsyncThunk(
-  "stocks/fetchUnits",
+  "units/fetchUnits",
   async () => {
-    const stocks = await fetchUnits();
-    return stocks;
+    const units = await fetchUnits();
+    return units;
   }
 );
 

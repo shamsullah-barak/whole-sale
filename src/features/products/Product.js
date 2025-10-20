@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Box, Container, Grid2 as Grid, Paper } from "@mui/material";
+import { Box, Grid2 as Grid, Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { DataGrid } from "@mui/x-data-grid";
+import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from "react-redux";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -12,35 +12,31 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
-import {
-  selectCompanies,
-  selectProducts,
-} from "../../store/selectors/product.selector";
+import { selectProducts } from "../../store/selectors/product.selector";
 import { fetchProductsAsync } from "../../store/slices/product.slice";
 import { selectCategories } from "../../store/selectors/category.selector";
 import Model from "../../components/Model";
 import Datagrid from "../../components/DataGrid";
 import { selectCompaniesList } from "../../store/selectors/company.selector";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import { selectUnits } from "../../store/selectors/unit.selector";
 
 const CreateProduct = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const categories = useSelector(selectCategories).categories;
   const companies = useSelector(selectCompaniesList);
+
+  const units = useSelector(selectUnits);
+
+  console.log({ unit: units });
+
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState({
-    name: "Sample Product",
-    type: "Electronics",
-    // unit: 10,
-    // sku: "SKU-12345",
-    // barCode: "9876543210123",
-    description: "This is a sample product description.",
-    // currentStock: 150,
+    name: "",
+    description: "",
     minStockLevel: 50,
-    purchasedPrice: 200,
-    salePrice: 250,
-    // status: "active",
-    companyId: "company123",
-    categoryId: "category456",
+    categoryId: "",
+    baseUnit: "",
   });
 
   // methods
@@ -92,101 +88,106 @@ const CreateProduct = ({ open, setOpen }) => {
           Add new Product
         </Typography>
 
-        <Grid container spacing={3} mt={2}>
-          {/* ================= General Info ================= */}
-          <Grid item xs={12}>
-            <Grid>
-              <Typography variant="subtitle1" gutterBottom>
+        {/* <Grid container spacing={3} mt={2}> */}
+        {/* ================= General Info ================= */}
+        {/* <Grid xs={12}> */}
+        {/* <Grid> */}
+        {/* <Typography variant="subtitle1" gutterBottom>
                 General Information
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <TextField
-                  label="Product Name"
-                  name="name"
-                  value={product.name}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                  size="small"
-                />
-                <TextField
-                  label="Type"
-                  name="type"
-                  value={product.type}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                />
-                {/* <TextField
-                  label="Unit"
-                  name="unit"
-                  type="number"
-                  value={product.unit}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                /> */}
-              </Box>
-              <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                {/* <TextField
-                  label="SKU"
-                  name="sku"
-                  value={product.sku}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                /> */}
-                {/* <TextField
-                  label="Barcode"
-                  name="barCode"
-                  value={product.barCode}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                /> */}
-                <TextField
-                  label="Description"
-                  name="description"
-                  value={product.description}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                />
-              </Box>
-            </Grid>
+              </Typography> */}
+        {/* <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}> */}
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            marginTop: "15px",
+            // backgroundColor: "blue",
+            // width: "100%",
+          }}
+        >
+          <Grid size={4} xs={12} sm={6}>
+            <TextField
+              label="Product Names"
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+              fullWidth
+              required
+              size="small"
+            />
           </Grid>
-
-          {/* ================= Stock Info ================= */}
-          <Grid item xs={12} sx={{ width: "100%" }} mt={2}>
-            <Grid>
-              <Typography variant="subtitle1" gutterBottom>
-                Stock Information
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2 }}>
-                {/* <TextField
-                  label="Current Stock"
-                  name="currentStock"
-                  type="number"
-                  value={product.currentStock}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                /> */}
-                <TextField
-                  label="Min Stock Level"
-                  name="minStockLevel"
-                  type="number"
-                  value={product.minStockLevel}
-                  onChange={handleChange}
-                  fullWidth
-                  size="small"
-                />
-              </Box>
-            </Grid>
+          <Grid size={4} xs={12} sm={6}>
+            <TextField
+              label="Min Stock Level"
+              name="minStockLevel"
+              type="number"
+              value={product.minStockLevel}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+            />
           </Grid>
+          <Grid size={4} xs={12} sm={6}>
+            <TextField
+              label="Base Unit"
+              name="baseUnit"
+              type="number"
+              value={product.baseUnit}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              select
+            >
+              {units.map((item) => (
+                <MenuItem key={item._id} value={item._id}>
+                  <Typography variant="body1">{`${item.engName}`}</Typography>
 
-          {/* ================= Pricing ================= */}
-          <Grid xs={12} sx={{ width: "100%" }} mt={2}>
+                  {/* <Typography variant="caption" color="text.secondary">
+                    {`  ${item.psName}`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {`   ${item.drName}`}
+                  </Typography> */}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </Grid>
+        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+          <TextField
+            label="Description"
+            name="description"
+            value={product.description}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+          />
+        </Box>
+        {/* </Grid> */}
+        {/* </Grid> */}
+
+        {/* ================= Stock Info ================= */}
+        {/* <Grid xs={12} sx={{ width: "100%" }} mt={2}>
+          <Grid>
+            <Typography variant="subtitle1" gutterBottom>
+              Stock 
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <TextField
+                label="Min Stock Level"
+                name="minStockLevel"
+                type="number"
+                value={product.minStockLevel}
+                onChange={handleChange}
+                fullWidth
+                size="small"
+              />
+            </Box>
+          </Grid>
+        </Grid> */}
+
+        {/* ================= Pricing ================= */}
+        {/* <Grid xs={12} sx={{ width: "100%" }} mt={2}>
             <Grid>
               <Typography variant="subtitle1" gutterBottom>
                 Pricing
@@ -212,8 +213,8 @@ const CreateProduct = ({ open, setOpen }) => {
                 />
               </Box>
             </Grid>
-          </Grid>
-        </Grid>
+          </Grid> */}
+        {/* </Grid> */}
         {/* ================= Relations ================= */}
         <Grid xs={12} mt={2}>
           <Grid>
@@ -234,7 +235,7 @@ const CreateProduct = ({ open, setOpen }) => {
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="inactive">Inactive</MenuItem>
               </TextField> */}
-              <TextField
+              {/* <TextField
                 select
                 fullWidth
                 required
@@ -249,7 +250,7 @@ const CreateProduct = ({ open, setOpen }) => {
                     {company.name}
                   </MenuItem>
                 ))}
-              </TextField>
+              </TextField> */}
               <TextField
                 select
                 fullWidth
@@ -575,16 +576,16 @@ const Products = () => {
 
   return (
     <>
-      <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
-        <Grid
+      {/* <Grid container spacing={2} columns={12} sx={{ width: "100%" }}> */}
+      {/* <Grid
           xs={12}
           lg={9}
           sx={{
             width: "100%",
             textAlign: selectedDirection === "rtl" ? "left" : "right",
           }}
-        >
-          <Button
+        > */}
+      {/* <Button
             variant="contained"
             color="inherit"
             sx={(theme) => ({
@@ -596,9 +597,50 @@ const Products = () => {
             onClick={() => setOpen(true)}
           >
             {t("newProduct")}
+          </Button> */}
+      {/* </Grid> */}
+      {/* </Grid> */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+        }}
+      >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+              <ProductionQuantityLimitsIcon
+                sx={{ mr: 1, verticalAlign: "middle" }}
+              />
+              Products Management
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage your Products transactions and customer orders
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpen(true)}
+            sx={{
+              backgroundColor: COLORS.PURPLE,
+              "&:hover": {
+                backgroundColor: COLORS.PURPLE_DARK,
+              },
+            }}
+          >
+            {t("newProduct")}
           </Button>
-        </Grid>
-      </Grid>
+        </Stack>
+      </Paper>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%" }}>
           <ProductList />

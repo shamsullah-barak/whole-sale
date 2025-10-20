@@ -1,23 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
   Button,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Snackbar,
   IconButton,
   Tooltip,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import TextField from "@mui/material/TextField";
+import StraightenIcon from "@mui/icons-material/Straighten";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { NavLink } from "react-router-dom";
 import {
   fetchCompaniesAsync,
   deleteCompanyAsync,
@@ -26,31 +27,193 @@ import {
 import {
   selectCompanies,
   selectCompaniesLoading,
-  selectCompaniesError,
 } from "../../../store/selectors/company.selector";
 import Datagrid from "../../../components/DataGrid";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import Model from "../../../components/Model";
+import COLORS from "../../../constant/colors";
+
+const CreateOrUpdateCompany = ({
+  open,
+  setOpen,
+  isUpdate,
+  setIsUpdate,
+  updatedCompany,
+  setUpdatedCompany,
+}) => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false);
+  const [company, setCompany] = useState({
+    name: "",
+    address: "",
+    contactEmail: "",
+    contactPhone: "",
+  });
+
+  // ✅ Only run when updatedCompany changes
+  useEffect(() => {
+    if (isUpdate && updatedCompany) {
+      setCompany({
+        name: updatedCompany.name || "",
+        address: updatedCompany.address || "",
+        contactEmail: updatedCompany.contactEmail || "",
+        contactPhone: updatedCompany.contactPhone || "",
+      });
+    } else {
+      setCompany({
+        name: "",
+        address: "",
+        contactEmail: "",
+        contactPhone: "",
+      });
+    }
+  }, [isUpdate, updatedCompany]);
+
+  // Methods
+  const handleClose = () => {
+    setOpen(false);
+    setIsUpdate(false);
+    setUpdatedCompany({});
+  };
+
+  const clearState = () => {
+    handleClose();
+    setCompany({
+      name: "",
+      address: "",
+      contactEmail: "",
+      contactPhone: "",
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const url = isUpdate
+        ? `http://localhost:5000/api/companies/${updatedCompany._id}`
+        : "http://localhost:5000/api/companies";
+
+      const method = isUpdate ? "patch" : "post";
+      await axios[method](url, company, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      dispatch(fetchCompaniesAsync());
+      clearState();
+      toast.success(
+        isUpdate
+          ? "Company updated successfully!"
+          : "Company created successfully!"
+      );
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ??
+          "Something went wrong, please try again"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <ToastContainer />
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="submit"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleSubmit}
+      >
+        <Typography variant="h6" mb={2}>
+          {isUpdate ? "Update Company" : "Add New Company"}
+        </Typography>
+
+        <Grid container xs={12} spacing={2}>
+          <Grid size={6} xs={12} spacing={2}>
+            <TextField
+              fullWidth
+              label={t("name")}
+              name="name"
+              type="text"
+              value={company.name}
+              onChange={(e) => setCompany({ ...company, name: e.target.value })}
+              size="small"
+            />
+          </Grid>
+          <Grid size={6} xs={12} spacing={2}>
+            <TextField
+              fullWidth
+              label={t("address")}
+              name="address"
+              type="text"
+              required
+              size="small"
+              value={company.address}
+              onChange={(e) =>
+                setCompany({ ...company, address: e.target.value })
+              }
+            />
+          </Grid>
+          <Grid size={6} xs={12} spacing={2}>
+            <TextField
+              fullWidth
+              required
+              size="small"
+              label={t("contactEmail")}
+              name="contactEmail"
+              type="text"
+              value={company.contactEmail}
+              onChange={(e) =>
+                setCompany({ ...company, contactEmail: e.target.value })
+              }
+            />
+          </Grid>
+          <Grid size={6} xs={12} spacing={2}>
+            <TextField
+              fullWidth
+              required
+              size="small"
+              label={t("contactPhone")}
+              name="contactPhone"
+              type="text"
+              value={company.contactPhone}
+              onChange={(e) =>
+                setCompany({ ...company, contactPhone: e.target.value })
+              }
+            />
+          </Grid>
+        </Grid>
+      </Model>
+    </>
+  );
+};
 
 const Companies = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const companies = useSelector(selectCompanies);
   const loading = useSelector(selectCompaniesLoading);
-  const error = useSelector(selectCompaniesError);
   const companiesList = useSelector((state) => state.companies.companies || []);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [companyToDelete, setCompanyToDelete] = React.useState(null);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [open, setOpen] = useState(false);
+
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [updatedCompany, setUpdatedCompany] = useState({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState(null);
 
   useEffect(() => {
     dispatch(fetchCompaniesAsync({ page: 1, limit: companies.limitPerPage }));
     dispatch(clearError());
   }, [dispatch, companies.limitPerPage]);
-
-  const handleEdit = (company) => {
-    navigate(`/master-data/companies/edit/${company.id}`);
-  };
 
   const handleDelete = (company) => {
     setCompanyToDelete(company);
@@ -60,19 +223,14 @@ const Companies = () => {
   const confirmDelete = async () => {
     if (companyToDelete) {
       try {
-        await dispatch(deleteCompanyAsync(companyToDelete.id)).unwrap();
-        setSnackbarMessage("Company deleted successfully");
-        setSnackbarOpen(true);
-        // Refresh the companies list
-        dispatch(
-          fetchCompaniesAsync({
-            page: companies.currentPage,
-            limit: companies.limitPerPage,
-          })
-        );
+        await dispatch(deleteCompanyAsync(companyToDelete._id)).unwrap();
+        dispatch(fetchCompaniesAsync());
+        toast.success("Company deleted successfully!");
       } catch (error) {
-        setSnackbarMessage("Failed to delete company");
-        setSnackbarOpen(true);
+        toast.error(
+          error?.response?.data?.message ??
+            "Something went wrong, please try again"
+        );
       }
     }
     setDeleteDialogOpen(false);
@@ -130,42 +288,11 @@ const Companies = () => {
       sortable: true,
     },
     {
-      field: "businessType",
-      headerName: "Business Type",
-      flex: 1,
-      minWidth: 150,
-      sortable: true,
-    },
-    {
-      field: "subscriptionStatus",
-      headerName: "Subscription Status",
-      flex: 1,
-      minWidth: 150,
-      sortable: true,
-    },
-    {
-      field: "isActive",
-      headerName: "Active",
-      flex: 0.5,
-      minWidth: 100,
-      sortable: true,
-      renderCell: (params) => (params.value ? "Yes" : "No"),
-    },
-    {
       field: "address",
       headerName: "Address",
       flex: 1.2,
       minWidth: 200,
       sortable: true,
-    },
-    {
-      field: "createdAt",
-      headerName: "Created Date",
-      flex: 1,
-      minWidth: 150,
-      sortable: true,
-      renderCell: (params) =>
-        params.value ? new Date(params.value).toLocaleDateString() : "",
     },
     {
       field: "actions",
@@ -178,36 +305,63 @@ const Companies = () => {
     },
   ];
 
+  const handleEdit = (updatedCompany) => {
+    setIsUpdate(true);
+    setOpen(true);
+    setUpdatedCompany(updatedCompany);
+  };
+
   return (
     <>
+      <ToastContainer />
+      <CreateOrUpdateCompany
+        isUpdate={isUpdate}
+        setIsUpdate={setIsUpdate}
+        open={open}
+        setOpen={setOpen}
+        updatedCompany={updatedCompany}
+        setUpdatedCompany={setUpdatedCompany}
+      />
       <Box sx={{ width: "100%" }}>
-        {/* Header with title and add button */}
-        <Box
+        <Paper
+          elevation={0}
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            p: 3,
             mb: 3,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
           }}
         >
-          <Typography variant="h4" component="h1">
-            Company Management
-          </Typography>
-          <NavLink
-            to="/master-data/companies/add"
-            style={{ textDecoration: "none" }}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
           >
-            <Button variant="contained" startIcon={<AddIcon />} size="large">
-              New Company
+            <Box>
+              <Typography variant="h4" component="h1" gutterBottom>
+                <StraightenIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                Companies Management
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Manage your companies
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpen(true)}
+              sx={{
+                backgroundColor: COLORS.PURPLE,
+                "&:hover": {
+                  backgroundColor: COLORS.PURPLE_DARK,
+                },
+              }}
+            >
+              Create Company
             </Button>
-          </NavLink>
-        </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          </Stack>
+        </Paper>
 
         {/* Data Grid */}
         <Box sx={{ width: "100%", height: 600 }}>
@@ -254,14 +408,6 @@ const Companies = () => {
             </Button>
           </DialogActions>
         </Dialog>
-
-        {/* Success/Error Snackbar */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-        />
       </Box>
     </>
   );

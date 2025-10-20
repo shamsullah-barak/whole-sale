@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -28,9 +27,7 @@ import {
 import {
   selectUnits,
   selectUnitsLoading,
-  selectUnitsError,
 } from "../../../store/selectors/unit.selector";
-import { fetchCompaniesAsync } from "../../../store/slices/company.slice";
 import Model from "../../../components/Model";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
@@ -175,8 +172,6 @@ const CreateOrUpdateUnit = ({
   );
 };
 
-// export default CreateOrUpdateUnit;
-
 const Units = () => {
   const dispatch = useDispatch();
   const units = useSelector(selectUnits);
@@ -187,20 +182,8 @@ const Units = () => {
 
   const [updatedUnit, setUpdatedUnit] = useState({});
 
-  const error = useSelector(selectUnitsError);
-
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  useEffect(() => {
-    dispatch(fetchUnitsAsync());
-    dispatch(fetchCompaniesAsync({ page: 1, limit: 100 }));
-  }, [dispatch]);
 
   const handleEdit = (updatedUnit) => {
     setIsUpdate(true);
@@ -219,18 +202,10 @@ const Units = () => {
         await dispatch(
           deleteUnitAsync(selectedUnit.id || selectedUnit._id)
         ).unwrap();
-        setSnackbar({
-          open: true,
-          message: "Unit deleted successfully",
-          severity: "success",
-        });
+        toast.success("Unit deleted successfully");
         dispatch(fetchUnitsAsync());
       } catch (err) {
-        setSnackbar({
-          open: true,
-          message: err?.message || "Failed to delete unit",
-          severity: "error",
-        });
+        toast.error(err?.message || "Failed to delete unit");
       }
     }
     setDeleteDialogOpen(false);
@@ -240,10 +215,6 @@ const Units = () => {
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
     setSelectedUnit(null);
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
   };
 
   const columns = [
@@ -294,26 +265,6 @@ const Units = () => {
         setUpdatedUnit={setUpdatedUnit}
       />
       <Box sx={{ width: "100%" }}>
-        {/* <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
-          <Typography variant="h4" component="h1">
-            Unit Management
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            size="large"
-            onClick={() => setOpen(!open)}
-          >
-            New Unit
-          </Button>
-        </Box> */}
         <Paper
           elevation={0}
           sx={{

@@ -26,13 +26,13 @@ export const fetchStocksAsync = createAsyncThunk(
 );
 
 // async reducers
-export const fetchStockNamesAsync = createAsyncThunk(
-  "stockNames/fetchStockNames",
-  async () => {
-    const stockNames = await fetchStockNames();
-    return stockNames;
-  }
-);
+// export const fetchStockNamesAsync = createAsyncThunk(
+//   "stockNames/fetchStockNames",
+//   async () => {
+//     const stockNames = await fetchStockNames();
+//     return stockNames;
+//   }
+// );
 
 // Delete stock async thunk
 export const deleteStockAsync = createAsyncThunk(
@@ -78,14 +78,14 @@ export const stockSlice = createSlice({
         state.stocks = action.payload;
       });
 
-    builder
-      .addCase(fetchStockNamesAsync.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchStockNamesAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.stockNames = action.payload;
-      });
+    // builder
+    //   .addCase(fetchStockNamesAsync.pending, (state) => {
+    //     state.loading = true;
+    //   })
+    //   .addCase(fetchStockNamesAsync.fulfilled, (state, action) => {
+    //     state.loading = false;
+    //     state.stockNames = action.payload;
+    //   });
 
     builder
       .addCase(deleteStockAsync.pending, (state) => {

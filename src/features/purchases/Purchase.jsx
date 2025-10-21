@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Grid, Typography, Button } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
 import { selectPurchases } from "../../store/selectors/purchase.selector";
@@ -10,9 +13,11 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { IconButton, Tooltip, Box } from "@mui/material";
 import { useNavigate } from "react-router";
 import { NavLink } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import Model from "../../components/Model";
+import COLORS from "../../constant/colors";
 
 const PurchaseList = () => {
   const dispatch = useDispatch();
@@ -195,16 +200,55 @@ const getColumns = (handleEdit, handleDelete, handleView) => [
 export default function DashboardCards() {
   return (
     <>
-      <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-        <Grid item xs={12} sm={6}>
+      {/* <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}> */}
+      {/* <Grid item xs={12} sm={6}>
           <Typography variant="h6">Purchases</Typography>
-        </Grid>
-        <Grid item xs={12} sm={6} style={{ textAlign: "right" }}>
+        </Grid> */}
+      {/* <Grid item xs={12} sm={6} style={{ textAlign: "right" }}>
           <NavLink to="/purchases/add">
             <Button variant="contained">New Purchase</Button>
           </NavLink>
-        </Grid>
-      </Grid>
+        </Grid> */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+        }}
+      >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+              <ShoppingCartIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+              Purchases Management
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage your Purchases
+            </Typography>
+          </Box>
+          <NavLink to="/purchases/add">
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                backgroundColor: COLORS.PURPLE,
+                "&:hover": {
+                  backgroundColor: COLORS.PURPLE_DARK,
+                },
+              }}
+            >
+              Create Unit
+            </Button>
+          </NavLink>
+        </Stack>
+      </Paper>
       <PurchaseList />
     </>
   );

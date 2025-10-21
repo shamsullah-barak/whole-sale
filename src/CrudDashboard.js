@@ -262,7 +262,7 @@ export default function CrudDashboard(props) {
     dispatch(fetchReceivablesAsync());
     dispatch(fetchNextInvoiceAsync());
     dispatch(fetchNextSaleNumberAsync());
-    dispatch(fetchStockNamesAsync());
+    // dispatch(fetchStockNamesAsync());/
     dispatch(fetchDashboardDataAsync());
     dispatch(fetchIncomeAsync());
     dispatch(fetchCashboxBalancesAsync());

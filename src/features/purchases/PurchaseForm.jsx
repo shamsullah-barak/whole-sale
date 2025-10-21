@@ -41,7 +41,7 @@ const PurchaseOfGoods = () => {
   const [loading, setLoading] = useState(false);
   const journals = useSelector(selectJournals);
   const nextInvoiceNo = useSelector(selectNextInvoiceNo);
-  const stocks = useSelector(selectStocks).stockNames;
+  const stocks = useSelector(selectStocks).stocks;
   const { products } = useSelector(selectProducts);
   const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);

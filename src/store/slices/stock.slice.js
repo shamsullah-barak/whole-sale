@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  fetchStockNames,
   fetchStocks,
   deleteStock,
   updateStock,
@@ -13,7 +12,6 @@ const initialState = {
   limitPerPage: 10,
   loading: false,
   totalRows: 0,
-  stockNames: [],
 };
 
 // async reducers
@@ -24,15 +22,6 @@ export const fetchStocksAsync = createAsyncThunk(
     return stocks;
   }
 );
-
-// async reducers
-// export const fetchStockNamesAsync = createAsyncThunk(
-//   "stockNames/fetchStockNames",
-//   async () => {
-//     const stockNames = await fetchStockNames();
-//     return stockNames;
-//   }
-// );
 
 // Delete stock async thunk
 export const deleteStockAsync = createAsyncThunk(
@@ -77,15 +66,6 @@ export const stockSlice = createSlice({
         state.loading = false;
         state.stocks = action.payload;
       });
-
-    // builder
-    //   .addCase(fetchStockNamesAsync.pending, (state) => {
-    //     state.loading = true;
-    //   })
-    //   .addCase(fetchStockNamesAsync.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.stockNames = action.payload;
-    //   });
 
     builder
       .addCase(deleteStockAsync.pending, (state) => {

@@ -47,7 +47,9 @@ const CreateSale = () => {
   const createLoading = useSelector(selectCreateSaleLoading);
   const updateLoading = useSelector(selectUpdateSaleLoading);
   const customers = useSelector(selectCustomers).customers;
-  const stocks = useSelector(selectStocks).stockNames;
+  const stocks = useSelector(selectStocks).stocks;
+
+  console.log({ stocks });
   const [formErrors, setFormErrors] = useState({});
 
   const [formData, setFormData] = useState({
@@ -240,8 +242,6 @@ const CreateSale = () => {
       dispatch(fetchSalesAsync());
       dispatch(fetchReceivablesAsync());
       dispatch(fetchNextSaleNumberAsync());
-
-      navigate("/sales");
     } catch (error) {
       toast.error(
         error?.response?.data?.message ??

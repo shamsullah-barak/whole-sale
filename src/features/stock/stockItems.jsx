@@ -23,7 +23,7 @@ const getColumns = (handleDelete) => [
     flex: 0.5,
     minWidth: 80,
     renderCell: (params) => {
-      return params?.row?.product ? `${params?.row?.product?.name}` : "N/A";
+      return params?.row?.productId ? `${params?.row?.productId?.name}` : "N/A";
     },
   },
   {
@@ -41,6 +41,11 @@ const getColumns = (handleDelete) => [
     align: "center",
     flex: 1,
     minWidth: 50,
+    renderCell: (params) => {
+      return params?.row?.productId?.baseUnitId?.engName
+        ? `${params.row.productId.baseUnitId.engName}`
+        : "N/A";
+    },
   },
 
   {

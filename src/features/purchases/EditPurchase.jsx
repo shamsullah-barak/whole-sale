@@ -21,7 +21,7 @@ const EditPurchase = () => {
         <Typography variant="h5" gutterBottom>
           Edit Purchase
         </Typography>
-        {/* <PurchaseForm key={id} /> */}
+        <PurchaseForm key={id} />
       </Paper>
     </>
   );

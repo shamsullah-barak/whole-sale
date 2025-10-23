@@ -14,7 +14,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useDispatch, useSelector } from "react-redux";
-import { selectJournals } from "../../store/selectors/journal.selector";
 import { useTranslation } from "react-i18next";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
@@ -27,6 +26,7 @@ import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
 import { useParams } from "react-router-dom";
 import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
 import { selectUnits } from "../../store/selectors/unit.selector";
+import { fetchStocksAsync } from "../../store/slices/stock.slice";
 
 // unit types for purchase component
 // const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
@@ -39,7 +39,6 @@ const PurchaseOfGoods = () => {
   const { id } = useParams();
 
   const [loading, setLoading] = useState(false);
-  const journals = useSelector(selectJournals);
   const nextInvoiceNo = useSelector(selectNextInvoiceNo);
   const stocks = useSelector(selectStocks).stocks;
   const { products } = useSelector(selectProducts);
@@ -208,10 +207,9 @@ const PurchaseOfGoods = () => {
             },
           }
         );
-        dispatch(
-          fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
-        );
+        dispatch(fetchPurchasesAsync({ page: 1, limit: 10 }));
         dispatch(fetchCashboxBalancesAsync());
+        dispatch(fetchStocksAsync());
         toast.success("data updated");
         setLoading(false);
       } catch (error) {
@@ -222,16 +220,15 @@ const PurchaseOfGoods = () => {
         );
       }
     } else {
-      console.log("trying...");
       try {
         await axios.post(`http://localhost:5000/api/purchases`, cleanedEntry, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        dispatch(
-          fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
-        );
+        dispatch(fetchPurchasesAsync({ page: 1, limit: 10 }));
+        dispatch(fetchCashboxBalancesAsync());
+        dispatch(fetchStocksAsync());
         toast.success("data added");
         setLoading(false);
       } catch (error) {

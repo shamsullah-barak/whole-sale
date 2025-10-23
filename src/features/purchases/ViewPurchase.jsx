@@ -68,19 +68,15 @@ const ViewPurchase = () => {
           : "N/A";
       },
     },
-    { field: "quantity", headerName: "Qty", flex: 0.5, minWidth: 80 },
-    { field: "unitType", headerName: "Type", flex: 0.5, minWidth: 80 },
-    {
-      field: "unitPerPackage",
-      headerName: "Per Pack",
-      flex: 0.6,
-      minWidth: 100,
-    },
+    { field: "quantity", headerName: "Quantity", flex: 0.5, minWidth: 80 },
     { field: "unitPrice", headerName: "Unit Price", flex: 0.6, minWidth: 120 },
-    { field: "totalPrice", headerName: "Total", flex: 0.6, minWidth: 120 },
+    {
+      field: "totalPrice",
+      headerName: "Total Price",
+      flex: 0.6,
+      minWidth: 120,
+    },
   ];
-
-  console.log({ items });
 
   return (
     <>

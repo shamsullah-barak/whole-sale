@@ -35,8 +35,14 @@ import COLORS from "../../constant/colors";
 import { toast, ToastContainer } from "react-toastify";
 import { fetchReceivablesAsync } from "../../store/slices/receivable.slice";
 import axios from "axios";
-import { CURRENCY_TYPES, PAYMENT_METHODS } from "../../constant/variables";
-import { t } from "i18next";
+import { PAYMENT_METHODS } from "../../constant/variables";
+import { selectUnits } from "../../store/selectors/unit.selector";
+
+const paymentMethods = [
+  { value: "cash", label: "Cash" },
+  { value: "credit", label: "Credit" },
+  { value: "cashAndCredit", label: "Cash & Credit" },
+];
 
 const CreateSale = () => {
   const dispatch = useDispatch();
@@ -49,7 +55,7 @@ const CreateSale = () => {
   const customers = useSelector(selectCustomers).customers;
   const stocks = useSelector(selectStocks).stocks;
 
-  console.log({ stocks });
+  const units = useSelector(selectUnits);
   const [formErrors, setFormErrors] = useState({});
 
   const [formData, setFormData] = useState({
@@ -59,8 +65,8 @@ const CreateSale = () => {
         stockId: "",
         stockItemId: "",
         quantity: 5,
-        unitType: "kg",
-        unitPerPackage: 10,
+        unitTypeId: "",
+        unitPerPackage: 1,
         unitPrice: 200,
         productId: "",
       },
@@ -69,7 +75,6 @@ const CreateSale = () => {
     givingCash: 0,
     remainingCash: 0,
     discount: 0,
-    currencyType: "afn",
     description: "Sale to regular customer — includes rice and LED bulbs.",
   });
 
@@ -109,9 +114,9 @@ const CreateSale = () => {
     setFormData((prev) => {
       const items = [...prev.items];
       const updatedItem = { ...items[index], [field]: value };
-      if (["kg", "piece", "liter"].includes(updatedItem.unitType)) {
-        updatedItem.unitPerPackage = 1;
-      }
+      // if (["kg", "piece", "liter"].includes(updatedItem.unitType)) {
+      //   updatedItem.unitPerPackage = 1;
+      // }
 
       if (field === "stockItemId") {
         const selectedStockItem = (stockItems[updatedItem.stockId] || []).find(
@@ -141,7 +146,7 @@ const CreateSale = () => {
           stockId: "",
           stockItemId: "",
           quantity: "",
-          unitType: "kg",
+          unitTypeId: "",
           unitPerPackage: "",
           unitPrice: "",
           productId: "",
@@ -219,7 +224,7 @@ const CreateSale = () => {
           stockItemId: it.stockItemId,
           productId: it.productId,
           quantity: Number(it.quantity),
-          unitType: it.unitType,
+          unitTypeId: it.unitTypeId,
           unitPerPackage: Number(it.unitPerPackage),
           unitPrice: Number(it.unitPrice),
           totalPrice: lineTotal(it),
@@ -230,7 +235,6 @@ const CreateSale = () => {
         remainingCash: Number(remainingCashComputed || 0),
         description: formData.description,
         discount: formData.discount,
-        currencyType: formData.currencyType,
       };
 
       await axios.post(`http://localhost:5000/api/sales`, saleData, {
@@ -253,14 +257,6 @@ const CreateSale = () => {
   const handleCancel = () => {
     navigate("/sales");
   };
-
-  const paymentMethods = [
-    { value: "cash", label: "Cash" },
-    { value: "credit", label: "Credit" },
-    { value: "cashAndCredit", label: "Cash & Credit" },
-  ];
-
-  const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -425,10 +421,11 @@ const CreateSale = () => {
                       {(stockItems[it.stockId] || []).map((item) => (
                         <MenuItem key={item._id} value={item._id}>
                           <Typography variant="body1">
-                            {`${item.productName} `}
+                            {`${item.product.name} `}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            quantity: {`${item.quantity} ${item.unitType}`}
+                            quantity:
+                            {`${item.availableQty} ${item?.unit?.engName}`}
                           </Typography>
                         </MenuItem>
                       ))}
@@ -448,7 +445,7 @@ const CreateSale = () => {
                         ).find((item) => item._id === it.stockItemId);
 
                         const maxQuantity = selectedItem
-                          ? selectedItem.quantity
+                          ? selectedItem.availableQty
                           : Infinity;
 
                         // Update state and set error if needed
@@ -485,9 +482,9 @@ const CreateSale = () => {
                       required
                       size="small"
                     >
-                      {unitTypes.map((unit) => (
+                      {units.map((unit) => (
                         <MenuItem key={unit} value={unit}>
-                          {unit}
+                          {unit.engName}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -620,22 +617,7 @@ const CreateSale = () => {
                   size="small"
                 />
               </Grid>
-              <Grid size={2.5} xs={12} sm={3}>
-                <TextField
-                  label="currency type"
-                  name="currencyType"
-                  value={formData.currencyType}
-                  fullWidth
-                  size="small"
-                  select
-                >
-                  {CURRENCY_TYPES.map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {t(`${item}`)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+
               <Grid size={12} xs={12}>
                 <TextField
                   label="Description"

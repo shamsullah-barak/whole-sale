@@ -26,10 +26,10 @@ import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
 import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
 import { useParams } from "react-router-dom";
 import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
-import { CURRENCY_TYPES } from "../../constant/variables";
+import { selectUnits } from "../../store/selectors/unit.selector";
 
 // unit types for purchase component
-const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
+// const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
 const paymentMethods = ["cash", "credit", "cashAndCredit"];
 
 const PurchaseOfGoods = () => {
@@ -43,18 +43,20 @@ const PurchaseOfGoods = () => {
   const nextInvoiceNo = useSelector(selectNextInvoiceNo);
   const stocks = useSelector(selectStocks).stocks;
   const { products } = useSelector(selectProducts);
+  const units = useSelector(selectUnits);
   const suppliers = useSelector(selectSuppliers).suppliers;
   const selectedDirection = useSelector(selectDirection);
   const [journalEntry, setJournalEntry] = useState({
     items: [
       {
         productId: "",
-        quantity: 20,
-        unitType: "kg",
+        quantity: 1,
+        unitTypeId: "",
         unitPerPackage: 1,
-        unitPrice: 120,
+        unitPrice: 1,
         stockId: "",
         expiryDate: "2025-12-31",
+        itemQuantity: 1,
       },
     ],
     paymentMethod: "cash",
@@ -62,7 +64,6 @@ const PurchaseOfGoods = () => {
     remainingCash: 0,
     supplierId: "",
     discount: 0,
-    currencyType: "afn",
   });
 
   const inputHandler = (event) => {
@@ -92,12 +93,21 @@ const PurchaseOfGoods = () => {
     setJournalEntry((prev) => {
       const items = [...prev.items];
       const updatedItem = { ...items[index], [field]: value };
-      if (field === "unitType" && ["kg", "piece", "liter"].includes(value)) {
-        updatedItem.unitPerPackage = 1;
+      // if (field === "unitTypeId" && ["kg", "piece", "liter"].includes(value)) {
+      //   updatedItem.unitPerPackage = 1;
+      // }
+
+      if (field === "itemQuantity") {
+        updatedItem.quantity = value * updatedItem.unitPerPackage;
+      }
+
+      if (field === "unitPerPackage") {
+        updatedItem.quantity = value * updatedItem.itemQuantity;
       }
       items[index] = updatedItem;
       const updated = { ...prev, items };
       const total = calculateGrandTotal(items, updated.discount);
+
       if (updated.paymentMethod === "credit") {
         updated.remainingCash = total;
         updated.givingCash = 0;
@@ -118,12 +128,13 @@ const PurchaseOfGoods = () => {
         ...prev.items,
         {
           productId: "",
-          quantity: "",
-          unitType: "kg",
-          unitPerPackage: "",
-          unitPrice: "",
+          quantity: 1,
+          unitTypeId: "",
+          unitPerPackage: 1,
+          unitPrice: 1,
           stockId: "",
-          expiryDate: "",
+          expiryDate: "2025-12-31",
+          itemQuantity: 1,
         },
       ],
     }));
@@ -148,7 +159,7 @@ const PurchaseOfGoods = () => {
   };
 
   const calculateLineTotal = (item) => {
-    const quantity = Number(item.quantity) || 0;
+    const quantity = Number(item.itemQuantity) || 0;
     const unitPerPackage = Number(item.unitPerPackage) || 0;
     const unitPrice = Number(item.unitPrice) || 0;
     return quantity * unitPerPackage * unitPrice;
@@ -174,6 +185,12 @@ const PurchaseOfGoods = () => {
     cleanedEntry.totalPrice = grandTotal;
 
     if (cleanedEntry.supplierId === "") cleanedEntry.supplierId = null;
+
+    cleanedEntry.items.forEach((item) => {
+      delete item.unitTypeId;
+      delete item.unitPerPackage;
+      delete item.itemQuantity;
+    });
 
     if (id) {
       delete cleanedEntry.__v;
@@ -205,6 +222,7 @@ const PurchaseOfGoods = () => {
         );
       }
     } else {
+      console.log("trying...");
       try {
         await axios.post(`http://localhost:5000/api/purchases`, cleanedEntry, {
           headers: {
@@ -215,7 +233,6 @@ const PurchaseOfGoods = () => {
           fetchPurchasesAsync({ page: 1, limit: journals?.limitPerPage })
         );
         toast.success("data added");
-        // clearState();
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -309,12 +326,12 @@ const PurchaseOfGoods = () => {
                 <TextField
                   size="small"
                   fullWidth
-                  label={t("Quantity")}
+                  label={t("item quantity")}
                   required
                   type="number"
-                  value={item.quantity}
+                  value={item.itemQuantity}
                   onChange={(e) =>
-                    handleItemChange(index, "quantity", e.target.value)
+                    handleItemChange(index, "itemQuantity", e.target.value)
                   }
                 />
               </Grid>
@@ -326,31 +343,40 @@ const PurchaseOfGoods = () => {
                   fullWidth
                   label={t("Unit Type")}
                   required
-                  value={item.unitType}
+                  value={item.unitTypeId || ""}
                   onChange={(e) =>
-                    handleItemChange(index, "unitType", e.target.value)
+                    handleItemChange(index, "unitTypeId", e.target.value)
                   }
                 >
-                  {unitTypes.map((ut, i) => (
-                    <MenuItem key={i} value={ut}>
-                      {t(`${ut}`)}
+                  {units.map((unit) => (
+                    <MenuItem key={unit._id} value={unit._id}>
+                      {unit.engName}
                     </MenuItem>
                   ))}
                 </TextField>
               </Grid>
 
-              <Grid size={3} xs={12} sm={6}>
+              <Grid size={1.5} xs={12} sm={6}>
                 <TextField
                   size="small"
                   fullWidth
                   required
-                  disabled={["kg", "piece", "liter"].includes(item.unitType)}
                   label={t("Unit Per Package")}
                   type="number"
                   value={item.unitPerPackage}
                   onChange={(e) =>
                     handleItemChange(index, "unitPerPackage", e.target.value)
                   }
+                />
+              </Grid>
+              <Grid size={1.5} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  disabled
+                  label={t("total quantity")}
+                  type="number"
+                  value={item.quantity}
                 />
               </Grid>
 
@@ -450,26 +476,6 @@ const PurchaseOfGoods = () => {
               <MenuItem key={index} value={item._id}>
                 {t(`${item.name}`)}-#{t(`${item.address}`)}-#
                 {t(`${item.phone}`)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid size={3} xs={12} sm={6}>
-          <TextField
-            size="small"
-            select
-            fullWidth
-            required
-            name="currencyType"
-            label={t("currencyType")}
-            style={{ minWidth: "200px" }}
-            dir={selectedDirection === "rtl" ? "right" : "left"}
-            value={journalEntry.currencyType}
-            onChange={inputHandler}
-          >
-            {CURRENCY_TYPES.map((item, index) => (
-              <MenuItem key={index} value={item}>
-                {t(`${item}`)}
               </MenuItem>
             ))}
           </TextField>

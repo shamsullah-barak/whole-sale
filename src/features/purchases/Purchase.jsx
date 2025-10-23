@@ -71,8 +71,6 @@ const PurchaseList = () => {
 
   const columns = getColumns(handleEdit, handleDelete, handleView);
 
-  console.log({ purchases: purchases });
-
   return (
     <>
       <ToastContainer />
@@ -200,15 +198,6 @@ const getColumns = (handleEdit, handleDelete, handleView) => [
 export default function DashboardCards() {
   return (
     <>
-      {/* <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}> */}
-      {/* <Grid item xs={12} sm={6}>
-          <Typography variant="h6">Purchases</Typography>
-        </Grid> */}
-      {/* <Grid item xs={12} sm={6} style={{ textAlign: "right" }}>
-          <NavLink to="/purchases/add">
-            <Button variant="contained">New Purchase</Button>
-          </NavLink>
-        </Grid> */}
       <Paper
         elevation={0}
         sx={{
@@ -240,11 +229,11 @@ export default function DashboardCards() {
               sx={{
                 backgroundColor: COLORS.PURPLE,
                 "&:hover": {
-                  backgroundColor: COLORS.PURPLE_DARK,
+                  backgroundColor: COLORS.LIGHT_PURPLE,
                 },
               }}
             >
-              Create Unit
+              Create Purchase
             </Button>
           </NavLink>
         </Stack>

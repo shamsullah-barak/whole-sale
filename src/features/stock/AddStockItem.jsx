@@ -3,36 +3,33 @@ import {
   Box,
   Button,
   TextField,
-  Grid,
+  Grid2 as Grid,
   Typography,
-  Autocomplete,
   MenuItem,
   Stack,
 } from "@mui/material";
 import { useParams, NavLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import COLORS from "../../constant/colors";
-import { selectDirection } from "../../store/selectors/app.selector";
-import { selectProducts } from "../../store/selectors/product.selector";
+import { selectProductsList } from "../../store/selectors/product.selector";
 import { fetchProductsAsync } from "../../store/slices/product.slice";
+import { selectUnits } from "../../store/selectors/unit.selector";
 
 const AddStockItem = () => {
-  const { t } = useTranslation();
   const { id: stockId } = useParams();
   const dispatch = useDispatch();
-  const selectedDirection = useSelector(selectDirection);
-  const products = useSelector(selectProducts);
+  const products = useSelector(selectProductsList);
+  const units = useSelector(selectUnits);
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     productId: "",
     quantity: "",
-    unitType: "",
-    // stockNotificationQuantity: "",
-    purchasePrice: "",
+    unitTypeId: "",
+    unitPerPackage: 1,
+    unitPrice: "",
   });
 
   // Fetch products when component mounts
@@ -40,18 +37,79 @@ const AddStockItem = () => {
     dispatch(fetchProductsAsync({ page: 1, limit: 1000 })); // Fetch all products
   }, [dispatch]);
 
+  // Helper function to get selected product
+  const getSelectedProduct = () => {
+    return products.find((p) => p._id === formData.productId);
+  };
+
+  // Helper function to check if selected unit is different from base unit
+  const isUnitDifferentFromBase = () => {
+    const selectedProduct = getSelectedProduct();
+    return (
+      selectedProduct && selectedProduct.baseUnitId?._id !== formData.unitTypeId
+    );
+  };
+
+  // Helper function to calculate total quantity
+  const calculateTotalQuantity = () => {
+    const quantity = parseFloat(formData.quantity) || 0;
+    const unitPerPackage = parseFloat(formData.unitPerPackage) || 1;
+
+    if (isUnitDifferentFromBase()) {
+      return quantity * unitPerPackage;
+    }
+    return quantity;
+  };
+
+  // Helper function to get base unit name
+  const getBaseUnitName = () => {
+    const selectedProduct = getSelectedProduct();
+    return selectedProduct?.baseUnitId?.engName || "";
+  };
+
   const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+
+      // If unitTypeId changes and it's different from base unit, reset unitPerPackage
+      if (field === "unitTypeId" || field === "productId") {
+        const selectedProduct = products.find(
+          (p) => p._id === updated.productId
+        );
+        const isBaseUnit =
+          selectedProduct && selectedProduct.baseUnitId?._id === value;
+        if (isBaseUnit) {
+          updated.unitPerPackage = "";
+        }
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!formData.productId || !formData.quantity || !formData.unitType) {
+    // const totalQty =
+    const data = {
+      quantity: calculateTotalQuantity(),
+      productId: formData.productId,
+      unitPrice: formData.unitPrice,
+    };
+    if (!formData.productId || !formData.quantity) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    // Validate unit per package if unit is different from base unit
+    if (
+      isUnitDifferentFromBase() &&
+      (!formData.unitPerPackage || parseFloat(formData.unitPerPackage) <= 0)
+    ) {
+      toast.error("Please enter a valid units per package value");
       return;
     }
 
@@ -60,14 +118,7 @@ const AddStockItem = () => {
     try {
       await axios.post(
         `http://localhost:5000/api/stocks/${stockId}/stock-items`,
-        {
-          productId: formData.productId,
-          quantity: parseFloat(formData.quantity),
-          unitType: formData.unitType,
-          stockNotificationQuantity:
-            parseFloat(formData.stockNotificationQuantity) || 0,
-          purchasePrice: parseFloat(formData.purchasePrice) || 0,
-        },
+        data,
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,9 +132,9 @@ const AddStockItem = () => {
       setFormData({
         productId: "",
         quantity: "",
-        unitType: "",
-        // stockNotificationQuantity: "",
-        purchasePrice: "",
+        unitTypeId: "",
+        unitPerPackage: "",
+        unitPrice: "",
       });
     } catch (error) {
       toast.error(
@@ -95,17 +146,6 @@ const AddStockItem = () => {
     }
   };
 
-  const unitTypes = [
-    { value: "piece", label: "Piece" },
-    { value: "kg", label: "Kilogram" },
-    { value: "gram", label: "Gram" },
-    { value: "liter", label: "Liter" },
-    { value: "meter", label: "Meter" },
-    { value: "box", label: "Box" },
-    { value: "pack", label: "Pack" },
-    { value: "dozen", label: "Dozen" },
-  ];
-
   return (
     <>
       <ToastContainer />
@@ -116,114 +156,94 @@ const AddStockItem = () => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
-            {/* Product Selection */}
-            <Grid item xs={12}>
-              <Autocomplete
-                options={products.products || []}
-                getOptionLabel={(option) => option.name || ""}
-                value={
-                  products.products?.find(
-                    (p) => p._id === formData.productId
-                  ) || null
-                }
-                onChange={(event, newValue) => {
-                  handleChange("productId", newValue?._id || "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Product *"
-                    required
-                    fullWidth
-                    placeholder="Search and select a product"
-                  />
-                )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Box>
-                      <Typography variant="body1">{option.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        SKU: {option.sku} | Category: {option.categoryName}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-                isOptionEqualToValue={(option, value) =>
-                  option._id === value?._id
-                }
-              />
+            <Grid size={12} xs={6}>
+              <TextField
+                select
+                label="Product"
+                name={`productId`}
+                value={formData.productId}
+                onChange={(e) => handleChange("productId", e.target.value)}
+                fullWidth
+                required
+                size="small"
+              >
+                {products.map((item) => (
+                  <MenuItem key={item._id} value={item._id}>
+                    <Typography variant="body1">{`${item.name} `}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Base Unit:
+                      {`${item?.baseUnitId?.engName}`}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
-
-            {/* Quantity and Unit Type */}
-            <Grid item xs={6}>
+            <Grid size={4} xs={6}>
               <TextField
                 fullWidth
-                label="Quantity *"
+                label="Quantity"
                 type="number"
                 value={formData.quantity}
                 onChange={(e) => handleChange("quantity", e.target.value)}
                 required
                 inputProps={{ min: 0, step: 0.01 }}
+                size="small"
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid size={4} xs={6}>
               <TextField
                 fullWidth
                 select
-                label="Unit Type *"
-                value={formData.unitType}
-                onChange={(e) => handleChange("unitType", e.target.value)}
-                required
+                label="Unit Type"
+                value={formData.unitTypeId}
+                onChange={(e) => handleChange("unitTypeId", e.target.value)}
+                size="small"
               >
-                {unitTypes.map((unit) => (
-                  <MenuItem key={unit.value} value={unit.value}>
-                    {unit.label}
+                {units.map((unit) => (
+                  <MenuItem key={unit._id} value={unit._id}>
+                    {unit.engName}
                   </MenuItem>
                 ))}
               </TextField>
             </Grid>
 
-            {/* Stock Notification Quantity */}
-            {/* <Grid item xs={6}>
+            <Grid size={4} xs={6}>
               <TextField
                 fullWidth
-                label="Stock Notification Quantity"
+                label="Units Per Package"
                 type="number"
-                value={formData.stockNotificationQuantity}
-                onChange={(e) =>
-                  handleChange("stockNotificationQuantity", e.target.value)
-                }
-                helperText="Minimum quantity before notification"
-                inputProps={{ min: 0, step: 0.01 }}
-              />
-            </Grid> */}
-
-            {/* Purchase Price */}
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Purchase Price"
-                type="number"
-                value={formData.purchasePrice}
-                onChange={(e) => handleChange("purchasePrice", e.target.value)}
-                inputProps={{ min: 0, step: 0.01 }}
+                value={formData.unitPerPackage}
+                onChange={(e) => handleChange("unitPerPackage", e.target.value)}
+                inputProps={{ min: 1, step: 1 }}
+                size="small"
+                disabled={!isUnitDifferentFromBase()}
               />
             </Grid>
 
-            {/* Supplier */}
-            {/* <Grid item xs={12}>
+            <Grid size={4} xs={6}>
               <TextField
                 fullWidth
-                label="Supplier"
-                value={formData.supplier}
-                onChange={(e) => handleChange("supplier", e.target.value)}
-                placeholder="Enter supplier name (optional)"
+                label="Total Quantity"
+                value={`${calculateTotalQuantity()} ${getBaseUnitName()}`}
+                disabled
+                size="small"
               />
-            </Grid> */}
+            </Grid>
 
-            {/* Action Buttons */}
-            <Grid item xs={12}>
+            <Grid size={4} xs={6}>
+              <TextField
+                fullWidth
+                label="unit price"
+                type="number"
+                value={formData.unitPrice}
+                onChange={(e) => handleChange("unitPrice", e.target.value)}
+                inputProps={{ min: 0, step: 0.01 }}
+                size="small"
+                required
+              />
+            </Grid>
+            <Grid xs={12}>
               <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button
                   type="submit"

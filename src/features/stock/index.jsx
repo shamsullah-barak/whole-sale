@@ -229,8 +229,8 @@ const StockList = () => {
           {stocks.map((card, index) => (
             <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
               <StatCard
-                title={card.stockEngName}
-                engName={card.stockEngName}
+                title={card.engName}
+                engName={card.engName}
                 value={card.productCount}
                 _id={card._id}
                 onDelete={handleDeleteClick}

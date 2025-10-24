@@ -65,8 +65,6 @@ const CreateSale = () => {
         stockId: "",
         stockItemId: "",
         quantity: 5,
-        unitTypeId: "",
-        unitPerPackage: 1,
         unitPrice: 200,
         productId: "",
       },
@@ -92,6 +90,7 @@ const CreateSale = () => {
           `http://localhost:5000/api/stocks/${stockId}/stock-items`
         );
         const data = await response.json();
+        console.log({ data });
         setStockItems((prev) => ({ ...prev, [stockId]: data }));
       }
     } catch (error) {
@@ -111,6 +110,7 @@ const CreateSale = () => {
 
   const handleItemChange = (index, field) => async (event) => {
     const value = event.target.value;
+
     setFormData((prev) => {
       const items = [...prev.items];
       const updatedItem = { ...items[index], [field]: value };
@@ -164,10 +164,9 @@ const CreateSale = () => {
 
   const lineTotal = (item) => {
     const q = Number(item.quantity) || 0;
-    const upp = Number(item.unitPerPackage) || 0;
     const up = Number(item.unitPrice) || 0;
     const d = Number(item.discount) || 0;
-    return q * upp * up - d;
+    return q * up - d;
   };
 
   const grandTotal = useMemo(() => {
@@ -220,12 +219,8 @@ const CreateSale = () => {
       const saleData = {
         customerId: formData.customerId === "" ? null : formData.customerId,
         items: formData.items.map((it) => ({
-          stockId: it.stockId,
           stockItemId: it.stockItemId,
-          productId: it.productId,
           quantity: Number(it.quantity),
-          unitTypeId: it.unitTypeId,
-          unitPerPackage: Number(it.unitPerPackage),
           unitPrice: Number(it.unitPrice),
           totalPrice: lineTotal(it),
         })),
@@ -243,7 +238,7 @@ const CreateSale = () => {
         },
       });
       toast.success("data added");
-      dispatch(fetchSalesAsync());
+      dispatch(fetchSalesAsync({ limit: 10, page: 1 }));
       dispatch(fetchReceivablesAsync());
       dispatch(fetchNextSaleNumberAsync());
     } catch (error) {
@@ -347,16 +342,17 @@ const CreateSale = () => {
             </Grid>
 
             {formData.items.map((it, idx) => (
-              <Box
+              <Grid
                 key={idx}
+                size={12}
                 sx={{
                   position: "relative",
                   // border: "1px solid #ddd",
                   // borderRadius: 2,
                   borderRIghtColor: "divider",
                   borderLeftColor: "divider",
-                  p: 2,
-                  mb: 2,
+                  // p: 2,
+                  // mb: 2,
                   "&:hover .delete-icon": {
                     opacity: 1,
                   },
@@ -387,7 +383,7 @@ const CreateSale = () => {
                 {/* Main Grid Content */}
                 <Grid container spacing={1}>
                   {/* Row 1 */}
-                  <Grid size={3} xs={12} sm={6}>
+                  <Grid size={2.4} xs={12} sm={6}>
                     <TextField
                       select
                       label="Stock"
@@ -406,7 +402,7 @@ const CreateSale = () => {
                     </TextField>
                   </Grid>
 
-                  <Grid size={3} xs={12} sm={6}>
+                  <Grid size={2.4} xs={12} sm={6}>
                     <TextField
                       select
                       label="Stock Item"
@@ -421,18 +417,18 @@ const CreateSale = () => {
                       {(stockItems[it.stockId] || []).map((item) => (
                         <MenuItem key={item._id} value={item._id}>
                           <Typography variant="body1">
-                            {`${item.product.name} `}
+                            {`${item.productId.name} `}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             quantity:
-                            {`${item.availableQty} ${item?.unit?.engName}`}
+                            {`${item.availableQty} ${item?.productId?.baseUnitId?.engName}`}
                           </Typography>
                         </MenuItem>
                       ))}
                     </TextField>
                   </Grid>
 
-                  <Grid size={3} xs={12} sm={6}>
+                  <Grid size={2.4} xs={12} sm={6}>
                     <TextField
                       label="Quantity"
                       type="number"
@@ -471,7 +467,7 @@ const CreateSale = () => {
                     />
                   </Grid>
 
-                  <Grid size={3} xs={12} sm={6}>
+                  {/* <Grid size={3} xs={12} sm={6}>
                     <TextField
                       select
                       label="Unit Type"
@@ -488,10 +484,10 @@ const CreateSale = () => {
                         </MenuItem>
                       ))}
                     </TextField>
-                  </Grid>
+                  </Grid> */}
 
                   {/* Row 2 */}
-                  <Grid size={3} xs={12} sm={6}>
+                  {/* <Grid size={3} xs={12} sm={6}>
                     <TextField
                       label="Unit Per Package"
                       name={`unitPerPackage-${idx}`}
@@ -504,9 +500,9 @@ const CreateSale = () => {
                       disabled={["kg", "piece", "liter"].includes(it.unitType)}
                       inputProps={{ min: 1, step: 1 }}
                     />
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid size={3} xs={12} sm={6}>
+                  <Grid size={2.4} xs={12} sm={6}>
                     <TextField
                       label="Unit Price"
                       name={`unitPrice-${idx}`}
@@ -520,7 +516,7 @@ const CreateSale = () => {
                     />
                   </Grid>
 
-                  <Grid size={3} xs={12} sm={6}>
+                  <Grid size={2.4} xs={12} sm={6}>
                     <TextField
                       label="Line Total"
                       name={`lineTotal-${idx}`}
@@ -531,7 +527,7 @@ const CreateSale = () => {
                     />
                   </Grid>
                 </Grid>
-              </Box>
+              </Grid>
             ))}
             <Grid size={12} xs={12}>
               <Button

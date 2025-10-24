@@ -254,7 +254,7 @@ export default function CrudDashboard(props) {
   React.useEffect(() => {
     dispatch(fetchPartnersAsync());
     dispatch(fetchTransactionTypesAsync());
-    dispatch(fetchSalesAsync());
+    dispatch(fetchSalesAsync({ limit: 10, page: 1 }));
     dispatch(fetchPayableAsync());
     dispatch(fetchReceivablesAsync());
     dispatch(fetchNextInvoiceAsync());

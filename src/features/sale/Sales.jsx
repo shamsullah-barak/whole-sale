@@ -43,14 +43,14 @@ const SalesList = () => {
   const loading = useSelector(selectSalesLoading);
   const pagination = useSelector(selectSalesPagination);
 
-  useEffect(() => {
-    const loadSales = () => {
-      dispatch(
-        fetchSalesAsync({ page: 1, limit: pagination.limitPerPage || 20 })
-      );
-    };
-    loadSales();
-  }, [dispatch, pagination.limitPerPage]);
+  // useEffect(() => {
+  //   const loadSales = () => {
+  //     dispatch(
+  //       fetchSalesAsync({ page: 1, limit: pagination.limitPerPage || 20 })
+  //     );
+  //   };
+  //   loadSales();
+  // }, [dispatch, pagination.limitPerPage]);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
@@ -107,13 +107,6 @@ const SalesList = () => {
       },
     },
     {
-      field: "currencyType",
-      headerName: "Currency",
-      flex: 0.5,
-      minWidth: 100,
-      align: "left",
-    },
-    {
       field: "totalPrice",
       headerName: "Total",
       flex: 0.5,
@@ -129,6 +122,9 @@ const SalesList = () => {
       flex: 0.5,
       minWidth: 100,
       align: "left",
+      valueFormatter: (params) => {
+        return params ? `$${params.toFixed(2)}` : "$0.00";
+      },
     },
     {
       field: "discount",

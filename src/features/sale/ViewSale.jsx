@@ -25,6 +25,44 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import Datagrid from "../../components/DataGrid";
 
+const columns = [
+  {
+    field: "productId",
+    headerName: "Product",
+    flex: 1,
+    minWidth: 140,
+    renderCell: (params) => {
+      return params?.row?.stockItemId.productId
+        ? `${params?.row?.stockItemId?.productId?.name}`
+        : "N/A";
+    },
+  },
+  {
+    field: "quantity",
+    headerName: "Qty",
+    flex: 0.5,
+    minWidth: 80,
+  },
+  {
+    field: "unitPrice",
+    headerName: "Unit Price",
+    flex: 0.6,
+    minWidth: 120,
+    valueFormatter: (params) => {
+      return params ? `${params.toFixed(2)}` : "$0.00";
+    },
+  },
+  {
+    field: "totalPrice",
+    headerName: "Total",
+    flex: 0.6,
+    minWidth: 120,
+    valueFormatter: (params) => {
+      return params ? `${params.toFixed(2)}` : "$0.00";
+    },
+  },
+];
+
 const ViewSale = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -333,49 +371,7 @@ const ViewSale = () => {
             <Divider sx={{ mb: 2 }} />
             <Datagrid
               rows={items}
-              columns={[
-                {
-                  field: "productId",
-                  headerName: "Product",
-                  flex: 1,
-                  minWidth: 140,
-                  renderCell: (params) => {
-                    return params?.row?.productId
-                      ? `${params?.row?.productId?.name}`
-                      : "N/A";
-                  },
-                },
-                {
-                  field: "quantity",
-                  headerName: "Qty",
-                  flex: 0.5,
-                  minWidth: 80,
-                },
-                {
-                  field: "unitType",
-                  headerName: "Type",
-                  flex: 0.5,
-                  minWidth: 80,
-                },
-                {
-                  field: "unitPerPackage",
-                  headerName: "Per Pack",
-                  flex: 0.6,
-                  minWidth: 100,
-                },
-                {
-                  field: "unitPrice",
-                  headerName: "Unit Price",
-                  flex: 0.6,
-                  minWidth: 120,
-                },
-                {
-                  field: "totalPrice",
-                  headerName: "Total",
-                  flex: 0.6,
-                  minWidth: 120,
-                },
-              ]}
+              columns={columns}
               autoHeight
               hideFooterSelectedRowCount
             />

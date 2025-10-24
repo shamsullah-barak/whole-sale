@@ -80,7 +80,6 @@ function CustomToolbar() {
 
 function CustomFooter() {
   const [loading, setLoading] = useState(false);
-  const [accountName, setAccountName] = useState("");
 
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -118,8 +117,10 @@ function CustomFooter() {
       );
       setLoading(false);
       toast.success("data updated");
-      result.data[0].accountName = accountName;
-      dispatch(addItemToJournals({ item: result.data[0] }));
+      // Get the selected ledger name
+      const selectedLedger = ledgers.find(ledger => ledger._id === formData.relatedTo);
+      const item = { ...result.data[0], accountName: selectedLedger?.name || "" };
+      dispatch(addItemToJournals({ item: item }));
     } catch (error) {
       setLoading(false);
       toast.error(
@@ -160,12 +161,11 @@ function CustomFooter() {
           label={t("ledger")}
           value={formData.relatedTo}
           onChange={(event) => {
-            setFormData({ ...formData, relatedTo: event.target.value._id });
-            setAccountName(event.target.value.name);
+            setFormData({ ...formData, relatedTo: event.target.value });
           }}
         >
           {ledgers.map((item, index) => (
-            <MenuItem key={index} value={item}>
+            <MenuItem key={index} value={item._id}>
               {t(`${item.name}`)}
             </MenuItem>
           ))}
@@ -223,14 +223,6 @@ export default function LedgerGrid() {
 
   const dispatch = useDispatch();
   const journals = useSelector(selectJournals);
-
-  useEffect(() => {
-    const loadProducts = () => {
-      // dispatch(fetchAccountsAsync({ page: 1, limit: journals?.limitPerPage }));
-      dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
-    };
-    loadProducts();
-  }, []);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
@@ -338,6 +330,17 @@ export default function LedgerGrid() {
         pageSize={journals?.limitPerPage}
         loading={journals?.loading}
         density="standard"
+        sx={{
+          borderColor: "divider",
+          "& .MuiDataGrid-columnHeaders": {
+            borderBottom: "1px solid ",
+            borderColor: "divider",
+          },
+          "& .MuiDataGrid-row": {
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          },
+        }}
       />
     </>
   );

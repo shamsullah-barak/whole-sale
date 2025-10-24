@@ -1,21 +1,14 @@
-import React, { useState } from "react";
 import Grid from "@mui/material/Grid2";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import MainDashboard from "../../theme/main/MainDashboard";
-import { Box, Button } from "@mui/material";
-import { NavLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import COLORS from "../../constant/colors";
-import { selectDirection } from "../../store/selectors/app.selector";
-import { useDispatch, useSelector } from "react-redux";
+import { Box } from "@mui/material";
+import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material/styles";
-import { selectCashboxs } from "../../store/selectors/stock.selector";
-import Model from "../../components/Model";
-import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import { fetchCashboxsAsync } from "../../store/slices/stock.slice";
+import {
+  selectCashboxBalances,
+  selectCashboxLoading,
+  selectCashboxError,
+} from "../../store/selectors/cashbox.selector";
 // import StatCard from "../../components/StatCard";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -79,7 +72,8 @@ function StatCard({ title, value, interval, trend, data, engName }) {
   const trendValues = { up: "+25%", down: "-25%", neutral: "+5%" };
 
   return (
-    <NavLink to={engName}>
+    // <NavLink to={engName}>
+    <>
       <Card
         variant="outlined"
         sx={{
@@ -141,11 +135,18 @@ function StatCard({ title, value, interval, trend, data, engName }) {
           </Stack>
         </CardContent>
       </Card>
-    </NavLink>
+    </>
+    // </NavLink>
   );
 }
 
 const CashboxList = () => {
+  const balances = useSelector(selectCashboxBalances);
+  const loading = useSelector(selectCashboxLoading);
+  const error = useSelector(selectCashboxError);
+
+  console.log({ balances });
+
   const data = {
     title: "Investment",
     value: "14k",
@@ -156,6 +157,26 @@ const CashboxList = () => {
     ],
   };
 
+  if (loading) {
+    return (
+      <Box
+        sx={{ width: "100%", display: "flex", justifyContent: "center", p: 4 }}
+      >
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{ width: "100%", display: "flex", justifyContent: "center", p: 4 }}
+      >
+        <Typography color="error">{String(error)}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       <Grid
@@ -164,9 +185,20 @@ const CashboxList = () => {
         columns={12}
         sx={{ mb: (theme) => theme.spacing(2) }}
       >
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <StatCard {...data} />
-        </Grid>
+        {balances.map((item) => {
+          return (
+            <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={item.id}>
+              <StatCard
+                title={item.type}
+                value={item.totalCash}
+                interval={"Current Balance"}
+                trend={"neutral"}
+                data={data.data}
+                engName={"afn"}
+              />
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );
@@ -175,9 +207,7 @@ const CashboxList = () => {
 const Cashbox = () => {
   return (
     <>
-      <MainDashboard title="Cashbox">
-        <CashboxList />
-      </MainDashboard>
+      <CashboxList />
     </>
   );
 };

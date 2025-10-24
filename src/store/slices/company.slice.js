@@ -9,44 +9,7 @@ import {
 } from "../actions/company.actions";
 
 const initialState = {
-  companies: [
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-    {
-      _id: "68ce3969f014952a405f338d",
-      name: "Company 1",
-    },
-  ],
+  companies: [],
   allCompanies: [], // For dropdowns
   currentPage: 1,
   totalPages: 1,
@@ -61,14 +24,12 @@ const initialState = {
 // Async thunks
 export const fetchCompaniesAsync = createAsyncThunk(
   "companies/fetchCompanies",
-  async ({ page, limit, filters = {} }, { rejectWithValue }) => {
+  async () => {
     try {
-      const companies = await fetchCompanies(page, limit, filters);
+      const companies = await fetchCompanies();
       return companies;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch companies"
-      );
+      console.log({ error });
     }
   }
 );

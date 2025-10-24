@@ -30,6 +30,8 @@ export const receivablesSlice = createSlice({
       })
       .addCase(fetchReceivablesAsync.fulfilled, (state, action) => {
         state.loading = false;
+        state.receivables = action?.payload;
+
         // state.receivables = action?.payload;
         // state.currentPage = action?.payload?.page;
         // state.limitPerPage = action?.payload?.limit;

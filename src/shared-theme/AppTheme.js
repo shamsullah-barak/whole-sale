@@ -1,6 +1,8 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { useSelector } from "react-redux";
+import { selectDirection, selectFontFamily } from "../store/selectors/app.selector";
 
 import { inputsCustomizations } from "./customizations/inputs";
 import { dataDisplayCustomizations } from "./customizations/dataDisplay";
@@ -8,41 +10,38 @@ import { feedbackCustomizations } from "./customizations/feedback";
 import { navigationCustomizations } from "./customizations/navigation";
 import { surfacesCustomizations } from "./customizations/surfaces";
 import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
-import { useSelector } from "react-redux";
-import { selectFontFamily } from "../store/selectors/app.selector";
 
 function AppTheme(props) {
   const { children, disableCustomTheme, themeComponents } = props;
-  const fontFamily = useSelector(selectFontFamily);
-
+  const selectedDirection = useSelector(selectDirection);
+  const selectedFontFamily = useSelector(selectFontFamily);
   const theme = React.useMemo(() => {
     return disableCustomTheme
       ? {}
       : createTheme({
+          direction: selectedDirection || "ltr",
           // For more details about CSS variables configuration, see https://mui.com/material-ui/customization/css-theme-variables/configuration/
-          // cssVariables: {
-          //   colorSchemeSelector: "data-mui-color-scheme",
-          //   cssVarPrefix: "template",
-          // },
+          cssVariables: {
+            colorSchemeSelector: "data-mui-color-scheme",
+            cssVarPrefix: "template",
+          },
           colorSchemes, // Recently added in v6 for building light & dark mode app, see https://mui.com/material-ui/customization/palette/#color-schemes
-          // shadows,
-          // shape,
-          // components: {
-          //   ...inputsCustomizations,
-          //   ...dataDisplayCustomizations,
-          //   ...feedbackCustomizations,
-          //   ...navigationCustomizations,
-          //   ...surfacesCustomizations,
-          //   ...themeComponents,
-          // },
-
-          // fonts
           typography: {
-            typography: typography,
-            fontFamily: fontFamily,
+            ...typography,
+            ...(selectedFontFamily ? { fontFamily: selectedFontFamily } : {}),
+          },
+          shadows,
+          // shape,
+          components: {
+            // ...inputsCustomizations,
+            // ...dataDisplayCustomizations,
+            // ...feedbackCustomizations,
+            // ...navigationCustomizations,
+            // ...surfacesCustomizations,
+            // // ...themeComponents,
           },
         });
-  }, [disableCustomTheme, themeComponents, fontFamily]);
+  }, [disableCustomTheme, themeComponents, selectedDirection, selectedFontFamily]);
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;
   }

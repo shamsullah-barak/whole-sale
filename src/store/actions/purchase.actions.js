@@ -64,3 +64,53 @@ export const fetchDashboardData = async () => {
     console.log({ error });
   }
 };
+
+// Create a purchase
+export const createPurchase = async (data) => {
+  try {
+    const response = await axios.post(`http://localhost:5000/api/purchases`, data, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};
+
+// Get purchase by id
+export const getPurchaseById = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/purchases/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};
+
+// Update purchase
+export const updatePurchase = async (id, data) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/api/purchases/${id}`,
+      data,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};
+
+// Delete purchase
+export const deletePurchase = async (id) => {
+  try {
+    const response = await axios.delete(`http://localhost:5000/api/purchases/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};

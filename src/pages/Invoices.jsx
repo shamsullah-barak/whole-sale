@@ -1,12 +1,7 @@
 import * as React from "react";
-import MainDashboard from "../theme/main/MainDashboard";
 
 const Invoices = () => {
-  return (
-    <MainDashboard>
-      <div>Invoices</div>
-    </MainDashboard>
-  );
+  return <div>Invoices</div>;
 };
 
 export default Invoices;

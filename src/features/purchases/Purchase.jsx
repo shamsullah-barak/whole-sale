@@ -1,86 +1,117 @@
-import React, { useEffect } from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
-import {
-  Grid,
-  Card,
-  Typography,
-  Box,
-  Avatar,
-  LinearProgress,
-} from "@mui/material";
-import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import React, { useState } from "react";
+import { Grid, Typography, Button } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
 import { selectPurchases } from "../../store/selectors/purchase.selector";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import Datagrid from "../../components/DataGrid";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import { IconButton, Tooltip, Box } from "@mui/material";
+import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
+import Model from "../../components/Model";
+import COLORS from "../../constant/colors";
 
 const PurchaseList = () => {
   const dispatch = useDispatch();
   const purchases = useSelector(selectPurchases);
-  useEffect(() => {
-    const loadProducts = () => {
-      dispatch(fetchPurchasesAsync({ page: 1, limit: purchases.limitPerPage }));
-    };
-    loadProducts();
-  }, []);
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   const stateChanged = (data) => {
     const { page, pageSize } = data;
     dispatch(fetchPurchasesAsync({ page: page + 1, limit: pageSize }));
   };
 
+  const handleDelete = (id) => {
+    setSelectedId(id);
+    setOpen(true);
+  };
+
+  const handleEdit = (row) => {
+    navigate(`/purchases/edit/${row._id}`);
+  };
+
+  const handleView = (row) => {
+    navigate(`/purchases/${row._id}`);
+  };
+
+  const handleClose = () => setOpen(false);
+
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      await axios.delete(`http://localhost:5000/api/purchases/${selectedId}`);
+      setOpen(false);
+      setLoading(false);
+      toast.success("data deleted");
+      dispatch(
+        fetchPurchasesAsync({
+          page: purchases.currentPage,
+          limit: purchases.limitPerPage,
+        })
+      );
+    } catch (error) {
+      setOpen(false);
+      setLoading(false);
+      toast.error(
+        error?.response.data.message ?? "something went wrong! please try again"
+      );
+    }
+  };
+
+  const columns = getColumns(handleEdit, handleDelete, handleView);
+
   return (
-    <Datagrid
-      rows={purchases?.purchases}
-      columns={columns}
-      limitPerPage={purchases?.limitPerPage}
-      loading={purchases?.loading}
-      totalRows={purchases?.totalRows}
-      currentPage={purchases?.currentPage}
-      stateChanged={stateChanged}
-    />
+    <>
+      <ToastContainer />
+      <Model
+        open={open}
+        handleClose={handleClose}
+        submit="delete"
+        cancel="cancel"
+        loading={loading}
+        disabled={loading}
+        handleSubmit={handleConfirm}
+      >
+        <Typography variant="h6" component="h2">
+          Are you sure
+        </Typography>
+        <Typography sx={{ mt: 2 }}>you cannot undo this action</Typography>
+      </Model>
+      <Datagrid
+        rows={purchases?.purchases}
+        columns={columns}
+        limitPerPage={purchases?.limitPerPage}
+        loading={purchases?.loading}
+        totalRows={purchases?.totalRows}
+        currentPage={purchases?.currentPage}
+        stateChanged={stateChanged}
+        onRowClick={(params) => handleView(params.row)}
+      />
+    </>
   );
 };
 
-const columns = [
+const getColumns = (handleEdit, handleDelete, handleView) => [
   {
-    field: "quantity",
-    headerName: "quantity",
+    field: "supplierName",
+    headerName: "Supplier",
     flex: 0.5,
     minWidth: 80,
-  },
-  {
-    field: "unitType",
-    headerName: "unit type",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 50,
-  },
-  {
-    field: "unitPerPackage",
-    headerName: "unit per package",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-    valueFormatter: (params) => {
-      return params ? params.toFixed(2) : 0.0;
-    },
-  },
-  {
-    field: "unitPrice",
-    headerName: "unit price",
-    headerAlign: "center",
-    align: "center",
-    flex: 1,
-    minWidth: 80,
-    valueFormatter: (params) => {
-      return params ? params.toFixed(2) : 0.0;
+    renderCell: (params) => {
+      return params?.row?.supplierId
+        ? `${params?.row?.supplierId?.name}`
+        : "N/A";
     },
   },
   {
@@ -113,124 +144,101 @@ const columns = [
     flex: 1,
     minWidth: 80,
   },
-];
-
-const StatCard = ({
-  title,
-  value,
-  icon,
-  iconColor,
-  change,
-  changeColor,
-  changeText,
-  extra,
-}) => {
-  return (
-    <Card
-      sx={{
-        p: 2,
-        borderRadius: 1,
-        boxShadow: 3,
-        height: "100%",
-        width: "100%",
-      }}
-    >
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box>
-          <Typography variant="body2" color="textSecondary">
-            {title}
-          </Typography>
-          <Typography variant="h5" fontWeight="bold">
-            {value}
-          </Typography>
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 220,
+    sortable: false,
+    filterable: false,
+    renderCell: (params) => {
+      return (
+        <Box sx={{ display: "flex", gap: 0.5 }}>
+          <Tooltip title="View">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleView(params.row);
+              }}
+            >
+              <ReceiptLongIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleEdit(params.row);
+              }}
+            >
+              <ModeEditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton
+              size="small"
+              color="error"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDelete(params.row._id);
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
-        <Avatar sx={{ bgcolor: iconColor }}>{icon}</Avatar>
-      </Box>
-      {extra && <Box mt={2}>{extra}</Box>}
-      <Box mt={1} display="flex" alignItems="center" gap={1}>
-        {change > 0 ? (
-          <ArrowUpward color="success" fontSize="small" />
-        ) : (
-          <ArrowDownward color="error" fontSize="small" />
-        )}
-        <Typography variant="body2" color={changeColor}>
-          {Math.abs(change)}%
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          {changeText}
-        </Typography>
-      </Box>
-    </Card>
-  );
-};
-
-const Cards = () => {
-  const purchases = useSelector(selectPurchases);
-
-  return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
-        <StatCard
-          title="Total Purchases"
-          value={purchases.totalPurchases}
-          icon={<ShoppingCartIcon />}
-          iconColor="orange"
-          change={-4}
-          changeColor="red"
-          changeText="Since last month"
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
-        <StatCard
-          title="Total Purchase on Cash"
-          value={purchases.totalCashPurchases}
-          icon={<AttachMoneyIcon />}
-          iconColor="mediumseagreen"
-          change={-16}
-          changeColor="red"
-          changeText="Since last month"
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
-        <StatCard
-          title="Total Purchase on Credit"
-          value={purchases.totalCreditPurchases}
-          icon={<ReceiptLongIcon />}
-          iconColor="orange"
-          change={0}
-          changeColor="textSecondary"
-          changeText=""
-          extra={
-            <LinearProgress
-              variant="determinate"
-              value={75.5}
-              sx={{ height: 6, borderRadius: 5 }}
-            />
-          }
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
-        <StatCard
-          title="Total purchase on Credit and Cash"
-          value={purchases.totalCashAndCreditPurchases}
-          icon={<AccountBalanceWalletIcon />}
-          iconColor="blueviolet"
-          change={0}
-          changeColor="textSecondary"
-          changeText=""
-        />
-      </Grid>
-    </Grid>
-  );
-};
+      );
+    },
+  },
+];
 
 export default function DashboardCards() {
   return (
-    <MainDashboard title="Purchases">
-      <Cards />
-      <Grid container spacing={2}>
-        <PurchaseList />
-      </Grid>
-    </MainDashboard>
+    <>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+        }}
+      >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+              <ShoppingCartIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+              Purchases Management
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage your Purchases
+            </Typography>
+          </Box>
+          <NavLink to="/purchases/add">
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                backgroundColor: COLORS.PURPLE,
+                "&:hover": {
+                  backgroundColor: COLORS.LIGHT_PURPLE,
+                },
+              }}
+            >
+              Create Purchase
+            </Button>
+          </NavLink>
+        </Stack>
+      </Paper>
+      <PurchaseList />
+    </>
   );
 }

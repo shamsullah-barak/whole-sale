@@ -32,6 +32,8 @@ import StorageIcon from "@mui/icons-material/Storage";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import PersonIcon from "@mui/icons-material/Person";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 import {
   TreeItem2Content,
@@ -46,7 +48,7 @@ const mainListItems = [
   { text: "Ledgers", icon: <ReceiptIcon />, path: "/ledgers" },
   { text: "Invoices", icon: <RequestQuoteIcon />, path: "/invoices" },
   {
-    text: "Products",
+    text: "products",
     icon: <ProductionQuantityLimitsIcon />,
     path: "/products",
   },
@@ -60,14 +62,16 @@ const mainListItems = [
   { text: "Suppliers", icon: <PeopleRoundedIcon />, path: "/suppliers" },
   { text: "Purchases", icon: <ShoppingCartIcon />, path: "/purchases" },
   { text: "Stock", icon: <InventoryIcon />, path: "/stocks" },
+  { text: "Sales", icon: <PointOfSaleIcon />, path: "/sales" },
   { text: "Incomes", icon: <TrendingUpIcon />, path: "/incomes" },
   { text: "CashBox", icon: <AttachMoneyIcon />, path: "/cashbox" },
-  { text: "Payable", icon: <PaymentsIcon />, path: "/payable" },
-  { text: "Receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
+  { text: "Installments", icon: <AccountBalanceWalletIcon />, path: "/installments" },
+  { text: "payable", icon: <PaymentsIcon />, path: "/payable" },
+  { text: "receivable", icon: <ArrowUpwardIcon />, path: "/receivable" },
   { text: "expenses", icon: <AttachMoneyIcon />, path: "/expenses" },
   { text: "Investment", icon: <EqualizerIcon />, path: "/investments" },
-  { text: "Category", icon: <EqualizerIcon />, path: "/categories" },
-  { text: "Company", icon: <EqualizerIcon />, path: "/companies" },
+  { text: "category", icon: <EqualizerIcon />, path: "/categories" },
+  { text: "company", icon: <EqualizerIcon />, path: "/companies" },
 ];
 
 const secondaryListItems = [
@@ -206,36 +210,17 @@ export default function MenuContent() {
         {mainListItems.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              {item.text === "Investment" ? (
-                <>
-                  <RichTreeView
-                    items={ITEMS}
-                    defaultExpandedItems={isCollapsed ? ["1"] : []}
-                    aria-label="pages"
-                    sx={{
-                      m: "0 -8px",
-                      pb: "8px",
-                      height: "fit-content",
-                      flexGrow: 1,
-                      overflowY: "auto",
-                    }}
-                    slots={{ item: CustomTreeItem }}
-                  />
-                </>
-              ) : (
-                <>
-                  <DashboardSidebarPageItem
-                    id={item.path}
-                    title={item.text}
-                    icon={item.icon}
-                    href={item.path}
-                    selected={
-                      !!matchPath(`${item.path}/*`, pathname) ||
-                      pathname === "/"
-                    }
-                  />
-                </>
-              )}
+              <>
+                <DashboardSidebarPageItem
+                  id={item.path}
+                  title={item.text}
+                  icon={item.icon}
+                  href={item.path}
+                  selected={
+                    !!matchPath(`${item.path}/*`, pathname) || pathname === "/"
+                  }
+                />
+              </>
             </React.Fragment>
           );
         })}

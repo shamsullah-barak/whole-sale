@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import MainDashboard from "../../theme/main/MainDashboard";
 import { useTranslation } from "react-i18next";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectDirection } from "../../store/selectors/app.selector";
 import { selectPayable } from "../../store/selectors/payable.selector";
+import Datagrid from "../../components/DataGrid";
 
 const PayableList = () => {
   const { t } = useTranslation();
@@ -24,14 +24,14 @@ const PayableList = () => {
       minWidth: 80,
     },
     {
-      field: "address",
-      headerName: "address",
+      field: "currentBalance",
+      headerName: "Current Balance",
       flex: 0.5,
       minWidth: 80,
     },
     {
-      field: "amount",
-      headerName: "Total Amount",
+      field: "currencyType",
+      headerName: "Currency",
       flex: 0.5,
       minWidth: 80,
     },
@@ -51,7 +51,7 @@ const PayableList = () => {
         </div>
       ) : (
         <div style={{ width: "100%" }}>
-          <DataGrid
+          {/* <DataGrid
             rows={payable?.payable}
             style={{
               cursor: "pointer",
@@ -104,6 +104,15 @@ const PayableList = () => {
                 },
               },
             }}
+          /> */}
+          <Datagrid
+            rows={payable?.payable}
+            columns={columns}
+            limitPerPage={payable?.limitPerPage}
+            loading={payable?.loading}
+            totalRows={payable?.totalRows}
+            currentPage={payable?.currentPage}
+            stateChanged={stateChanged}
           />
         </div>
       )}
@@ -114,9 +123,9 @@ const PayableList = () => {
 const Payable = () => {
   return (
     <>
-      <MainDashboard title="Payable">
+      <>
         <PayableList />
-      </MainDashboard>
+      </>
     </>
   );
 };

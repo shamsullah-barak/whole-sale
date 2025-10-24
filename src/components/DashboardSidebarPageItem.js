@@ -14,10 +14,11 @@ import Typography from "@mui/material/Typography";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link } from "react-router";
-// import DashboardSidebarContext from "../context/DashboardSidebarContext";
-import { MINI_DRAWER_WIDTH } from "../constant/pageSize";
 import DashboardSidebarContext from "../context/DashboardSidebarContext";
-// import { MINI_DRAWER_WIDTH } from '../constants';
+import { MINI_DRAWER_WIDTH } from "../constants";
+import { t } from "i18next";
+import { useTheme } from "@mui/material/styles";
+import COLORS from "../constant/colors";
 
 function DashboardSidebarPageItem({
   id,
@@ -31,6 +32,7 @@ function DashboardSidebarPageItem({
   disabled = false,
   nestedNavigation,
 }) {
+  const theme = useTheme();
   const sidebarContext = React.useContext(DashboardSidebarContext);
   if (!sidebarContext) {
     throw new Error("Sidebar context was used without a provider.");
@@ -114,6 +116,20 @@ function DashboardSidebarPageItem({
           disabled={disabled}
           sx={{
             height: mini ? 50 : "auto",
+            ...(theme.palette.mode === "light"
+              ? {
+                  "&.Mui-selected": {
+                    backgroundColor: COLORS.PURPLE,
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: COLORS.LIGHT_PURPLE,
+                    },
+                  },
+                  "&.Mui-selected .MuiListItemIcon-root": {
+                    color: "#fff",
+                  },
+                }
+              : {}),
           }}
           {...(nestedNavigation && !mini
             ? {
@@ -176,15 +192,17 @@ function DashboardSidebarPageItem({
                   sx={{
                     position: "absolute",
                     bottom: -18,
-                    left: "50%",
+                    left: "60%",
                     transform: "translateX(-50%)",
-                    fontSize: 10,
+                    fontSize: 7,
                     fontWeight: 500,
-                    textAlign: "center",
+                    textAlign: "left",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     maxWidth: MINI_DRAWER_WIDTH - 28,
+                    paddingLeft: 1,
+                    paddingRight: 1,
                   }}
                 >
                   {title}
@@ -194,7 +212,7 @@ function DashboardSidebarPageItem({
           ) : null}
           {!mini ? (
             <ListItemText
-              primary={title}
+              primary={t(`${title}`)}
               sx={{
                 whiteSpace: "nowrap",
                 zIndex: 1,

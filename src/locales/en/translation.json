@@ -8,6 +8,7 @@
   "Suppliers": "Suppliers",
   "Purchases": "Purchases",
   "Stock": "Stock",
+  "Add New Item": "Add New Item",
   "Bank": "Bank",
   "Incomes": "Incomes",
   "Loan": "Loans",
@@ -121,5 +122,8 @@
   "addNewInvest": "Add new Invest",
   "newCategory": "New Category",
   "categoryName": "Category Name",
-  "newSupplier": "New Supplier"
+  "newSupplier": "New Supplier",
+  "engName": "English Name",
+  "psName": "Pashto Name",
+  "drName": "Dari Name"
 }

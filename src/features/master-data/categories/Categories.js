@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainDashboard from "../../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -283,7 +282,7 @@ const Category = () => {
   const selectedDirection = useSelector(selectDirection);
 
   return (
-    <MainDashboard title={t("Category")}>
+    <>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid
           xs={12}
@@ -314,7 +313,7 @@ const Category = () => {
           <CreateCategory open={open} setOpen={setOpen} />
         </Grid>
       </Grid>
-    </MainDashboard>
+    </>
   );
 };
 

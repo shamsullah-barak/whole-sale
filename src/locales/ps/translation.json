@@ -8,6 +8,7 @@
   "Suppliers": "رسوونکي",
   "Purchases": "خرید",
   "Stock": "ګودام",
+  "Add New Item": "نوی توکي اضافه کړئ",
   "Bank": "بانک",
   "Incomes": "ګټه",
   "Loan": "پورونه",
@@ -121,5 +122,8 @@
   "addNewInvest": "سرمایه اضافه کړي ",
   "newCategory": "نوې کټګوري",
   "categoryName": "د کټګوری نوم",
-  "newSupplier": "نوي سفلایر اضافه کول"
+  "newSupplier": "نوي سفلایر اضافه کول",
+  "engName": "انګلیسي نوم",
+  "psName": "پښتونوم",
+  "drName": "دری نوم"
 }

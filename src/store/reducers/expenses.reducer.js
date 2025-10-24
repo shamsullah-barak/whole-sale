@@ -1,2 +1,2 @@
-import { expensesSlice } from "../slices/expenses.slice";
-export default expensesSlice.reducer;
+import { expenseSlice } from "../slices/expenses.slice";
+export default expenseSlice.reducer;

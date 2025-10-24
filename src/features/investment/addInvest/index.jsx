@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainDashboard from "../../../theme/main/MainDashboard";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -307,9 +306,9 @@ const AddNewInvest = () => {
 const AddInvest = () => {
   const { t } = useTranslation();
   return (
-    <MainDashboard title={t("AddInvest")}>
+    <>
       <AddNewInvest />
-    </MainDashboard>
+    </>
   );
 };
 

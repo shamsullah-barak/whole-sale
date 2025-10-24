@@ -1,172 +1,578 @@
-import React, { useState } from "react";
-import { TextField, MenuItem, Button, Grid } from "@mui/material";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Grid2 as Grid,
+  Autocomplete,
+  Divider,
+  Typography,
+  IconButton,
+  Box,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { selectDirection } from "../../store/selectors/app.selector";
+import COLORS from "../../constant/colors";
+import { selectProducts } from "../../store/selectors/product.selector";
+import { ToastContainer, toast } from "react-toastify";
+import { selectStocks } from "../../store/selectors/stock.selector";
+import { selectSuppliers } from "../../store/selectors/businessEntity.selector";
+import { fetchPurchasesAsync } from "../../store/slices/purchase.slice";
+import { selectNextInvoiceNo } from "../../store/selectors/purchase.selector";
+import { useParams } from "react-router-dom";
+import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
+import { selectUnits } from "../../store/selectors/unit.selector";
+import { fetchStocksAsync } from "../../store/slices/stock.slice";
 
-const PurchaseForm = () => {
-  const [purchase, setPurchase] = useState({
-    note: "",
-    purchasedPrice: 0,
-    totalPrice: 0,
-    salePrice: 0,
-    status: "paid",
-    companyName: "",
-    category: "",
-    quantity: 0,
+// unit types for purchase component
+// const unitTypes = ["kg", "piece", "carton", "liter", "dozen"];
+const paymentMethods = ["cash", "credit", "cashAndCredit"];
+
+const PurchaseOfGoods = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+
+  const { id } = useParams();
+
+  const [loading, setLoading] = useState(false);
+  const nextInvoiceNo = useSelector(selectNextInvoiceNo);
+  const stocks = useSelector(selectStocks).stocks;
+  const { products } = useSelector(selectProducts);
+  const units = useSelector(selectUnits);
+  const suppliers = useSelector(selectSuppliers).suppliers;
+  const selectedDirection = useSelector(selectDirection);
+  const [journalEntry, setJournalEntry] = useState({
+    items: [
+      {
+        productId: "",
+        quantity: 1,
+        unitTypeId: "",
+        unitPerPackage: 1,
+        unitPrice: 1,
+        stockId: "",
+        expiryDate: "2025-12-31",
+        itemQuantity: 1,
+      },
+    ],
+    paymentMethod: "cash",
+    givingCash: 3000,
+    remainingCash: 0,
+    supplierId: "",
+    discount: 0,
   });
 
-  // purchase handler
-  const createPurchaseHandler = async (event) => {
-    event.preventDefault(event);
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/purchases",
-        purchase,
+  const inputHandler = (event) => {
+    const { name, value } = event.target;
+    setJournalEntry((prevState) => {
+      const updatedEntry = { ...prevState, [name]: value };
+      const { paymentMethod, givingCash } = updatedEntry;
+      const total = calculateGrandTotal(
+        updatedEntry.items,
+        updatedEntry.discount
+      );
+
+      if (paymentMethod === "credit") {
+        updatedEntry.remainingCash = total;
+        updatedEntry.givingCash = 0;
+      } else if (paymentMethod === "cash") {
+        updatedEntry.remainingCash = 0;
+        updatedEntry.givingCash = total;
+      } else if (paymentMethod === "cashAndCredit") {
+        updatedEntry.remainingCash = total - (Number(givingCash) || 0);
+      }
+      return updatedEntry;
+    });
+  };
+
+  const handleItemChange = (index, field, value) => {
+    setJournalEntry((prev) => {
+      const items = [...prev.items];
+      const updatedItem = { ...items[index], [field]: value };
+      // if (field === "unitTypeId" && ["kg", "piece", "liter"].includes(value)) {
+      //   updatedItem.unitPerPackage = 1;
+      // }
+
+      if (field === "itemQuantity") {
+        updatedItem.quantity = value * updatedItem.unitPerPackage;
+      }
+
+      if (field === "unitPerPackage") {
+        updatedItem.quantity = value * updatedItem.itemQuantity;
+      }
+      items[index] = updatedItem;
+      const updated = { ...prev, items };
+      const total = calculateGrandTotal(items, updated.discount);
+
+      if (updated.paymentMethod === "credit") {
+        updated.remainingCash = total;
+        updated.givingCash = 0;
+      } else if (updated.paymentMethod === "cash") {
+        updated.remainingCash = 0;
+        updated.givingCash = total;
+      } else if (updated.paymentMethod === "cashAndCredit") {
+        updated.remainingCash = total - (Number(updated.givingCash) || 0);
+      }
+      return updated;
+    });
+  };
+
+  const addItem = () => {
+    setJournalEntry((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
         {
+          productId: "",
+          quantity: 1,
+          unitTypeId: "",
+          unitPerPackage: 1,
+          unitPrice: 1,
+          stockId: "",
+          expiryDate: "2025-12-31",
+          itemQuantity: 1,
+        },
+      ],
+    }));
+  };
+
+  const removeItem = (index) => {
+    setJournalEntry((prev) => {
+      const items = prev.items.filter((_, i) => i !== index);
+      const updated = { ...prev, items };
+      const total = calculateGrandTotal(items, updated.discount);
+      if (updated.paymentMethod === "credit") {
+        updated.remainingCash = total;
+        updated.givingCash = 0;
+      } else if (updated.paymentMethod === "cash") {
+        updated.remainingCash = 0;
+        updated.givingCash = total;
+      } else if (updated.paymentMethod === "cashAndCredit") {
+        updated.remainingCash = total - (Number(updated.givingCash) || 0);
+      }
+      return updated;
+    });
+  };
+
+  const calculateLineTotal = (item) => {
+    const quantity = Number(item.itemQuantity) || 0;
+    const unitPerPackage = Number(item.unitPerPackage) || 0;
+    const unitPrice = Number(item.unitPrice) || 0;
+    return quantity * unitPerPackage * unitPrice;
+  };
+
+  const calculateGrandTotal = (items, discount = 0) => {
+    const subtotal = items.reduce((sum, it) => sum + calculateLineTotal(it), 0);
+    return subtotal - (Number(discount) || 0);
+  };
+
+  const grandTotal = useMemo(
+    () => calculateGrandTotal(journalEntry.items, journalEntry.discount),
+    [journalEntry.items, journalEntry.discount]
+  );
+
+  const journalEntryHandler = async (event) => {
+    event.preventDefault(event);
+
+    setLoading(true);
+
+    const cleanedEntry = { ...journalEntry };
+    if (!cleanedEntry.invoiceNo) delete cleanedEntry.invoiceNo;
+    cleanedEntry.totalPrice = grandTotal;
+
+    if (cleanedEntry.supplierId === "") cleanedEntry.supplierId = null;
+
+    cleanedEntry.items.forEach((item) => {
+      delete item.unitTypeId;
+      delete item.unitPerPackage;
+      delete item.itemQuantity;
+    });
+
+    if (id) {
+      delete cleanedEntry.__v;
+      delete cleanedEntry.createdAt;
+      delete cleanedEntry.updatedAt;
+      delete cleanedEntry._id;
+
+      try {
+        await axios.patch(
+          `http://localhost:5000/api/purchases/${id}`,
+          cleanedEntry,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        dispatch(fetchPurchasesAsync({ page: 1, limit: 10 }));
+        dispatch(fetchCashboxBalancesAsync());
+        dispatch(fetchStocksAsync());
+        toast.success("data updated");
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        toast.error(
+          error?.response?.data?.message ??
+            "something went wrong! please try again"
+        );
+      }
+    } else {
+      try {
+        await axios.post(`http://localhost:5000/api/purchases`, cleanedEntry, {
           headers: {
             "Content-Type": "application/json",
           },
-        }
-      );
-      setPurchase({
-        note: "",
-        purchasedPrice: 0,
-        totalPrice: 0,
-        salePrice: 0,
-        status: "paid",
-        companyName: "",
-        category: "",
-        quantity: 0,
-      });
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ??
-          "something went wrong! please try again"
-      );
+        });
+        dispatch(fetchPurchasesAsync({ page: 1, limit: 10 }));
+        dispatch(fetchCashboxBalancesAsync());
+        dispatch(fetchStocksAsync());
+        toast.success("data added");
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        toast.error(
+          error?.response?.data?.message ??
+            "something went wrong! please try again"
+        );
+      }
     }
   };
 
   return (
-    <form>
+    <>
       <ToastContainer />
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+      <Grid container spacing={2} sx={{ marginTop: "15px" }}>
+        <Grid size={12} xs={12} sx={{ textAlign: "right" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            {t("invoiceNo")} #{nextInvoiceNo}
+          </Typography>
+        </Grid>
+
+        <Grid size={12} xs={12}>
+          <Divider>
+            <Typography variant="subtitle1">{t("Products")}</Typography>
+          </Divider>
+        </Grid>
+
+        {journalEntry.items.map((item, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: "relative",
+              // border: "1px solid #ddd",
+              // borderRadius: 2,
+              borderRIghtColor: "divider",
+              borderLeftColor: "divider",
+              p: 2,
+              mb: 2,
+              "&:hover .delete-icon": {
+                opacity: 1,
+              },
+            }}
+          >
+            {/* Delete Icon */}
+            <IconButton
+              className="delete-icon"
+              onClick={() => removeItem(index)}
+              disabled={journalEntry.items.length === 1}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: "-15px",
+                transform: "translateY(-50%)",
+                bgcolor: "white",
+                color: "red",
+                boxShadow: 2,
+                opacity: 0,
+                transition: "opacity 0.3s",
+                zIndex: 10,
+                "&:hover": { bgcolor: "#ffe6e6" },
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+
+            {/* Main Grid Content */}
+            <Grid container spacing={1}>
+              {/* Row 1 */}
+              <Grid size={3} xs={12} sm={6}>
+                <Autocomplete
+                  disablePortal
+                  disableClearable
+                  options={products}
+                  getOptionLabel={(option) => option.name}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t("Products")}
+                      required
+                      size="small"
+                    />
+                  )}
+                  value={products.find((p) => p._id === item.productId) || null}
+                  onChange={(event, value) =>
+                    value && handleItemChange(index, "productId", value._id)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  label={t("item quantity")}
+                  required
+                  type="number"
+                  value={item.itemQuantity}
+                  onChange={(e) =>
+                    handleItemChange(index, "itemQuantity", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  select
+                  fullWidth
+                  label={t("Unit Type")}
+                  required
+                  value={item.unitTypeId || ""}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitTypeId", e.target.value)
+                  }
+                >
+                  {units.map((unit) => (
+                    <MenuItem key={unit._id} value={unit._id}>
+                      {unit.engName}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid size={1.5} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  required
+                  label={t("Unit Per Package")}
+                  type="number"
+                  value={item.unitPerPackage}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitPerPackage", e.target.value)
+                  }
+                />
+              </Grid>
+              <Grid size={1.5} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  disabled
+                  label={t("total quantity")}
+                  type="number"
+                  value={item.quantity}
+                />
+              </Grid>
+
+              {/* Row 2 */}
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  select
+                  fullWidth
+                  label={t("Stock Name")}
+                  required
+                  value={item.stockId}
+                  onChange={(e) =>
+                    handleItemChange(index, "stockId", e.target.value)
+                  }
+                >
+                  {stocks.map((s) => (
+                    <MenuItem key={s._id} value={s._id}>
+                      {t(s.engName)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  label={t("Unit Price")}
+                  type="number"
+                  required
+                  value={item.unitPrice}
+                  onChange={(e) =>
+                    handleItemChange(index, "unitPrice", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  label={t("Expiry Date")}
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={item.expiryDate}
+                  onChange={(e) =>
+                    handleItemChange(index, "expiryDate", e.target.value)
+                  }
+                />
+              </Grid>
+
+              <Grid size={3} xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  disabled
+                  label={t("Total Price")}
+                  type="number"
+                  value={calculateLineTotal(item)}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+
+        <Grid size={12} xs={12} sx={{ mt: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={addItem}
+            style={{ width: "100%" }}
+          >
+            {t("Add Product")}
+          </Button>
+        </Grid>
+
+        <Grid size={12} xs={12}>
+          <Divider sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">{t("Payment & Party")}</Typography>
+          </Divider>
+        </Grid>
+        <Grid size={12} xs={12} sm={6}>
           <TextField
+            size="small"
+            select
             fullWidth
-            label="Name | Note | Description"
-            name="note"
-            value={purchase.note}
-            onChange={(event) =>
-              setPurchase({ ...purchase, note: event.target.value })
+            required
+            name="supplierId"
+            label={t("supplier")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.supplierId}
+            onChange={inputHandler}
+          >
+            {suppliers.map((item, index) => (
+              <MenuItem key={index} value={item._id}>
+                {t(`${item.name}`)}-#{t(`${item.address}`)}-#
+                {t(`${item.phone}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            size="small"
+            select
+            fullWidth
+            required
+            name="paymentMethod"
+            label={t("paymentMethod")}
+            style={{ minWidth: "200px" }}
+            dir={selectedDirection === "rtl" ? "right" : "left"}
+            value={journalEntry.paymentMethod}
+            onChange={inputHandler}
+          >
+            {paymentMethods.map((item, index) => (
+              <MenuItem key={index} value={item}>
+                {t(`${item}`)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
+          <TextField
+            size="small"
+            fullWidth
+            required
+            disabled={
+              journalEntry.paymentMethod === "cash" ||
+              journalEntry.paymentMethod === "credit"
             }
+            label={t("givingCash")}
+            name="givingCash"
+            type="number"
+            value={journalEntry.givingCash}
+            onChange={inputHandler}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
-            label="Purchase Price"
-            name="purchasedPrice"
+            disabled
+            label={t("remainingCash")}
+            name="remainingCash"
             type="number"
-            value={purchase.purchasedPrice}
-            onChange={(event) =>
-              setPurchase({
-                ...purchase,
-                purchasedPrice: event.target.value,
-                totalPrice: purchase.quantity * event.target.value,
-              })
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Quantity"
-            name="quantity"
-            type="number"
-            value={purchase.quantity}
-            onChange={(event) =>
-              setPurchase({
-                ...purchase,
-                quantity: event.target.value,
-                totalPrice: purchase.purchasedPrice * event.target.value,
-              })
-            }
+            value={journalEntry.remainingCash}
+            onChange={inputHandler}
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={12} xs={12}>
+          <Divider sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">{t("Summary & Date")}</Typography>
+          </Divider>
+        </Grid>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
-            label="Total Price"
-            name="totalPrice"
+            disabled
+            label={t("totalPrice")}
+            name="grandTotal"
             type="number"
-            value={purchase.quantity * purchase.purchasedPrice}
-            disabled={true}
+            value={grandTotal}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={3} xs={12} sm={6}>
           <TextField
+            size="small"
             fullWidth
-            label="Sale Price"
-            name="salePrice"
+            label={t("discount")}
+            name="discount"
             type="number"
-            value={purchase.salePrice}
-            onChange={(event) =>
-              setPurchase({ ...purchase, salePrice: event.target.value })
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            select
-            fullWidth
-            label="Status"
-            name="status"
-            value={purchase.status}
-            onChange={(event) =>
-              setPurchase({ ...purchase, status: event.target.value })
-            }
-          >
-            <MenuItem value="paid">Paid</MenuItem>
-            <MenuItem value="partial">Partial</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Company Name"
-            name="companyName"
-            value={purchase.companyName}
-            onChange={(event) =>
-              setPurchase({ ...purchase, companyName: event.target.value })
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Category "
-            name="category"
-            value={purchase.category}
-            onChange={(event) =>
-              setPurchase({ ...purchase, category: event.target.value })
-            }
+            value={journalEntry.discount}
+            onChange={inputHandler}
           />
         </Grid>
       </Grid>
       <Button
         type="submit"
         variant="contained"
-        color="primary"
         fullWidth
+        color="inherit"
         style={{ marginTop: 20 }}
-        onClick={createPurchaseHandler}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === "dark" ? COLORS.WHITE : COLORS.PURPLE,
+          color: theme.palette.mode === "dark" ? COLORS.BLACK : COLORS.WHITE,
+        })}
+        loading={loading}
+        disabled={loading}
+        onClick={journalEntryHandler}
       >
-        Create Purchase
+        {id ? <>{t("update")}</> : <>{t("Add")}</>}
       </Button>
-    </form>
+    </>
   );
 };
 
-export default PurchaseForm;
+export default PurchaseOfGoods;

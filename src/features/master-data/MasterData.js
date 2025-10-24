@@ -1,5 +1,4 @@
 import React from "react";
-import MainDashboard from "../../theme/main/MainDashboard";
 import {
   Box,
   Typography,
@@ -43,7 +42,7 @@ const MasterData = () => {
   ];
 
   return (
-    <MainDashboard title="Master Data">
+    <>
       <Grid container spacing={2} columns={12} sx={{ width: "100%" }}>
         <Grid xs={12} lg={9} sx={{ width: "100%", height: "100%" }}>
           <EntryForm />
@@ -147,7 +146,7 @@ const MasterData = () => {
           </Grid>
         </Box>
       </Box> */}
-    </MainDashboard>
+    </>
   );
 };
 

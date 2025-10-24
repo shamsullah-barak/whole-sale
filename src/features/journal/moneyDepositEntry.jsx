@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { TextField, MenuItem, Button, Grid2 as Grid } from "@mui/material";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Grid2 as Grid,
+  Typography,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJournalsAsync } from "../../store/slices/journal.slice";
 import { selectJournals } from "../../store/selectors/journal.selector";
@@ -9,6 +15,8 @@ import { selectLedgers } from "../../store/selectors/ledgers.selector";
 import { selectDirection } from "../../store/selectors/app.selector";
 import COLORS from "../../constant/colors";
 import { toast, ToastContainer } from "react-toastify";
+import { fetchCashboxBalancesAsync } from "../../store/slices/cashbox.slice";
+import { fetchPayableAsync } from "../../store/slices/payable.slice";
 
 const MoneyDeposit = ({ statusId }) => {
   const { t } = useTranslation();
@@ -29,6 +37,8 @@ const MoneyDeposit = ({ statusId }) => {
           },
         }
       );
+      dispatch(fetchCashboxBalancesAsync());
+      dispatch(fetchPayableAsync());
       dispatch(fetchJournalsAsync({ page: 1, limit: journals?.limitPerPage }));
       setJournalEntry({
         description: "",
@@ -48,19 +58,18 @@ const MoneyDeposit = ({ statusId }) => {
     description: "",
     amount: 0,
     ledgerId: "",
-    ledgerInfo: "",
   });
 
   return (
     <>
       <ToastContainer />
       <Grid container spacing={2} sx={{ marginTop: "15px" }}>
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={6} md={4}>
           <TextField
             select
             fullWidth
             label={t("select ledger")}
-            style={{ minWidth: "200px" }}
+            sx={{ width: "100%" }}
             dir={selectedDirection === "rtl" ? "right" : "left"}
             value={journalEntry.ledgerId}
             onChange={(event) => {
@@ -70,22 +79,27 @@ const MoneyDeposit = ({ statusId }) => {
               setJournalEntry({
                 ...journalEntry,
                 ledgerId: selectedLedger._id,
-                ledgerInfo: selectedLedger.name,
               });
             }}
           >
             {ledgers.ledgers?.map((item, index) => (
               <MenuItem key={index} value={item._id}>
-                {item.name}
+                {/* {item.name}  */}
+                <Typography variant="body1">{item.name}</Typography>
+                {"     "}
+                <Typography variant="caption" color="text.secondary">
+                  ledger type: {item.ledgerType} | currencyType:{" "}
+                  {item.currencyType}
+                </Typography>
               </MenuItem>
             ))}
           </TextField>
         </Grid>
 
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={6} md={4}>
           <TextField
             fullWidth
-            label={t("Quantity")}
+            label={t("amount")}
             name="amount"
             type="number"
             value={journalEntry.amount}
@@ -97,7 +111,7 @@ const MoneyDeposit = ({ statusId }) => {
             }
           />
         </Grid>
-        <Grid size={4} xs={12} sm={12}>
+        <Grid size={12} xs={12} sm={12} md={4}>
           <TextField
             fullWidth
             label={t("description")}

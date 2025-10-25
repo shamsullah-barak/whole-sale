@@ -35,7 +35,7 @@ import {
 import Datagrid from "../../components/DataGrid";
 import COLORS from "../../constant/colors";
 import formatDate from "../../utils/moment";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 // Columns will be defined inside the component to access handler functions
 
@@ -90,83 +90,39 @@ const ExpensesList = () => {
     }
   };
 
-  // Define columns inside component to access handler functions
   const columns = [
     {
-      field: "ExpenseNumber",
-      headerName: "Expense #",
+      field: "expenseCategoryId",
+      headerName: "Category",
       flex: 0.5,
       minWidth: 100,
-      align: "center",
+      align: "left",
+      renderCell: (params) => {
+        return params?.row?.expenseCategoryId?.name
+          ? params?.row?.expenseCategoryId?.name
+          : "N/A";
+      },
     },
     {
-      field: "customerName",
-      headerName: "Customer",
+      field: "amount",
+      headerName: "Amount",
       flex: 1,
       minWidth: 150,
       align: "left",
     },
     {
-      field: "productName",
-      headerName: "Product",
+      field: "description",
+      headerName: "Description",
       flex: 1,
       minWidth: 150,
       align: "left",
     },
     {
-      field: "quantity",
-      headerName: "Quantity",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-    },
-    {
-      field: "unitPrice",
-      headerName: "Unit Price",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-      valueFormatter: (params) => {
-        return params ? `$${params.toFixed(2)}` : "$0.00";
-      },
-    },
-    {
-      field: "totalPrice",
-      headerName: "Total",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-      valueFormatter: (params) => {
-        return params ? `$${params.toFixed(2)}` : "$0.00";
-      },
-    },
-    {
-      field: "paymentMethod",
-      headerName: "Payment",
-      flex: 0.5,
-      minWidth: 100,
-      align: "center",
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          color={
-            params.value === "cash"
-              ? "success"
-              : params.value === "credit"
-              ? "warning"
-              : "info"
-          }
-          size="small"
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: "createdAt",
+      field: "date",
       headerName: "Date",
       flex: 0.5,
-      minWidth: 120,
-      align: "center",
+      minWidth: 100,
+      align: "left",
       valueFormatter: (params) => {
         return formatDate(params);
       },
@@ -177,6 +133,7 @@ const ExpensesList = () => {
       width: 120,
       sortable: false,
       filterable: false,
+      align: "center",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5 }}>
           <IconButton
@@ -233,6 +190,7 @@ const ExpensesList = () => {
   return (
     <Box sx={{ width: "100%" }}>
       {/* Header */}
+      <ToastContainer />
       <Paper
         elevation={0}
         sx={{
